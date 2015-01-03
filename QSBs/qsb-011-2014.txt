@@ -1,0 +1,71 @@
+
+
+        ---===[ Qubes Security Bulletin #11 ]===---
+
+Clipboard leak when copying between VMs due to lack of truncating
+
+
+Problem description
+---------------------
+
+Due to lack of explicit truncating of the file which holds the content
+of the Qubes inter-VM clipboard, in some situations parts of the
+inter-VM clipboard buffer might be readable to another VM.
+
+In order to trigger this bug, a user would need to initiate inter-VM
+clipboard copy operation from domain A first, then, without pasting this
+buffer to any other VM, initiate another inter-VM copy operation from
+domain B, which would have to be a Windows-based AppVM, and then paste
+the buffer into domain C. If the buffer copied from domain A was larger
+than that copied from domain B, and if no paste operation was issued in
+the meantime, which would otherwise wipe the buffer, then domain C would
+receive the remaining bytes of the buffer the user copied from domain A
+(despite user intention for C to receive only the buffer copied from B).
+
+The bug is not trigger-able by software (malware) in the VMs, only
+physical user can initiate inter-VM clipboard copy operations in Qubes.
+Additionally, in a normal workflow, the user would likely be issuing
+matching copy and paste operations in pairs, in which cases the buffer
+would be properly wiped on each paste operation.
+
+The bug affects only situations when the 2nd copy is from a
+Windows-based AppVM. This is because clipboard copy operations from
+Linux-based AppVMs are done using a "shortcut" and take a different,
+non-vulnerable code path.
+
+Patching
+----------
+
+The specific packages that resolve the problems mentioned
+in this bulletin have been uploaded to the current repo:
+
+* qubes-gui-dom0-2.1.34-1
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+Credits
+----------
+
+The bug was discovered and fixed by a Qubes core developer, Marek
+Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+
+References
+------------
+
+[1] The commit that introduced the bug:
+
+http://git.qubes-os.org/?p=qubes-r2/gui-daemon.git;a=commit;h=72acbaf688a864a0838b6ed2fe5c14ee93c31ef6
+
+[2] The commit that fixes the bug:
+
+http://git.qubes-os.org/?p=marmarek/gui-daemon.git;a=commitdiff;h=9800e1ab9954cb247d5dc50da325e875a09a98ff
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+

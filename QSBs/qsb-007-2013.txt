@@ -1,0 +1,65 @@
+
+
+        ---===[ Qubes Security Bulletin #7 ]===---
+
+
+Problem description
+---------------------
+
+Xen.org has announced a bunch of security advisories (XSA 52-54, XSA 57,
+see [1]) affecting the Xen hypervisor, some of which apply to Qubes OS
+Release 1 and Release 2 as well.
+
+While the impact of the XSA 52-54 does not seem to be so problematic in
+practice, the XSA 57 seems to allow for much more serious attacks, and
+so users are recommended to apply the patches as soon a possible.
+
+Patching
+----------
+
+We have uploaded the patched Xen packages for Qubes Release 1 (version
+4.1.5-1), as well as for the latest Qubes R2 Beta 2 (version 4.1.5-4).
+In order to update your system use the following command from Dom0 console:
+
+sudo qubes-dom0-updates
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+
+Discussion
+------------
+
+This is not the first time when the overly-complex permission system
+strikes back and causes more harm than good. Xen has also some history
+of bugs in their XSM infrastructure, another form of (unnecessary?)
+permission system framework. The very xenstore permission system also
+tricked us (Qubes Developers) in the past as seen in this commit:
+
+http://git.qubes-os.org/?p=joanna/core-admin.git;a=commitdiff;h=59f71f634af596c8fe2ef507509bf1ae850286c7
+
+Such vulnerabilities serve as an example of how we cannot forget about
+keeping things simple, also when designing security mechanisms.
+
+The XSA 52-54 patches could not be easily applied to Xen 4.1.2, which
+has been used in Qubes R1 and R2 so far, and thus we had to upgrade to
+Xen 4.1.5 in both cases.
+
+
+References
+------------
+
+[1] http://wiki.xen.org/wiki/Security_Announcements
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+
+

@@ -1,0 +1,104 @@
+
+
+
+
+
+        ---===[ Qubes Security Bulletin #3 ]===---
+
+
+Problem description
+---------------------
+
+A few days ago Xen.org has announced a bunch of security advisories
+affecting the Xen hypervisor, some of which apply to Qubes OS [1]-[3].
+The impact of those bugs appears to be limited to DoS attacks only,
+however. Nevertheless, a bug is a bug, and all the users are encouraged
+to patch.
+
+Patching
+----------
+
+We have uploaded the patched Xen packages (version 4.1.2-6). In order to
+update your system, either click on the "Upload" button in the Qubes
+Manager after selecting Dom0, or use the following command-line command:
+
+sudo qubes-dom0-updates
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+Note: The new Xen packages we publish also incorporate a few other
+patches [4] -- even though they apply only to the case of running HVM
+domains, and so don't apply to the case of current Qubes OS. We just
+decided to include them for completeness, even though some of them don't
+apply even for our Qubes 2 branch (with HVM support), as e.g. qemu is
+not part of TCB in our case. Anyway, it doesn't hurt to have them.
+
+Discussion
+------------
+
+Out of the bugs mentioned above, the one described in XSA 13 [2] seems
+to be having some potential for more than just a DoS. The vulnerability
+allows to write (int)0x1, i.e. the value of PIRQ_ALLOCATED, at an
+address ENOSPC*sizeof(int), or 112, bytes below the d->arch.pirq_irq
+buffer, which is allocated via xmalloc() in the hypervisor.
+
+One can think of at least two ways of how to exploit it for something
+more practical than just a DoS:
+
+1) By overwriting an upper half of some hypervisor function pointer, and
+subsequently redirecting execution to a shellcode allocated in the VM.
+This would require enough luck for such a function pointer to be found
+at the specific offset below the mentioned buffer, which seems rather
+unlikely. Furthermore, the attacker's VM would need to be scheduled for
+execution at the moment when the hypervisor decided to use such an
+overwritten function pointer so that the execution landed in the
+attacker's controlled address space, and not that of some other VM.
+Finally, this attack on modern hardware would be prevented by SMEP [5].
+(Unless the attacker is a kung fu master of rare degree, and could
+inject some code into the hypervisor via some other hypercall, and then,
+using this vulnerability overwrite a pointer, this time the bottom half,
+or less, so that the execution jumped to the attacker-provided shellcode
+within the hypervisor).
+
+2) By overwriting some security-critical variable, preferably boolean or
+flag, with 0 or 1 (depending on the alignment), such as e.g. the famous
+'is_privileged' field in the 'domain' structure. This, however, seems
+very unlikely, as there are few such fields (in fact I can only think
+about this very 'is_privileged' one) and counting that they will appear
+112 bytes (more or less, depending on the alignment) below our pirq_irq
+buffer, is a bit too much of wishing, in my opinion.
+
+So, both methods seem very unlikely to work in practice. The situation,
+from the attacker's point of view, is further worsened by the fact that
+the system will likely crash after a wrong overwrite, so the number of
+allowed tries is very limited...
+
+Nevertheless, one should remember that sometimes the most unthinkable
+bugs got exploited by clever people, so go ahead a patch! :)
+
+References
+------------
+
+[1] XSA 12,
+http://lists.xen.org/archives/html/xen-devel/2012-09/msg00181.html
+
+[2] XSA 13,
+http://lists.xen.org/archives/html/xen-devel/2012-09/msg00187.html
+
+[3] XSA 14,
+http://lists.xen.org/archives/html/xen-devel/2012-09/msg00194.html
+
+[4]
+http://git.qubes-os.org/?p=joanna/xen.git;a=commit;h=3040418f522da0cec6ee72344813f6c7ac76ea41
+
+[5]
+http://theinvisiblethings.blogspot.com/2011/06/from-slides-to-silicon-in-3-years.html
+
+Thanks,
+joanna.
+
+

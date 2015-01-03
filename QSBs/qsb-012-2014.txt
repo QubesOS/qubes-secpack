@@ -1,0 +1,138 @@
+
+
+
+        ---===[ Qubes Security Bulletin #12 ]===---
+
+Memory leak in Xen hypervisor via RDMSR emulation bug (XSA 108)
+
+
+Problem description
+---------------------
+
+This is a bug in the upstream Xen. Below is the description provided by
+the Xen Security Team:
+
+"The MSR range specified for APIC use in the x2APIC access model spans
+256 MSRs. Hypervisor code emulating read and write accesses to these
+MSRs erroneously covered 1024 MSRs. While the write emulation path is
+written such that accesses to the extra MSRs would not have any bad
+effect (they end up being no-ops), the read path would (attempt to)
+access memory beyond the single page set up for APIC emulation."
+
+In other words, the bug allows a malicious HVM guest to read some
+contents of the hypervisor memory.
+
+
+Discussion of practical impact
+--------------------------------
+
+This very bug got lots of attention on public forums in the recent days,
+so we think a more detailed discussion is justified.
+
+This seemingly looks like a serious problem, but if we think a little
+bit about the practical impact the conclusion might be quite different.
+
+First, there are really no secrets or keys in the hypervisor memory that
+might make a good target for an exploit here. Xen hypervisor does not do
+encryption, neither it deals with any storage subsystems. Also there is
+no explicit guest memory content intermixed with the hypervisor code and
+data.
+
+But one place to see pieces of potentially sensitive data are the Xen
+internal structures where the guest _registers_ are stored whenever the
+guest execution is interrupted (e.g. because of a trap). These registers
+might contain e.g. (parts of) keys or other secrets, if the guest was
+executing some sensitive crypto operation just before it got interrupted.
+
+The vulnerability allows to read only a few kB of the hypervisor memory,
+with only relative addressing from the emulated APIC registers page,
+whose address is not known to the attacker. Still, for the exactly
+same systems (same binaries running, same ACPI tables, etc) it's likely
+that the attacker would be able to guess the address of the APIC page.
+However, it is much less probable she would be able to predict what Xen
+structures are located in the adjacent memory. Much less the attacker
+would be able to control what structure are located there, as there
+doesn't seem to be many ways of how a malicious HVM might be
+significantly affecting the layout of the hypervisor heap (e.g. force
+arch_vcpu structures of interesting domains to appear nearby).
+
+Nevertheless, it might happen, by pure coincidence, that an arch_vcpu
+structure with a content of an interesting VM will just happen to be
+located adjacently to the emulated APIC page.
+
+In that case, the next problem for the attacker would be lack of control
+and knowledge over the target VM execution: even if the attacker were
+somehow lucky to find the other VM's register-holding-structure adjacent
+to the APIC page, it would still be unclear what the target VM was
+executing at the time it was suspended and so, whether the registers
+stored in the structure are worthwhile or not.
+
+It is thinkable that the attacker might attempt to use some form of a
+heuristic, such as e.g. "if RIP == X, then RAX likely contains (parts
+of) the important key", hoping that this specific RIP would signify a
+specific interesting instruction (e.g. part of some crypto library)
+being executed while the VM was interrupted, and so the key is to be
+found in one of the registers.
+
+But the attacker's memory reading exploit doesn't offer a comfort of
+synchronization, so even though the attacker might be so extremely lucky
+as to find out that *(apic_page + guessed_offset_to_rip) == X (the
+attacker here assumes the 'guessed_offset_to_rip' is the distance
+between the APIC page and the address where RIP is stored in the
+presumable arch_vcpu structure, that presumably is located adjacently),
+still there is no guarantees that the next read to *(apic_page +
+guest_offset_to_rax) will return the content of RAX from the same moment
+that RIP was snapshot (and which the attacker considered interesting).
+
+Arguably the attacker might try to fire up the attack continuously, thus
+increasing chances of success. Assuming this won't cause system to crash
+due to accessing non-mapped memory, this might sound like a somehow good
+strategy.
+
+However, in case of a desktop system like Qubes OS, the attacker has
+very limited control over other domains. Unlike as in case of attacking
+a VM playing a role of a Web server for instance, the attacker probably
+won't be able to force the target VMs to do lots of repeated crypto
+operations, neither choose moments when the target VM traps.
+
+It seems like exploiting this bug in an IaaS scenario might be more
+practical, though, as the attacker also has some control of domain
+creation/termination, so can affect Xen heap to some extent. But on a
+system like Qubes OS, it seems unlikely.
+
+So, are we doomed? We likely are, but probably not because of this bug.
+
+
+Patching
+----------
+
+The specific packages that resolve the problems mentioned
+in this bulletin have been uploaded to the current-testing repo:
+
+* Xen packages version 4.1.6.1-16
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+
+References
+------------
+
+[1] http://xenbits.xen.org/xsa/advisory-108.html
+
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+
+

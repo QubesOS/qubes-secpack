@@ -1,0 +1,129 @@
+
+
+
+        ---===[ Qubes Security Bulletin #9 ]===---
+
+
+Problem description
+---------------------
+
+Vincent Penquerc'h, while performing review of the Qubes code, has
+discovered an information leak, which occurs when one VM is sending
+(with the user's consent) a file to another VM for opening via the
+qubes.OpenInVM service. This service is exposed to the user via
+qvm-open-in-[d]vm commands, as well as GUI extensions to the Nautilus
+file manager ("Open in DispVM" context menus).
+
+Because of the lack of zero-padding, the buffer which contains the name
+of the file being sent for opening might contain up to 255 bytes of
+the qvm-open-in-[d]vm or Nautilus process shell environment.
+
+We are not aware of any practical scenario where the default environment
+could contain any sensitive or otherwise useful information, which could
+be exploited by an attacker in the receiving VM using this information
+leak. Typically Linux applications are written with an assumption that
+secrets are not to be stored within the environment variables.
+
+
+Patching
+----------
+
+We have uploaded the patched qubes-core packages for Qubes Release 1
+(qubes-core-vm-* version 1.7.48), as well as for the latest Qubes R2
+Beta 3 (qubes-core-vm-* version 2.1.25).
+
+The packages are for the Linux AppVMs, which means they should be
+installed in the Template VM(s) and any Standalone Linux AppVMs.
+
+
+Discussion (lengthy; for developers and researchers)
+------------------------------------------------------
+
+The buggy code has been introduced long time ago by one of the Qubes
+core developers in the body of the following function (see commit [1]):
+
+void send_file(char *fname)
+{
+	char *base;
+	int fd = open(fname, O_RDONLY);
+	if (fd < 0)
+		fatal("open file_to_be_edited");
+	base = rindex(fname, '/');
+	if (!base)
+		base = fname;
+	else
+		base++;
+	if (strlen(base) >= DVM_FILENAME_SIZE)
+		base += strlen(base) - DVM_FILENAME_SIZE + 1;
+	if (!write_all(1, base, DVM_FILENAME_SIZE))
+		fatal("send filename");
+	if (!copy_fd_all(1, fd))
+		fatal("send file");
+	close(1);
+}
+
+The obvious problem in the function above is that it always tries to
+send out DVM_FILENAME_SIZE bytes of the base buffer, without ensuring
+that the buffer is of sufficient size.
+
+Interestingly, the code, as a whole, introduced in the above mentioned
+commit, originally worked correctly. This is because Somewhere Else(TM)
+the buffer, which was later passed to the send_file(), was allocated to
+be of enough size:
+
+void process_spoolentry(char *entry_name) {
+	(...)
+	filename = calloc(1, entry_size + DVM_FILENAME_SIZE);
+	(...)
+	talk_to_daemon(filename);
+}
+void talk_to_daemon(char *fname)
+{
+	send_file(fname);
+	recv_file(fname);
+}
+
+However, some months later, the code was slightly re-factored,
+incidentally by the same developer [2], and the buffer no longer was
+allocated to have the sufficient size.
+
+The developer who introduced this bug, one of the best bug hunter and
+exploit writer in the world, made this mistake because he apparently
+overestimated his ability to comprehend all the inter-dependencies in
+the code. In Qubes project we do realize that writing a usable,
+long-term maintained code is not the same as writing a brilliant exploit
+which is to be shown off once during a conference. For this very reason
+we have created our Coding Guidelines [3] and we will continue to
+maintain those guidelines e.g. by linking to security bulletins like
+this one today, in the hope it will be a good lesson for everybody.
+
+
+Credits
+----------
+
+The Qubes Security Team would like to thank Vincent Penquerc'h
+<vincent@collabora.co.uk> for reporting the issue and working with us to
+resolve the problem.
+
+
+References
+------------
+
+[1] The commit which introduced the bug:
+http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=commit;h=f075e66a87e3dc66e66bb414f3fbf30cad2ab6d7
+
+[2] The commit which activated the buggy code (4 months after the #1
+commit above):
+http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=commitdiff;h=dc33f0c9a7d8c50a9619964207a98c8101557eba
+
+[3] Qubes Coding Guidelines:
+http://wiki.qubes-os.org/trac/wiki/CodingStyle
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+

@@ -1,0 +1,47 @@
+
+
+
+        ---===[ Qubes Security Bulletin #2 ]===---
+
+
+Problem description
+--------------------
+
+Today Xen.org has announced a critical bug in the Xen hypervisor [1],
+that allows for PV DomU->hypervisor escalation. The bug has been found,
+as usual, by Rafal Wojtczuk, Qubes co-author, and is a beautiful
+demonstration of incorrect design decisions made by Intel, specifically
+in the behavior of the SYSRET instruction (AMD processors are not
+vulnerable).
+
+So, while the bug has been patched in software by adding some extra
+checks to the hypervisor (Xen.org just released a patch), one should
+still consider it a CPU-level bug. The issue also affects other systems,
+not just Xen (more details in the original advisory). Congrats to Rafal
+for coming unprecedentedly close to "The Holly Grail" of system-level
+exploitation!
+
+Patching
+----------
+
+We have uploaded the patched Xen packages and users of current Qubes
+Beta 3 should upgrade immediately, by running (in Dom0 console):
+
+sudo qubes-dom0-updates
+
+... which should bring Xen v4.1.2-4 packages that are immune to the
+attack. Please reboot your systems afterwards.
+
+References
+------------
+
+1) The official Xen.org advisory:
+http://lists.xen.org/archives/html/xen-devel/2012-06/msg00670.html
+
+2) A complete list of all Qubes Security bulletins (2010-2012):
+http://wiki.qubes-os.org/trac/wiki/SecurityBulletins
+
+Thanks,
+joanna.
+
+

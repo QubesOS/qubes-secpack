@@ -1,0 +1,66 @@
+
+
+        ---===[ Qubes Security Bulletin #6 ]===---
+
+
+Problem description
+---------------------
+
+Over the last weeks, Xen.org has announced a bunch of security
+advisories (XSA 44-51 [1]) affecting the Xen hypervisor, some of which
+apply to Qubes OS Release 1 and Release 2 as well.
+
+The impact of those bugs appears to be limited to DoS attacks only,
+however. Nevertheless, a bug is a bug, and all the users are encouraged
+to patch.
+
+Patching
+----------
+
+We have uploaded the patched Xen packages for Qubes Release 1 (version
+4.1.2-9), as well as for the latest Qubes R2 Beta 2 (version 4.1.2-27).
+In order to update your system, either click on the "Upload"
+button in the Qubes Manager after selecting Dom0, or use the following
+command-line command:
+
+sudo qubes-dom0-updates
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+
+Discussion
+------------
+
+Out of the bugs mentioned above, the one described in XSA 50 [2] seems
+to be having some potential for more than just a DoS. Xen.org in the
+advisory wrote this:
+
+"A malicious guest administrator can cause undefined behaviour;
+depending on the dom0 kernel a host crash is possible, but information
+leakage or privilege escalation cannot be ruled out."
+
+The Qubes Security Team is not aware of any successful exploitation
+approach of this bug on Qubes OS, whether reliable or not, but we have
+not investigated this issue more thoroughly.
+
+
+References
+------------
+
+[1] http://wiki.xen.org/wiki/Security_Announcements
+[2] http://lists.xen.org/archives/html/xen-devel/2013-04/msg01780.html
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+
+
+

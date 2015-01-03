@@ -1,0 +1,51 @@
+
+
+        ---===[ Qubes Security Bulletin #8 ]===---
+
+
+Problem description
+---------------------
+
+Xen.org has announced today a security advisory XSA 58, which fixes a
+bug introduced by... a previous security fix identified as XSA 45 (see [1]).
+
+The original problem that the XSA 45 was supposed to fix was a
+timing-based DoS attack. Unfortunately the XSA 45 fix, according to the
+description in today's advisory, has turned it into a theoretical
+privilege escalation bug (so, something much worse, than just some DoS).
+
+Quite fortunately we have not applied XSA 45 patch previously to the Xen
+packages released for Qubes R2, so the users, up to date, have only been
+affected by the timing DoS, related to XSA 45 problem. Today, we have
+released updated Xen packages that apply both patches, hopefully solving
+this issue for good.
+
+Patching
+----------
+
+We have uploaded the patched Xen packages for Qubes Release 1 (version
+4.1.5-2), as well as for the latest Qubes R2 Beta 2 (version 4.1.5-2).
+In order to update your system use the following command from Dom0 console:
+
+sudo qubes-dom0-update
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+
+References
+------------
+
+[1] http://wiki.xen.org/wiki/Security_Announcements
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+

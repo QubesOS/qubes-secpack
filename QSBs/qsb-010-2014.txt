@@ -1,0 +1,231 @@
+
+
+
+        ---===[ Qubes Security Bulletin #10 ]===---
+
+
+Problem description
+---------------------
+
+Several bugs in Qubes code have been discovered by Vincent Penquerc'h
+and Marek Marczykowski while performing review of the code. Additionally
+one of the bugs in Xen.org has been announced [5] which might be
+affecting Qubes OS as well.
+
+We are not aware of practical and reliable method of exploitation of the
+mentioned bugs, but some of them came very close to allowing for a real
+attack.
+
+Patching
+----------
+
+The specific packages that resolve the problems mentioned
+in this bulletin have been uploaded to the current repo:
+
+* qubes-gui-dom0 version 2.1.23-1
+* qubes-libvchan-xen version 2.2.5-1
+* xen packages version 4.1.6.1-5
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+
+Discussion of the bugs in the Qubes codebase
+-----------------------------------------------
+
+First, we have a bug in the pulseaudio backend that is responsible for
+receiving audio frames from VMs and playing them via the physical audio
+card in Dom0. The offending code was [1]:
+
+static void process_playback_data(...)
+{
+size_t l = 0;
+	size_t index, buffer_length
+	(...)
+	buffer_length = max_length;
+	(...)
+	index = 0;
+
+	while (libvchan_data_ready(u->play_ctrl) && buffer_length > 0) {
+		l = libvchan_read(u->play_ctrl, buffer + index,
+						buffer_length);
+		if (l < 0) {
+			pacat_log("vchan read failed");
+			quit(u, 1);
+			return;
+		}
+		(...)
+		buffer_length -= l;
+		index += l;
+	}
+
+(...)
+}
+
+Because size_t type is unsigned, the error handler will never be called
+whenever the libvchan_read() returns -1 (error), and, as a result, the
+buffer_length will get incremented, while index decremented. This
+assumes that the first call to libvchan_data_ready() succeeds, while the
+one to libvchan_read() returns an error, which would require the
+attacker to win a very tight race condition here. This is theoretically
+possible, as the attacker fully controls the other end of the vchan
+connection (in the VM). If the attacker is able to systematically win
+this race condition n times, than each time the attacker might be able
+to decrease index below the original buffer, and then, in the final
+strike, overwrite some bytes starting at the address (buffer - n). We
+believe this is very difficult to be meaningfully exploited in reality.
+
+***
+
+There is also a somehow symmetric bug in the send_rec_data() function
+[2], where the same bug might allow the attacker (who controls a VM to
+which audio input has been assigned) to increment index, while
+decrementing the corresponding buffer_length variable. If the attacker
+is able to continue this process long enough, than the buffer_length
+will finally wrap through zero and suddenly become very large,
+theoretically allowing the attacker to command a very large memcpy
+operation between two regions in the guid process. However, the attacker
+doesn't really control the source buffer contents in this case, because
+this is the raw audio input data, from the physical mic, to be passed to
+the AppVM[*]. In other words, we don't believe this bug to be
+exploitable in practice for anything besides the DoS.
+
+[*] Sci-fi fans might be tempted to consider a scenario where the
+attacker is controlling this source buffer by playing back some specific
+audio through the computer speakers (via Qubes audio virtualization
+service), in the hope it will get recorded in the very same shape by the
+mic. ;)
+
+***
+
+A somehow related bug was also found in our libvchan implementation. The
+relevant bugggy code looks like this:
+
+typedef uint32_t VCHAN_RING_IDX;
+
+struct libvchan {
+(...)
+	VCHAN_RING_IDX *wr_cons, *wr_prod, *rd_cons, *rd_prod;
+(...)
+};
+
+int libvchan_data_ready(struct libvchan *ctrl)
+{
+	return *ctrl->rd_prod - *ctrl->rd_cons;
+}
+
+int libvchan_read(struct libvchan *ctrl, char *data, int size)
+{
+	int avail, avail_contig;
+	int real_idx;
+
+	while ((avail = libvchan_data_ready(ctrl)) == 0)
+        	if (libvchan_wait(ctrl) < 0)
+            		return -1;	
+	if (avail > size) avail = size;
+
+	real_idx = (*ctrl->rd_cons) & (ctrl->rd_ring_size - 1);
+	avail_contig = ctrl->rd_ring_size - real_idx;
+	if (avail_contig < avail) avail = avail_contig;
+
+	memcpy(data, ctrl->rd_ring + real_idx, avail);
+	(...)
+}
+
+If the remote party (which might be an attacker-controlled VM) sets
+*ctrl->rd_prod < *ctrl->rd_cons, then libvchan_data_ready() will return
+a negative number. But, as seen in the code snippet above, the return
+value from libvchan_data_ready() is compared against 0 (because it
+wasn't expected by the author of the code that it might result a
+negative value), and so the while loop will not be waiting for data to
+become available in vchan. The "if (avail > size)" check, will not be
+triggered, because avail is negative, and the comparison is (properly)
+done between signed variable. However, the memcpy(), a few lines below,
+will interpret avail as unsigned, and so as a very large number.
+
+However, because of the limitations of the vchan implementation (it uses
+only one ring buffer page), the maximum amount of data the attacker can
+supply is 4k. Additionally, the buffer allocated by the processes who
+calls this function would typically be allocated for either this max
+expected buffer size (4k bytes) or for the amount reported by the
+libvchan_data_ready(). In case of the former, the attacker is unable to
+control any single byte of the overwrite, yielding this attack most
+likely only a DoS [**], while in the latter case, the attacker would
+have to win a tight race condition between the first and 2nd call to the
+libvchan_data_ready(), i.e. make it return some small value when called
+the first time, but subsequently to return a negative value to trigger
+this bug.
+
+[**] Advanced Exploitation Ninjas might be tempted to consider an
+exploitation scenario where the attacker, despite not being able to
+control the data which are being overwritten, still achieve their
+miscreant goal by somehow predicting what bytes are likely to be
+overwritten and perhaps finding some address in the target process,
+that, when overwritten with those predicted bytes pattern (e.g. nulls)
+might redirect execution to some attacker-controllable area...
+
+This bug has been present since the initial implementation of libvchan
+[3], since the most early days of Qubes...
+
+Interestingly this same bug also made it to the Xen's libvchan
+implementation, which is now part of Xen 4.2 (Qubes OS R2 uses Xen 4.1).
+The Xen's libvchan was based on our original vchan code, although
+significantly rewritten and improved (e.g. not to be bound to use only
+one ring page, and to allow proper VM-VM communication, not just
+VM-Dom0). The related Xen's advisory has also been released today [4].
+
+***
+
+As can be seen the bugs discussed in today's bulletin are all related to
+the flawed signed/unsigned types handling. Some of them could likely be
+caught by the compiler if we used more aggressive warning reporting
+(-Wextra vs. -Wall), which we should have done earlier...
+
+
+Credits
+----------
+
+The bugs in audio virtualization backend have been discovered and
+reported to us by Vincent Penquerc'h <vincent@collabora.co.uk>. The
+Qubes Security Team would like to thank Vincent for working with us on
+this problem.
+
+The vchan bug was discovered by Marek Marczykowski
+<marmarek@invisiblethingslab.com>, a Qubes core developer.
+
+The Xen-related bug (XSA87) has been reported on public Xen mailing list
+and provided, together with a patch, by Xen Security Team.
+
+
+References
+------------
+
+[1] The commit that introduced the pulseaudio bug in
+process_playback_data():
+
+http://git.qubes-os.org/?p=qubes-r2/gui-daemon.git;a=commit;h=dc6a6bc8efa89b82f154fe0ab2a007c0c5db9414
+
+[2] The commit that introduced the pulseaudio bug in send_rec_data():
+
+http://git.qubes-os.org/?p=qubes-r2/gui-daemon.git;a=commit;h=3fcccd75b999da8598eeb102263556402f3711ed
+
+[3] Original commit which introduced the libvchan bug (actually the
+offending file, as the "Initial commit" brought about the whole
+code base all at once):
+
+http://git.qubes-os.org/?p=qubes-r1/gui.git;a=blob;f=vchan/vchan/io.c;h=7b524279a01f3fd8b395dba79da3c13c9e377ba9;hb=38497199397636069088df2b9fe88ecc02db2ddb
+
+[4] Xen Security Advisory XSA-86
+http://lists.xen.org/archives/html/xen-devel/2014-02/msg00477.html
+
+[5] Xen Security Advisory XSA-87
+http://lists.xen.org/archives/html/xen-devel/2014-01/msg02129.html
+
+Thanks,
+joanna.
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+
+

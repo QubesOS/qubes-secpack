@@ -1,0 +1,78 @@
+
+
+
+
+        ---===[ Qubes Security Bulletin #4 ]===---
+
+
+Problem description
+---------------------
+
+Due to a silly mistake made by the Qubes Team, the IPv6 filtering rules
+have been set to ALLOW by default in all Service VMs, which results in
+lack of filtering for IPv6 traffic originating between NetVM and the
+corresponding FirewallVM, as well as between AppVMs and the
+corresponding FirewallVM. Because the RPC services (rpcbind and
+rpc.statd) are, by default, bound also to the IPv6 interfaces in all the
+VMs by default, this opens up an avenue to attack a FirewallVM from a
+corresponding NetVM or AppVM, and further attack another AppVM from the
+compromised FirewallVM, using a hypothetical vulnerability in the above
+mentioned RPC services (chained attack). In the end, it thus might be
+possible to attack an AppVM from the NetVM, or one AppVM from another
+AppVM (if both use the same firewallvm/netvm). Also, if the NetVM is
+connected to the IPv6-enabled network, it might be possible to attack
+the NetVM remotely, and further conduct the NetVM->FirewallVM->AppVM attack.
+
+Another way of looking at this problem is to state that as a result of
+this security policy misconfiguration, the Qubes TCB [1] has become
+unwillingly extended to also include the mentioned above RPC services,
+which it normally should not, of course.
+
+The Qubes Team is not aware of a vulnerability that could be used to
+exploit this problem in practice. Nevertheless, patching is strongly
+advised, in order to revert the TCB back to its desired shape.
+
+Patching
+----------
+
+We have uploaded new core VM packages (qubes-core-vm-* version 1.7.46)
+that fix this problem [2].
+
+In order to update your system, you should install those packages in the
+TemplateVM that is used by your Services VMs (typically there is only
+one Template VM, on which all other VMs are based). The preferred way
+for doing this is via the Qubes Manager application (select the Template
+VM and click the Update button). A shutdown of the Template VM, and then
+at least of all the service VMs will be required for the changes to take
+effect.
+
+Additionally we have uploaded also new core package for Dom0 that also
+adds DROP rules to IP6 filter, which, however could only be useful if
+one manually connected networking to Dom0 via
+qubes-dom0-network-via-netvm command -- typically this is only used for
+debugging or testing purposes, and is never needed for normal operation
+of the system.
+
+The new uploaded packages also contain some other, security-unrelated
+minor fixes.
+
+Credits
+---------
+
+The Qubes Team would like to thank:
+
+Alexandre Bezroutchko <abb@gremwell.com>
+
+...for discovering the issue and discussing it with us.
+
+References
+------------
+
+[1] https://wiki.qubes-os.org/trac/wiki/SecurityCriticalCode
+[2]
+http://git.qubes-os.org/?p=joanna/core.git;a=commitdiff;h=a90a21b8ff29f50d3c7a611ae2f9880d2f9d752e
+
+Thanks,
+joanna.
+
+

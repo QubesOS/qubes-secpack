@@ -1,0 +1,185 @@
+
+
+
+
+        ---===[ Qubes Security Bulletin #1 ]===---
+
+
+So, finally, 13 months after the first public release, we're publishing
+our first security bulletin for Qubes. This is for two critical problems
+we have found recently that affect Qubes: one is a problem with Intel
+VT-d technology, the other one, even more critical, is a bug in our GUI
+virtualization daemon. Users of Qubes Beta 1 are encouraged to update
+immediately.
+
+The update instructions are described here:
+
+http://wiki.qubes-os.org/trac/wiki/SoftwareUpdateDom0
+
+Below we describe the bugs and problems that are being patched in more
+detail.
+
+Critical bug in Qubes GUI daemon (QUBES-SEC-01)
+================================================
+
+Overview
+---------
+
+A critical bug in our GUI daemon might allow an attacker who already
+controls one of the Qubes domains (VMs) to exploit the GUI daemon
+process running in Dom0 and gain full control over the system.
+
+The attacker would need to first compromise one of the domains, e.g. by
+exploiting a buffer overflow in a Web browser running in the domain.
+
+The bug has been introduced on April 1st by a new developer who was
+implementing tray icons virtualization for Beta 1:
+
+http://git.qubes-os.org/?p=mainstream/gui.git;a=commit;h=35647b9eb54c689e81aa5b9bdd4ab60fc1de41d2
+
+All Beta 1 installations are affected.
+
+Non-vulnerable GUI packages
+----------------------------
+
+We have fixed the above problem in qubes-gui-dom0 version 1.2.11. Ensure
+you have this, or newer, package installed in Dom0.
+
+
+Exploitation Feasibility Analysis by Rafal Wojtczuk
+----------------------------------------------------
+
+The buggy code allocates a buffer on the heap and then fills this buffer
+with data whose size is controllable by a VM (determined by the contents
+of a window update message) and not bound by the buffer size. Thus, an
+attacker controlling the VM can send a malformed window update message
+with arbitrarily large dimensions, which in turn will cause a heap
+buffer overflow in the qubes_guid process running in Dom0.
+
+It is considered to be difficult to write a working exploit for
+this vulnerability, due to the following facts:
+
+1) The attacker has only one chance to conduct the attack against the
+qubes_guid process. The qubes_guid process crashes in case of a failed
+attempt, and cannot be attacked again.
+
+One theoretical way to get around this problem is to spawn a disposable
+VM, take control over it and attack the disposable VM's qubes_guid
+process instead. Creation of a disposable VM takes time of the order of
+seconds, however, and so this kind of a brute force attack would be very
+slow and ineffective.
+
+2) The attacker is not able to write beyond the buffer with arbitrary
+pattern, but instead can only _set_ single bits (but not clear any bit).
+
+3) The heap buffer overflow does not provide immediate shellcode
+execution, as all data areas in qubes_guid process are not executable.
+Thus, the attacker would need to conduct a return oriented attack, which
+requires control over the stack. The stack and libraries' bases are,
+however, randomized, which makes this task difficult. Additionally,
+because of the qubes_guid executable's small size, it may be difficult
+to find all the required code pieces for a return oriented attack.
+
+4) Due to qubes_guid's limited interaction with the attacker, the latter
+has very limited control over the heap contents, so the
+exploitation is much more difficult in comparison with e.g. exploiting a
+buffer overflow in a web browser.
+
+Regardless of the above mitigating factors, this vulnerability is still
+considered to be critical.
+
+
+Improving the Qubes Security Process
+-------------------------------------
+
+After this incident we have decided to take some additional steps in
+order to minimize the likelihood of similar bugs in the future.
+
+First, we decided to clearly mark all the VM-controlled variables with
+the "untrusted_" prefix in all the Qubes security-critical code (see
+below), as well as adding more extra checks and comments to the code.
+This is all in the hope that developers who might be touching this code
+in the future should be now much more alert and careful when processing
+the untrusted input, and also it should be much easier for others to
+spot an offensive commit this way.
+
+Additionally we decided to recompile qubes_guid and qrexec_daemon with
+-pie/-fPIE options to allow for better ASLR protection. Just in case ;)
+
+Finally, we have carefully reviewed all _our_ security-critical code in
+Qubes, that is:
+* qubes_guid and pacat-simple-vchan
+* qrexec_daemon
+* qfile-unpacker (this one runs in a VM, but is security critical
+because it handles file transfers from other domains)
+
+I would like to make it clear, however, that at this moment (Qubes Beta
+stage) we are _not_ putting any effort into auditing the Xen hypervisor,
+and the Xen Dom0 backends we use: the storage backend (blkback) and the
+xenstore (xenstored). This is because we still haven't decided on a
+specific version of Xen and Dom0 kernel to use for the final Qubes 1.0,
+and we're still experimenting with a few options.
+
+
+VT-d escape attacks on non-IR hardware (CVE-2011-1898)
+=======================================================
+
+Problem description
+--------------------
+
+Intel VT-d technology does not protect against certain class of software
+attacks coming from driver domains if the processor/chipset doesn't
+support Interrupt Remapping. Currently the only client systems that
+support Interupt Remapping are believed to be the very latest Sandy
+Bridge-based systems, released a few months ago. All previous client
+VT-d systems are believed to be vulnerable.
+
+We discuss this class of attacks in our upcoming paper, "Following the
+White Rabbit: Software Attacks against Intel VT-d technology", that
+will be released soon.
+
+This attack is only of concern to users who already rely on VT-d to
+isolate their driver domains. Users that don't use Intel VT-d on their
+systems are vulnerable to much simpler DMA-based attacks anyway.
+
+An attacker would need to first compromise one of the driver domains in
+the system, such as the default network domain (NetVM), in order to
+trigger this attack.
+
+On most other client systems the attacker who compromised the networking
+stack or drivers would automatically gain full control over the system,
+so wouldn't need to bother to use such an attack. On Qubes, however,
+such an attack is needed to compromise the system, because the
+networking code itself is outside of the TCB.
+
+
+Exploitation feasibility
+-------------------------
+
+We have managed to demonstrated a reliable code execution in the
+hypervisor context on Xen.
+
+
+Patching approach
+------------------
+
+While the attack exploits a hardware problem, it seems reasonably
+efficient software patches could be applied to the hypervisor in order
+to mitigate known exploitation patterns, at least those that we have
+discussed in our paper. Such patches for the Xen hypervisor have been
+prepared and current updates for Qubes xen package brings them in.
+
+The patches have been introduced into xen 3.4.3-9 packages. Ensure you
+have those, or newer, packages installed in Dom0. There is no need to
+update xen-libs and xen-devel packages in VMs.
+
+Xen.org advisory
+-----------------
+
+Here is an official Xen.org advisory for the same problem:
+http://lists.xensource.com/archives/html/xen-devel/2011-05/msg00687.html
+
+Thanks,
+joanna.
+
+

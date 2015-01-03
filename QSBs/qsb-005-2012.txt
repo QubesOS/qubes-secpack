@@ -1,0 +1,62 @@
+
+
+        ---===[ Qubes Security Bulletin #5 ]===---
+
+
+Problem description
+---------------------
+
+Yesterday, Xen.org has announced a bunch of security advisories
+(XSA20-32 [1]) affecting the Xen hypervisor, some of which apply to
+Qubes OS Release 1 as well.
+
+The impact of those bugs appears to be limited to DoS attacks only,
+however. Nevertheless, a bug is a bug, and all the users are encouraged
+to patch.
+
+Patching
+----------
+
+We have uploaded the patched Xen packages for Qubes Release 1 (version
+4.1.2-7). In order to update your system, either click on the "Upload"
+button in the Qubes Manager after selecting Dom0, or use the following
+command-line command:
+
+sudo qubes-dom0-updates
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+
+Discussion
+------------
+
+Out of the bugs mentioned above, the one described in XSA 29 [2] seems
+to be having some potential for more than just a DoS. Xen.org in the
+advisory wrote this:
+
+"A malicious guest administrator can cause Xen to crash. If the out of
+address space bounds access does not lead to a crash, a carefully
+crafted privilege escalation cannot be excluded, even though the guest
+doesn't itself control the values written."
+
+It's not immediately obvious to me that the guest cannot indeed really
+control the values written, but I must admit I don't fully understand
+how does the XENMEM_exchange hypercall work in detail and some more
+investigations would be needed here in order to exclude exploitation
+possibility with some higher degree of confidence (perhaps a good
+exercise to someone from the list?).
+
+References
+------------
+
+[1] http://wiki.xen.org/wiki/Security_Announcements
+[2] http://lists.xen.org/archives/html/xen-devel/2012-12/msg00082.html
+
+Thanks,
+joanna.
+
+

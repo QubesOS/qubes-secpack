@@ -61,7 +61,7 @@ provided to it via the GUI daemon before the user presses the 'V' key
 which completes the magic Qubes clipboard paste sequence (Qubes allows
 to redefine this sequence, but we assume here the default is used, for
 simplicity of description). Once the attacking AppVM detects the
-Ctrl-Shit sequence, it might start blocking its corresponding GUI
+Ctrl-Shift sequence, it might start blocking its corresponding GUI
 daemon, e.g. by sending a partial message over the vchan connection.
 This will, naturally, cause all the GUI windows of this AppVM to
 freeze on Dom0 desktop. Now, if the user, unperplexed by this sudden

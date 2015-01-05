@@ -1,0 +1,90 @@
+
+
+			---===[ Qubes Canary #1 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who undersigned this file [1] state the
+following:
+
+1. The date of issue of this canary is January 5th, 2015.
+
+2. There have been 13 Qubes Security Bulletins published so far,
+including the QSB #13.
+
+3. Qubes Master Signing Key fingerprint is:
+
+427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to them with regards to the Qubes
+OS Project (e.g. to hand out the private signing keys, or to introduce
+backdoors).
+
+5. The next such canary statement is planned to be published in the
+first week of March 2015. Special note should be taken if no new
+canary gets published by that time, or if the list of statements
+change without plausible explanation.
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers & Notes
+---------------------
+
+This scheme is not infallible. Although signing the declaration makes
+it very difficult for a third party to produce arbitrary declarations,
+it does not prevent them from using force, or other means like
+blackmail, or compromise of the signers' laptops, to coerce us to
+produce false declarations.
+
+The news feed quoted below (Proof of Date) serves to demonstrate that
+this canary could not have been created prior to the date stated. It
+shows that a series of canaries were not created in advance.
+
+This declaration is merely a best effort and provided without any
+guarantees, warranty, and is not legally binding in any way to
+anybody.  None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+
+Proof of freshness
+-------------------
+
+$ feedstail -1 -n5 -f {title} -u https://www.spiegel.de/international/index.rss
+Grexit Grumblings: Germany Open to Possible Greek Euro Zone Exit
+Greek Roulette: What Would Syriza's Victory Mean for Europe?
+Obama Envoy John Allen: No 'Short-Term Solutions' for Stopping Islamic State
+NSA Documents: The Afghanistan Kill List
+NSA Documents: Attacks on VPN, SSL, TLS, SSH, Tor
+
+$ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+2 Opposition Activists Die in Clashes in Bangladesh
+China Issues Complaint After North Korean Defector Is Said to Kill 4
+Sinosphere Blog: Taiwan's Ex-Leader Released From Prison on Medical Parole
+Jury Selection Starting in Boston Marathon Bombing Trial
+DealBook: Investors Bought Into Nearly $250 Billion in Global I.P.O.s in 2014
+
+$ feedstail -1 -n5 -f {title} -u http://feeds.bbci.co.uk/news/world/rss.xml
+Lebanon restricts Syria refugee flow
+AirAsia 'black box' search resumes
+Euro slides to a nine-year low
+Australia races to control bushfires
+Calorie-counting wristband tested
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached GPG
+signatures by each of the signers, distributed together with this
+canary in qubes-secpack.git repo, and (2) via digitial signatures on
+the corresponding qubes-secpack.git repo tags.
+
+[2] Don't trust just the contents of this file blindly, go and verify
+the digital signatures!
+

@@ -1,0 +1,241 @@
+
+
+        ---===[ Qubes Security Bulletin #13 ]===---
+
+
+Qubes Clipboard Timing Attacks and Qubes Core Python API Inconsistency
+
+
+Quick Summary
+==============
+
+This Security Bulletin discusses two (unrelated) security problems
+potentially affecting Qubes OS. One problem might allow for stealing
+or injecting Qubes clipboard, while another to construct a multistage
+attack on Dom0. We believe both of these attacks are largely
+theoretical, but recommend patching nevertheless (see the end of this
+document for patching instructions).
+
+
+Timing Attacks on Qubes Secure Clipboard
+=========================================
+
+Problem description
+--------------------
+
+Jann Horn has discovered two smart attacks in which a malicious AppVM
+might, under some circumstances and with some cooperation of the
+physical user, attack the Qubes Secure Clipboard mechanism, by either
+stealing or providing a falsified contents without the user realizing
+it.
+
+In the first attack scenario (clipboard injection attack), the
+malicious AppVM, which the physical user has selected for copy-from
+operation (i.e. the user selected one of its windows and pressed the
+Qubes unspoofable clipboard copy key combination, typically
+Ctrl-Shift-C), delays its response (which contain the contents of the
+clipboard) for an extended period of time, hoping the user might
+select another AppVM and issue another copy-from clipboard operation
+in the meantime. If the attacker guesses the timing correctly and now
+completes the response after the 2nd AppVM responded with its
+clipboard contents, the Qubes GUI daemon serving the 1st (malicious)
+AppVM will now overwrite the Qubes global clipboard with the data
+provided by the 1st (malicious) AppVM. If the 2nd AppVM was considered
+trusted and the clipboard copied from this 2nd AppVM was supposed to
+be used as sensitive input into some other AppVM (e.g. it might have
+been a shell command), this would present a security problem.
+
+
+However, given the attacker in the malicious AppVM is unable to
+observe any events outside of the AppVM, nor is able to influence the
+physical user actions, we consider this attack highly theoretical.
+
+In the second attack (clipboard stealing attack), the malicious AppVM
+attempts to block the corresponding GUI daemon just a moment before
+the user is likely to issue Qubes global clipboard paste-to operation.
+The AppVM can pretty reliably guess this moment by looking for
+scancodes of the 'Ctrl' and 'Shift' keys, which would be normally
+provided to it via the GUI daemon before the user presses the 'V' key
+which completes the magic Qubes clipboard paste sequence (Qubes allows
+to redefine this sequence, but we assume here the default is used, for
+simplicity of description). Once the attacking AppVM detects the
+Ctrl-Shit sequence, it might start blocking its corresponding GUI
+daemon, e.g. by sending a partial message over the vchan connection.
+This will, naturally, cause all the GUI windows of this AppVM to
+freeze on Dom0 desktop. Now, if the user, unperplexed by this sudden
+freeze of all the AppVM's windows, will continue to work with other
+AppVMs, and at some point decides to copy some sensitive data to Qubes
+global clipboard from another AppVM, then it might be possible for the
+attacking AppVM to steal it. This is because the attacking AppVM could
+now: 1) unblock its GUI daemon (hanging so far), which would 2) cause
+it to consume the Ctrl-Shift-V event queued a while ago by the Dom0 X
+server (it's important to realize that Qubes GUI daemon processes both
+the Dom0 X events and GUI protocol messages in the same thread,
+alternating between the two queues), and this will lead it to 3) send
+the _current_ (not the one the user intended a while back, when
+originally pressed the Ctrl-Shift-V combination) content of the global
+clipboard to that AppVM.
+
+
+Discussion of practical impact
+-------------------------------
+
+Both of the attacks discussed above require precise timing, which we
+believe presents a very hard challange for the attacker who is unable
+to observe any relevant events in the system outside of the attacker's
+AppVM, e.g. that the physical user just copied some (sensitive) buffer
+to the global clipboard from another AppVM, neither is able to
+influence the physical user behaviour, e.g. force it to copy something
+the attacker is after (from another AppVM) into the global clipboard.
+
+In both of the attack scenario the attacker must fit in a (typically)
+very shallow timing window between when the user copies and pastes the
+buffer between some other two AppVMs (this constrain applies also to
+the 2nd attack because Qubes automatically wipes the global clipboard
+content after a paste operation).
+
+Additional complication for the 1st attack (clipboard injection) is
+that the attacker has typically no way of knowing what application the
+user intends to paste the buffer to, nor its state.
+
+Additional complication for the 2nd attack (clipboard stealing) is
+freezing of all the AppVMs windows for the whole period while the
+attacker is waiting for the user to issue copy operation to the global
+clipboard in another AppVM.
+
+Jann Horn suggested a theoretical improvement for the stealing attack,
+where the attacking AppVM generates lots of window resize events (over
+Qubes GUI protocol), which in turn generate lots of X events in Dom0
+that are send to the GUI daemon (to its X events queue). This allows
+the GUI agent (in the attacking AppVM) to periodically complete the
+vchan message, forcing the GUI daemon to refresh the windows contents.
+Unfortunately we have had no success testing this improved attack in
+practice. Additionally, even if the attacker could use this trick for
+sucessful refreshing of the window contents, they would still not be
+able to correctly handle mouse or keyboard input to the VM. And, last
+but not least, the primary problem for the attacker, i.e. timing,
+remains still the major blocker for this stealing attack.
+
+
+Solution
+---------
+
+Both of the attacks are a result of subtle race condition in managing
+of the Qubes global clipboard. We believe we have now resolved this
+issue by 1) keeping track of when the global clipboard file was last
+modified (by a successful fetch-from-VM operation), and 2) when the
+particular GUI daemon received clipboard copy magic sequence
+(Ctrl-Shift-C).
+
+If we detect that the timestampt of the (latest) clipboard copy magic
+keypress is *before* the time of last effective modification of the
+Qubes global clipboard, we drop that request and don't overwrite the
+clipboard, thus eliminating the 1st attack.
+
+Similarly, if we detect the timestampt of the magic clipboard paste
+event (as provided to the gui daemon by the Dom0 X event) is *before*
+the time of last effective modification of the Qubes global clipboard,
+we drop that request, eliminating the 2nd attack.
+
+The above fix has been committed to the gui-daemon repository [1].
+
+
+Qubes Core API inconsistency in QubesVm.run() method
+================================================
+
+Problem description
+--------------------
+
+An individual nicknamed HW42 pointed out a semantic problem with one
+of the functions compromising Qubes Core API that might result in
+security vulnerabilities in programs using this API incorrectly.
+
+The problematic API turned out to be the interpretation of the 'wait'
+and 'passio' arguments in the QubesVm.run() method. Contrary to what a
+programmer might expect, passing 'passio = False' was itself not
+enough to prevent QubesVm.run() from connecting the VM's process
+output (i.e.  stdin/stdout) to the calling process. In fact this was
+only the case if additionally 'wait = False' was also passed to the
+run() method.  Fortunately both of these parameters were defined as
+False by default.
+
+However, if a program called this method in the following way:
+
+some_untrusted_vm.run (..., passio = False, wait = True)
+
+This would result in the run() method connecting stdout of the
+(untrusted) process in the VM to the (trusted) calling process,
+despite the, admittedly obvious, programmer's intention not to. This
+might then resulted in unexpected consequences, depending on how was
+the output handled.
+
+In fact, HW42 pointed out that one of the Qubes internal commands,
+qvm-sync-clock (itself called by qubes-dom0-update command), did
+indeed call the run() method in the above way, making it vulnerable to
+outputting un-escaped sequences in case one of the agent processes in
+one of the (untrusted) VMs got compromised by an attacker.
+
+We have not identified any more programs calling the run() method in
+this way. However it cannot be ruled out that custom programs doing
+that exist. These should then be carefully reviewed, specifically what
+other programs consume and process their stdout.
+
+Discussion of practical impact
+--------------------------------
+
+For the default Qubes installation the practical impact is limited to
+feeding the Dom0 terminal with (untrusted) escape sequence codes [2].
+The problem of exposing terminals to such untrusted escape sequences
+has been known for more than a decade, as seen in the referenced
+paper, and it looks like all the popular terminal emulators are immune
+to such attacks these days. Specifically we have tested the terminal
+emulators that ship with Qubes Dom0, i.e. Konsole and Gnome Terminal,
+and concluded they are safe from these attacks. Nevertheless it's
+advisable to patch this problem.
+
+
+Solution
+---------
+
+To address this issue, we have modified QubesVm.run() behavior to
+reflect what a common sense tells, i.e. to discard any output from
+remote process whenever passio is False [3].
+
+Patching
+=========
+
+The specific packages that resolve the problems mentioned in this
+bulletin have been uploaded to the current-testing repo:
+
+* qubes-gui-dom0 version 2.1.35
+* qubes-core-dom0 version 2.1.66
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager. After instillation it is necessary
+to restart each of the VMs for changes to take effect (for the
+clipboard issue). Reboot of the whole system is not necessary.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problems discussed above:
+
+* Jann Horn <jann at thejh.net> for discovering the Clipboard Attacks
+
+* HW42 <hw42 at ipsumj.de> for pointing out the vm.run() API issue
+
+
+References
+------------
+
+[1] http://git.qubes-os.org/?p=qubes-r2/gui-daemon.git;a=commitdiff;h=d30edb5e7b1d82d06da20839b0515b106882a083
+
+[2] http://marc.info/?l=bugtraq&m=104612710031920
+
+[3] http://git.qubes-os.org/?p=qubes-r2/core-admin.git;a=commitdiff;h=6a0a932fbd0dfd4b0c85e7a8f1354ec664aeda1f
+
+
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage

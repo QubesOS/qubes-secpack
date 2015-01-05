@@ -1,6 +1,8 @@
 
 
-        ---===[ Qubes Security Bulletin #8 ]===---
+	      ---===[ Qubes Security Bulletin #8 ]===---
+
+			    June 26, 2013
 
 
 Problem description

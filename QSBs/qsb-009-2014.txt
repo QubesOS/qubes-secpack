@@ -1,7 +1,8 @@
 
 
+	      ---===[ Qubes Security Bulletin #9 ]===---
 
-        ---===[ Qubes Security Bulletin #9 ]===---
+			   January 9, 2014
 
 
 Problem description

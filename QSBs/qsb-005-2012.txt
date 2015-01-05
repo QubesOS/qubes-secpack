@@ -1,6 +1,8 @@
 
 
-        ---===[ Qubes Security Bulletin #5 ]===---
+	      ---===[ Qubes Security Bulletin #5 ]===---
+
+			   December 4, 2012
 
 
 Problem description

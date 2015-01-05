@@ -1,6 +1,9 @@
 
 
-        ---===[ Qubes Security Bulletin #11 ]===---
+	     ---===[ Qubes Security Bulletin #11 ]===---
+
+			  September 10, 2014
+
 
 Clipboard leak when copying between VMs due to lack of truncating
 

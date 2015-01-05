@@ -1,6 +1,8 @@
 
 
-        ---===[ Qubes Security Bulletin #13 ]===---
+	     ---===[ Qubes Security Bulletin #13 ]===---
+
+			   January 5, 2015
 
 
 Qubes Clipboard Timing Attacks and Qubes Core Python API Inconsistency

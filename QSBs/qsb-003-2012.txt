@@ -1,9 +1,8 @@
 
 
+	      ---===[ Qubes Security Bulletin #3 ]===---
 
-
-
-        ---===[ Qubes Security Bulletin #3 ]===---
+			  September 11, 2012
 
 
 Problem description

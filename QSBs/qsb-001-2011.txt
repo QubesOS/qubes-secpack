@@ -1,8 +1,8 @@
 
 
+	      ---===[ Qubes Security Bulletin #1 ]===---
 
-
-        ---===[ Qubes Security Bulletin #1 ]===---
+			     May 12, 2011
 
 
 So, finally, 13 months after the first public release, we're publishing

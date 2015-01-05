@@ -1,8 +1,8 @@
 
 
-	      ---===[ Qubes Security Bulletin #4 ]===---
+              ---===[ Qubes Security Bulletin #4 ]===---
 
-			  September 28, 2012
+                          September 28, 2012
 
 
 Problem description

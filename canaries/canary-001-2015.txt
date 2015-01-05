@@ -1,6 +1,6 @@
 
 
-			---===[ Qubes Canary #1 ]===---
+                    ---===[ Qubes Canary #1 ]===---
 
 
 Statements

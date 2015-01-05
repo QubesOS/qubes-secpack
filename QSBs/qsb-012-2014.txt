@@ -1,8 +1,8 @@
 
 
-	     ---===[ Qubes Security Bulletin #12 ]===---
+             ---===[ Qubes Security Bulletin #12 ]===---
 
-			   October 1, 2014
+                           October 1, 2014
 
 
 Memory leak in Xen hypervisor via RDMSR emulation bug (XSA 108)

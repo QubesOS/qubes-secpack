@@ -1,8 +1,8 @@
 
 
-	     ---===[ Qubes Security Bulletin #10 ]===---
+             ---===[ Qubes Security Bulletin #10 ]===---
 
-			   February 6, 2014
+                           February 6, 2014
 
 
 Problem description
@@ -41,24 +41,24 @@ card in Dom0. The offending code was [1]:
 static void process_playback_data(...)
 {
 size_t l = 0;
-	size_t index, buffer_length
-	(...)
-	buffer_length = max_length;
-	(...)
-	index = 0;
+        size_t index, buffer_length
+        (...)
+        buffer_length = max_length;
+        (...)
+        index = 0;
 
-	while (libvchan_data_ready(u->play_ctrl) && buffer_length > 0) {
-		l = libvchan_read(u->play_ctrl, buffer + index,
-						buffer_length);
-		if (l < 0) {
-			pacat_log("vchan read failed");
-			quit(u, 1);
-			return;
-		}
-		(...)
-		buffer_length -= l;
-		index += l;
-	}
+        while (libvchan_data_ready(u->play_ctrl) && buffer_length > 0) {
+                l = libvchan_read(u->play_ctrl, buffer + index,
+                                                buffer_length);
+                if (l < 0) {
+                        pacat_log("vchan read failed");
+                        quit(u, 1);
+                        return;
+                }
+                (...)
+                buffer_length -= l;
+                index += l;
+        }
 
 (...)
 }
@@ -106,31 +106,31 @@ typedef uint32_t VCHAN_RING_IDX;
 
 struct libvchan {
 (...)
-	VCHAN_RING_IDX *wr_cons, *wr_prod, *rd_cons, *rd_prod;
+        VCHAN_RING_IDX *wr_cons, *wr_prod, *rd_cons, *rd_prod;
 (...)
 };
 
 int libvchan_data_ready(struct libvchan *ctrl)
 {
-	return *ctrl->rd_prod - *ctrl->rd_cons;
+        return *ctrl->rd_prod - *ctrl->rd_cons;
 }
 
 int libvchan_read(struct libvchan *ctrl, char *data, int size)
 {
-	int avail, avail_contig;
-	int real_idx;
+        int avail, avail_contig;
+        int real_idx;
 
-	while ((avail = libvchan_data_ready(ctrl)) == 0)
-        	if (libvchan_wait(ctrl) < 0)
-            		return -1;	
-	if (avail > size) avail = size;
+        while ((avail = libvchan_data_ready(ctrl)) == 0)
+                if (libvchan_wait(ctrl) < 0)
+                            return -1;        
+        if (avail > size) avail = size;
 
-	real_idx = (*ctrl->rd_cons) & (ctrl->rd_ring_size - 1);
-	avail_contig = ctrl->rd_ring_size - real_idx;
-	if (avail_contig < avail) avail = avail_contig;
+        real_idx = (*ctrl->rd_cons) & (ctrl->rd_ring_size - 1);
+        avail_contig = ctrl->rd_ring_size - real_idx;
+        if (avail_contig < avail) avail = avail_contig;
 
-	memcpy(data, ctrl->rd_ring + real_idx, avail);
-	(...)
+        memcpy(data, ctrl->rd_ring + real_idx, avail);
+        (...)
 }
 
 If the remote party (which might be an attacker-controlled VM) sets

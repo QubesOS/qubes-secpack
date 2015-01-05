@@ -1,8 +1,8 @@
 
 
-	      ---===[ Qubes Security Bulletin #9 ]===---
+              ---===[ Qubes Security Bulletin #9 ]===---
 
-			   January 9, 2014
+                           January 9, 2014
 
 
 Problem description
@@ -45,22 +45,22 @@ core developers in the body of the following function (see commit [1]):
 
 void send_file(char *fname)
 {
-	char *base;
-	int fd = open(fname, O_RDONLY);
-	if (fd < 0)
-		fatal("open file_to_be_edited");
-	base = rindex(fname, '/');
-	if (!base)
-		base = fname;
-	else
-		base++;
-	if (strlen(base) >= DVM_FILENAME_SIZE)
-		base += strlen(base) - DVM_FILENAME_SIZE + 1;
-	if (!write_all(1, base, DVM_FILENAME_SIZE))
-		fatal("send filename");
-	if (!copy_fd_all(1, fd))
-		fatal("send file");
-	close(1);
+        char *base;
+        int fd = open(fname, O_RDONLY);
+        if (fd < 0)
+                fatal("open file_to_be_edited");
+        base = rindex(fname, '/');
+        if (!base)
+                base = fname;
+        else
+                base++;
+        if (strlen(base) >= DVM_FILENAME_SIZE)
+                base += strlen(base) - DVM_FILENAME_SIZE + 1;
+        if (!write_all(1, base, DVM_FILENAME_SIZE))
+                fatal("send filename");
+        if (!copy_fd_all(1, fd))
+                fatal("send file");
+        close(1);
 }
 
 The obvious problem in the function above is that it always tries to
@@ -73,15 +73,15 @@ the buffer, which was later passed to the send_file(), was allocated to
 be of enough size:
 
 void process_spoolentry(char *entry_name) {
-	(...)
-	filename = calloc(1, entry_size + DVM_FILENAME_SIZE);
-	(...)
-	talk_to_daemon(filename);
+        (...)
+        filename = calloc(1, entry_size + DVM_FILENAME_SIZE);
+        (...)
+        talk_to_daemon(filename);
 }
 void talk_to_daemon(char *fname)
 {
-	send_file(fname);
-	recv_file(fname);
+        send_file(fname);
+        recv_file(fname);
 }
 
 However, some months later, the code was slightly re-factored,

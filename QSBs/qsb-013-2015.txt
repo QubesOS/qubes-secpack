@@ -240,4 +240,4 @@ References
 
 
 The Qubes Security Team
-http://wiki.qubes-os.org/trac/wiki/SecurityPage
+https://wiki.qubes-os.org/trac/wiki/SecurityPage

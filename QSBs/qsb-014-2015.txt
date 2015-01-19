@@ -1,11 +1,11 @@
 
 
-	     ---===[ Qubes Security Bulletin #14 ]===---
+             ---===[ Qubes Security Bulletin #14 ]===---
 
-			      TODO: date
+                              TODO: date
 
 
-	 Race condition in Qubes Inter-VM File-Copy Mechanism
+         Race condition in Qubes Inter-VM File-Copy Mechanism
 
 
 Quick Summary
@@ -314,7 +314,7 @@ process and force all the Create{File,Directory}() calls (which
 processes the untrusted paths sent from the other VM) to be of the
 following form:
 
-	"%c:\\%s", virtualDrive, untrustedPath
+        "%c:\\%s", virtualDrive, untrustedPath
 
 So, this is quite similar to mount --bind technique that we have now
 implemented for the Linux agent.

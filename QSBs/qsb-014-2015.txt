@@ -283,10 +283,16 @@ on. This has been implemented as a patch to core-agent-linux [10].
 2) Additionally, each file, before it gets fully received in the
 target VM, is created with O_TMPFILE flag (as passed to the open()
 syscall) which ensures it is not linked to the directory, and so is
-inaccessible through the filesystem. Only once the file gets
-successfully received, it's linked into the parent directory, making
-it now accessible to the user. On older kernels we use 0x0 attributes
-for the file instead, as the O_TMPFILE flag is available only on newer
+inaccessible through the filesystem. This is to prevent a variation of
+the attack where the user opens the file on the receiving VM (still in
+the QubesIncoming directory) with some application, while the transfer
+is still ongoing (the sending VM might have maliciously hang the
+transfer), and so the attacking VM can modify the file behind the
+user's back, after the user e.g. visually inspected the file with an
+editor and closed() it. Now, only once the file gets successfully
+received, it's linked into the parent directory, making it now
+accessible to the user. On older kernels we use 0x0 attributes for the
+file instead, as the O_TMPFILE flag is available only on newer
 kernels. This has been implemented as a patch to linux-utils [11].
 
 

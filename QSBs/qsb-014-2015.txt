@@ -1,0 +1,357 @@
+
+
+	     ---===[ Qubes Security Bulletin #14 ]===---
+
+			      TODO: date
+
+
+	 Race condition in Qubes Inter-VM File-Copy Mechanism
+
+
+Quick Summary
+==============
+
+Jann Horn has discovered a very clever attack affecting the Qubes
+inter-VM secure file copy mechanism. The attack allow a malicious VM
+to compromise another VM, to which the file copy transfer is destined.
+The attack does not affect any other parts of the system, i.e. other
+VMs not involved in the copy operation, nor other elements of the
+system (Dom0/admin domain, hypervisor). The attack also requires
+cooperation from the physical user: 1) first the user must explicitly
+allow the copy transfer operation, and 2) the user must perform
+additional operation (but not so uncommon) in the destination VM to
+trigger the attack.  Additionally the attack requires wining a race
+condition, although this is practically feasible.
+
+Below we discuss what Qubes secure file copy mechanism is, why is it
+important, how does the attack work, discuss practical scenarios where
+the attack might be considered fatal, and how we have resolved the
+problem. At the end of this bulletin we provide patching instructions.
+
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
+
+* qubes-core-vm packages, version 2.1.50
+* qubes-utils packages, version 2.0.16
+
+The packages are to be installed in every template VM and standalone
+VM.  Each of the VMs based on a template should then be rebooted for
+the changes to make it its fileysystems. Reboot of the system is not
+necessary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+
+Details & Discussion
+=====================
+
+About Qubes Secure Inter-VM File Copy Service
+----------------------------------------------
+
+Typically inter-VM file copy operations, as provided on most VMM
+systems, are implemented through allowing a rich file-sharing
+protocol, such as SMB/CIFS, between the two VMs. Alternatively a
+virtual "pendrive" block device might be used to swap files back and
+forth between the VMs. Both solutions present significant security
+problems, because of the large attack surfaces on the target VM that
+is exposed to the source VM: which is either the complexity of the
+file sharing server code (e.g. SMB), plus networking stacks, or the
+code that is used to parse and mount all the disk and filesystem
+information in the receiving VM.
+
+In Qubes OS we have specifically designed a more secure mechanism for
+transferring files between VMs. This mechanism is based on Qubes
+qrexec framework [1] and implemented as qubes.Filecopy service. The
+service consist of a very simple protocol for serializing a collection
+of files [2] matched with a very simple server (around 250 LOC)
+[3][4].
+
+The goal of this mechanism is, again, to prevent the target VM from
+getting compromised in case the source VM was malicious. Of course,
+the source VM is allowed to interact with the target VM only if qrexec
+policy (so, the physical user) allows for it [5].
+
+
+Practical importance of Qubes Filecopy service
+-----------------------------------------------
+
+We should remember, however, that this mechanism is not meant to
+protect against the source VM sending malicious files, e.g.
+executables or PDFs, which might later compromise the target VM when
+opened there. This might create a false impression that the secure
+inter-VM file copy is of mere academic interest, as in practice the
+user/admin should never be allowing file transfers from less trusted
+to more trusted VMs. While it is generally a good idea to partition
+one's digital life in such a way that indeed one never needs to
+perform "up-transfers", this is often not possible in practice.
+
+To address these problems Qubes also offers some solutions: e.g. a
+trusted PDF converter [6] that allows to take a (potentially
+untrusted) PDF file and convert it into a trusted one. Naturally such
+a conversion should be initiated from a trusted VM, so a mechanism to
+put the (untrusted) file from potentially untrusted VM is needed here.
+
+Another option Qubes provides is a mechanism of Disposable VMs [7]
+which allow to open specific files (e.g. a PDF document) in a
+dedicated, isolated, created on the fly, disposable AppVM which is
+automatically destroyed after the user finishes working with the file
+(i.e. closes the application that was started as a result of default
+MIME handler for the particular file). This mechanism also allows the
+user to make changes to the file edited in a disposable VM (e.g. if
+that is a PDF form or an office document), and then the (updated) file
+is copied back to the originating VM. While the mechanism used
+currently allows only one file to be opened and copied back, and so
+doesn't reuse the qubes.Filecopy service and is not vulnerable to the
+attack discussed, it does present another example of the need for
+secure inter-VM file copy operation.
+
+As a generalization, we can think of more use-cases where a mechanism
+to safely deliver a file to the VM filesystem is needed, even though
+the file itself is not trusted itself (see also the planned work for
+Qubes MIME handlers [8]).
+
+For all these approaches to work correctly, a secure inter-VM file
+copy mechanism is an important prerequisite.
+
+
+The chroot() Race Condition Attack against Qubes Filecopy Service
+------------------------------------------------------------------
+
+The Qubes receiving process (server) for handling the inter-VM file
+copy operations (qfile-unpacker.c [9]) makes use of the Linux chroot()
+call in order to sanitize the file paths passed by the corresponding
+agent running in another (sending) VM. The Qubes (trusted) daemon
+chroot()s itself into ~/QubesIncoming/$(NameOfSendingVm) directory and
+processes the cpio-like blob provided by the agent from the sending
+VM. This is to ensure that the sending VM can only place (untrusted)
+files within this particular subdirectory on the target VM's
+filesystem. We should stress that this use of chroot() is *not* to
+sandbox any untrusted code execution -- something that is generally
+believed chroot() cannot accomplish -- but rather only to sanitize
+untrusted input paths.
+
+Apparently, as Jann Horn has found out (and Linux Kernel Security Team
+confirmed -- see below), even for such basic validation the chroot()
+system call is not well suited.
+
+The proposed attack exploits the lack of atomic'ity in some of the
+file-related syscalls, such as open() -- to quote Jann Horn:
+
+"If the user, believing that the copy operation has finished (because
+the source VM has maliciously closed the copy dialog while the RPC
+channel is still open), moves a folder out of the chroot while the
+kernel is traversing a directory structure within the folder for the
+chrooted qfile-unpacker, the kernel code will now follow paths like
+../../.. until it reaches the real filesystem root."
+
+Practically-wise, the attack involves the following steps:
+
+1) In the source (attacking VM): prepare complex directory structure
+that, when being processed in the target VM (victim) and moved during
+that time away from ~/QubesIncoming/ directory (by the user), would
+trigger the attack, i.e. create some file on the target VM.
+
+2) Additionally prepare dummy target directory structure and place
+next to the "attacking" directory -- both will need to be copied to
+the target VM later. This dummy directory needs to have the same name
+as the actual root directory on the VM's filesystem the attacker
+wishes to place her files under (so, if the attacker hopes to place
+some files, as a result of the Linux processing directory prepared in
+the step #1 above, in, say: "/home/user/.config/autostart", then a
+directory named "home" will need to be used and copied to the
+QubesIncoming directory on the target, next another directory
+containing the exploit)
+
+3) Convince the user to allow qubes.Filecopy operation from the
+attacking VM to the target VM. It's important to realize this
+requirement doesn't involve convincing the user to copy *particular*
+files out of the attacking VM, because we assume here the attacking VM
+is already compromised and might be providing whatever files it wants
+over the qrexec conenction -- all we need is the user granting
+permission for the copy operation (qubes.Filecopy service) between the
+attacking and the victim VMs.
+
+4) On the target (victim) VM: convince the user to move the
+just-copied directory out of the ~/QubesIncoming/ directory. It's
+irrelevant where the user moves this directory, it's only important
+for this to be somewhere outside of the chroot()ed sub-directory.
+
+Jann Horn has provided us with a proof of concept for the above
+attack, and we have tested it successfully on our systems.
+
+
+Mitigating factors
+-------------------
+
+1) The attack requires the physical user to allow file-copy service
+between the VMs. There is no way for the attacker/malware to perform
+file copy to a VM that it didn't explicitly got permission for,
+
+2) The attack requires the physical user to move the copied files out
+of the QubesIncoming directory,
+
+3) The attack requires residual additional directories to be copied
+into the target VM's QubesIncoming directory (typically named "home"),
+which might be easily spotted by the user and signal something wrong
+is going on,
+
+4) The attacker only partially controls the destination file name --
+parts of name will be unpredictable (e.g. random sequence of digits).
+
+5) The attack requires wining a race condition, although this race
+condition is easy to win in practice, as Jann Horn's proof of concept
+demonstrates in practice. However, in case of a failure, the attacking
+VM will need to wait for another permission for file-copy operation to
+be issued by the physical user, as well as for the user to perform the
+move operation again.
+
+Note on Trusting Linux Mechanisms in Qubes OS
+----------------------------------------------
+
+Arguably the attack described above is a problem with the Linux
+chroot() system call, rather than with Qubes code (see also the
+discussion below). An alter reader might be surprised that we decided
+to rely on a Linux security mechanism, i.e. chroot(), because the
+primary reason for the Qubes project to exist is that we believe Linux
+(and similar monolithic OSes) do not provide adequate security
+mechanisms in the first place...
+
+However, the issue under discussion affects an inter-VM service and in
+such case, necessarily, _some_ reliance on the underlying OS
+mechanisms (i.e. the OSes which run in the VMs concerned) cannot be
+avoided.  Qubes can still isolate these VMs from the rest of the
+system and other VMs, and still allows the user to be in control of
+which VMs interacts with each other (service-wise and network-wise).
+
+The decision to rely on chroot() syscall in our qfile-unpacker process
+seemed justified, because the chroot() was _not_ meant to sandbox
+untrusted code execution (which we all know is not feasible) but
+rather only to sanitize open() syscalls with untrusted paths,
+something, we believed, chroot() has been designed to do. Apparently
+we were mistaken about this assumption, as discussed in the next
+section...
+
+
+The Response from Linux Kernel Security Team
+---------------------------------------------
+
+Jann Horn has reported this issue also to the Linux Kernel Security
+mailing list, with his rationale for doing being that the chroot()
+race condition attack affects also other software, not just Qubes
+inter-VM file copy service. Members of the Qubes Security Team have
+been kept in the copy during his discussions with the Kernel Security
+Team, as well as other software's maintainers.
+
+The general conclusion of these discussions was... that this is not a
+security issue. One could get an impression the distinction between
+use of chroot() to sandbox untrusted process vs. to sanitize open()
+argument has not been fully appreciated by the kernel maintainers.
+
+Also, one of the members of the Kernel Security Team has responded
+with this, rather cryptic, explanation:
+
+"(...) chroots are not safe for security and are just an increased
+protection level."
+
+Another member wrote:
+
+"[chroot()] wasn't intended for security, and therefore the design is
+pretty awful for security."
+
+It seems thus, that: 1) none from Kernel Security Team considers
+chroot() as a security mechanism of any kind, nor 2) is willing to
+change its behavior to prevent attacks such as the one discussed in
+this bulletin.
+
+
+Preventing the Attack (our solution)
+-------------------------------------
+
+The solution we implemented to prevent the attack is two fold:
+
+1) We now use "mount --bind" to remount each of the ~/QubesIncoming/
+subdirectories, making them distinct mount points, and so breaking the
+possibility for the user to accidentally move files to other parts of
+the VM's filesystem while keeping other operations on the files going
+on. This has been implemented as a patch to core-agent-linux [10].
+
+2) Additionally, each file, before it gets fully received in the
+target VM, is created with O_TMPFILE flag (as passed to the open()
+syscall) which ensures it is not linked to the directory, and so is
+inaccessible through the filesystem. Only once the file gets
+successfully received, it's linked into the parent directory, making
+it now accessible to the user. On older kernels we use 0x0 attributes
+for the file instead, as the O_TMPFILE flag is available only on newer
+kernels. This has been implemented as a patch to linux-utils [11].
+
+
+Applicability to other platforms
+---------------------------------
+
+Qubes has also support for Windows-based AppVMs and the inter-VM file
+copy service naturally is also supported by our Windows agent.
+However, in case of the Qubes agent on Windows, the above attack, we
+believe, doesn't work for the following reason:
+
+On Windows there is no classic chroot(), and so we use instead
+ZwSetInformationProcess(ProcessDeviceMap) to create a "virtual drive"
+for the QubesIncoming directory for our (trusted) file receiving
+process and force all the Create{File,Directory}() calls (which
+processes the untrusted paths sent from the other VM) to be of the
+following form:
+
+	"%c:\\%s", virtualDrive, untrustedPath
+
+So, this is quite similar to mount --bind technique that we have now
+implemented for the Linux agent.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problem discussed above:
+
+* Jann Horn <jann at thejh.net>
+
+
+References
+===========
+
+[1] https://wiki.qubes-os.org/wiki/Qrexec
+
+[2]
+http://git.qubes-os.org/?p=qubes-r2/linux-utils.git;a=blob;f=qrexec-lib/libqubes-rpc-filecopy.h;h=d566345b5f7b533209aee63498b397678a81f3e3;hb=HEAD#l34
+
+[3]
+http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=blob;f=qubes-rpc/qfile-unpacker.c;h=7bb8606a245962e9496514bde4e6aa47c3f350c3;hb=HEAD
+
+[4]
+http://git.qubes-os.org/?p=qubes-r2/linux-utils.git;a=blob;f=qrexec-lib/unpack.c;h=d7787d1895bf95571e9dd4d4c7b12f6f98d5f38e;hb=HEAD
+
+[5] https://wiki.qubes-os.org/wiki/Qrexec#QubesServicesRPCpolicy
+
+[6]
+http://theinvisiblethings.blogspot.ie/2013/02/converting-untrusted-pdfs-into-trusted.html
+
+[7] https://wiki.qubes-os.org/wiki/DisposableVms
+
+[8] https://wiki.qubes-os.org/ticket/441
+
+[9]
+http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=blob;f=qubes-rpc/qfile-unpacker.c;h=7bb8606a245962e9496514bde4e6aa47c3f350c3;hb=HEAD
+
+[10] TODO: 4a732564faed8984c1d1554b89c2eae0ac4e74b5
+
+[11] TODO: 72069d852659130e5d8dce70f5a28391c6fbc5c0
+
+
+
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage
+

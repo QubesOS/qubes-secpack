@@ -198,7 +198,9 @@ of the QubesIncoming directory,
 3) The attack requires residual additional directories to be copied
 into the target VM's QubesIncoming directory (typically named "home"),
 which might be easily spotted by the user and signal something wrong
-is going on,
+is going on. However in some attack scenarios those residual
+directories might actually be hidden (e.g. ".config") if the attacker
+can predict location to which the user will move incoming files,
 
 4) The attacker only partially controls the destination file name --
 parts of name will be unpredictable (e.g. random sequence of digits).

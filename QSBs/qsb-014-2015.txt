@@ -293,9 +293,10 @@ transfer), and so the attacking VM can modify the file behind the
 user's back, after the user e.g. visually inspected the file with an
 editor and closed() it. Now, only once the file gets successfully
 received, it's linked into the parent directory, making it now
-accessible to the user. On older kernels we use 0x0 attributes for the
-file instead, as the O_TMPFILE flag is available only on newer
-kernels. This has been implemented as a patch to linux-utils [11].
+accessible to the user. On older kernels (before 3.11) we use 0x0
+attributes for the file instead, as the O_TMPFILE flag is available
+only on newer kernels. This has been implemented as a patch to
+linux-utils [11].
 
 
 Applicability to other platforms

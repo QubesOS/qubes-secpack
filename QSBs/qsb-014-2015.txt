@@ -1,8 +1,8 @@
 
 
-	     ---===[ Qubes Security Bulletin #14 ]===---
+             ---===[ Qubes Security Bulletin #14 ]===---
 
-			   January 20, 2015
+                           January 20, 2015
 
 
          Race condition in Qubes Inter-VM File-Copy Mechanism
@@ -375,7 +375,7 @@ http://theinvisiblethings.blogspot.ie/2013/02/converting-untrusted-pdfs-into-tru
 [9]
 http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=blob;f=qubes-rpc/qfile-unpacker.c;h=7bb8606a245962e9496514bde4e6aa47c3f350c3;hb=HEAD
 
-[10] http://git.qubes-os.org/?p=joanna/core-agent-linux.git;a=commit;h=4a732564faed8984c1d1554b89c2eae0ac4e74b5
+[10] http://git.qubes-os.org/?p=qubes-r2/core-agent-linux.git;a=commit;h=4a732564faed8984c1d1554b89c2eae0ac4e74b5
 
 [11] http://git.qubes-os.org/?p=qubes-r2/linux-utils.git;a=commit;h=72069d852659130e5d8dce70f5a28391c6fbc5c0
 

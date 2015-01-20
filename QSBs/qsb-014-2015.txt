@@ -1,8 +1,8 @@
 
 
-             ---===[ Qubes Security Bulletin #14 ]===---
+	     ---===[ Qubes Security Bulletin #14 ]===---
 
-                              TODO: date
+			   January 20, 2015
 
 
          Race condition in Qubes Inter-VM File-Copy Mechanism

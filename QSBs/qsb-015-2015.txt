@@ -57,7 +57,7 @@ the system (PV domains) are not trusted.
 associated stubdomain (so, in the qemu process). If the attacker
 doesn't have such an exploit, the attack cannot be conducted. However,
 it is reasonable to assume such attacks are feasible in practice,
-because of the qemu complexity. On the other, hand many commercial VMM
+because of the qemu complexity. On the other hand, many commercial VMM
 systems, incl. Xen-based, incorporate qemu (or equivalent components)
 into their TCBs, which makes the market value of such attacks actually
 significant, as on these systems such attacks are fatal. On Qubes OS

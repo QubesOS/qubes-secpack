@@ -1,0 +1,179 @@
+
+
+             ---===[ Qubes Security Bulletin #15 ]===---
+
+                           January 21, 2015
+
+
+            Critical Xen Hypervisor Vulnerability (XSA 109)
+
+
+Quick Summary
+==============
+
+Xen Security Team has yesterday updated their Xen Security Advisory
+#109 [1] originally released about 2 months ago, changing
+qualification of its potential impact from mere denial of service to
+privilege escalation. After closer study, we believe this is indeed a
+critical vulnerability, at least for some users, and so have uploaded
+new Xen packages that resolve the problem (see section Patching
+below), as well as detailed discussion of the risk.
+
+Discussion
+===========
+
+Attack scenario
+----------------
+
+The attacker must first gain access to a fully-virtualized VM (HVM
+domain) such as e.g. a Windows VM. Then the attacker is required to
+use some attack and gain access to the associated stub-domain, where
+the device model for the HVM is implemented. From there, the attacker
+is able to exploit this (XSA109) vulnerability, assuming the proper
+combination of processor features or lack thereof (see Mitigating
+factors, below).
+
+We generally believe the attacks jumping from an HVM domain to its
+associated stub domain, while require additional unknown
+vulnerabilities, are practically feasible, because of the great
+complexity of the device emulation required. Thus, we consider this
+bug to be security critical and advise immediate patching.
+
+
+Risk Analysis and Mitigating factors
+-------------------------------------
+
+1) If the user does not run any HVM-based VMs, then the attack cannot
+be conducted. By default Qubes Linux AppVMs are of PV type, not HVM
+type. However Windows VMs are always of HVM type.
+
+2) The attacker must compromise one of the running HVMs to start the
+attack. If the user runs HVM domains, but they are considered trusted
+(e.g. offline Windows-based VMs to work on trusted documents only),
+then the attack might be considered impractical. Even if other VMs in
+the system (PV domains) are not trusted.
+
+3) The attacker must find and successfully exploit a bug in the
+associated stubdomain (so, in the qemu process). If the attacker
+doesn't have such an exploit, the attack cannot be conducted. However,
+it is reasonable to assume such attacks are feasible in practice,
+because of the qemu complexity. On the other, hand many commercial VMM
+systems, incl. Xen-based, incorporate qemu (or equivalent components)
+into their TCBs, which makes the market value of such attacks actually
+significant, as on these systems such attacks are fatal. On Qubes OS
+they are just one stage in a multi-stage attack, like in this case.
+
+4) If the processor support SMEP (AKA Intel OS Guard), then the attack
+will be stopped and can be considered Denial Of Service only (i.e.
+crash the system, but no privilege escalation). SMEP has been
+implemented on Intel Core gen 4 and 5 processors.
+
+5) If the processor does *not* support Extended Page Tables (EPT), or
+the user manually disabled Hardware Assisted Paging (HAP), then the
+attack will not work. In practice most modern processors support EPT,
+however.
+
+To ease with risk evaluation we have attached a risk analysis graph in
+dot format to that bulletin [2]. In order to render it into a more
+human-pleasing form one should use the dot program:
+
+$ dot xsa-109-risk-graph.dot -O -Tpdf
+
+
+Qubes Policy on Patching Xen Bugs
+----------------------------------
+
+Qubes Security Team gets notified in advanced about all security bugs
+discovered by the Xen Security Team via security pre-disclosure list.
+Majority of these problems gets classified, by the Xen team, as denial
+of service attacks, and/or as attacks that affect components of Xen
+that are not security critical on Qubes OS (either because of the way
+we configure Xen on Qubes, or because of our additional patches, or
+because they affect features that are not used on Qubes).
+
+Qubes Team evaluates Xen bugs based on the advisories provided by the
+Xen Security Team. Generally this works well, as the Xen Team is
+comprised of very skilled experts. At the same time, it takes at least
+several hours to understand specific bug and perform, even rough,
+analysis of exploitability. Given that Qubes Team has limited
+resources and different focus (Qubes development, not Xen development)
+we considered this to be a reasonable compromise. With this one bug,
+this procedure didn't quite work out, because, if we only spent enough
+time back in November studying this bug, we might have spotted it was
+not just DoS, but a privilege escalation. Or we might have not....
+
+There is also a reason why we don't blindly accept all the
+Xen-reported bugs into Qubes. The primary reason for this is that
+Qubes R2 still uses, rather dated, Xen 4.1, which is no longer
+officially supported by Xen.org. This means the Xen Security
+Advisories typically do not contain patches for Xen 4.1, only for
+newer Xen versions. Qubes team has, again, not enough resources to
+back port and, specifically, throughly test, each such patch. Thus, we
+generally tend to downplay the importance of these bugs that have been
+classified as mere denial of service bugs, which, as far as desktop
+products are concerned, are really considered reliability problems
+rather than security ones.
+
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin (and also brining a few other reliability patches to Xen)
+have been uploaded to the security-testing repository:
+
+* xen packages, version 4.1.6.1-18
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+This bugs has been found by Xen Security Team, and reported via Xen
+Security mailing list.
+
+
+References
+===========
+
+[1] http://xenbits.xen.org/xsa/advisory-109.html
+
+[2] The xsa-109-risk-graph.dot file is attached to this QSB, part of the Qubes
+Security Pack
+
+
+
+
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage

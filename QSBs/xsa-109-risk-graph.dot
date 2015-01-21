@@ -1,0 +1,50 @@
+digraph {
+        risk_high [
+                label="Vulnerable, high risk",
+                style=filled, fillcolor=red, shape=box,
+        ];
+        risk_medium [
+                label="Vulnerable, medium risk",
+                style=filled, fillcolor=yellow, shape=box,
+        ];
+        risk_low [
+                label="Not vulnerable to priv escalation",
+                style=filled, fillcolor=green, shape=box,
+        ];
+        { rank=same; risk_low; risk_medium; risk_high; }
+        
+        1 [label="Do you use Windows VMs or other HVMs?"];
+        1 -> 2 [label="yes"];
+        1 -> risk_low [label="no"];
+
+        2 [label="Does your processor support SMEP (Intel OS Guard)?"];
+        2 -> risk_low [label="yes"];
+        2 -> 3 [label="no"];
+        2 -> cpu_1 [label="I don't know?"];
+
+        3 [label="Does your processor support NPT/EPT?"];
+        3 -> risk_low [label="no", weight=0.5];
+        3 -> 4 [label="yes"];
+        3 -> cpu_1 [label="I don't know?"];
+
+        4 [label="How trusted are your Windows/HVMs?"];
+        4 -> risk_medium [label="reasonably trusted"];
+        4 -> risk_high [label="untrusted"];     
+
+        {
+        cpu_1 [label="What processor do you have?"];
+        cpu_2 [label="Which generation?"];
+        cpu_other [label="Other?", shape=box];
+        cpu_has_smep_likely [label="You likely have SMEP", shape=box];
+        cpu_has_nosmep [label="No SMEP support (but likely EPT)", shape=box];
+        cpu_1 -> cpu_2 [label="Intel Core(TM)"];
+        cpu_1 -> cpu_other [weight=0.3];
+        cpu_2 -> cpu_has_smep_likely [label="Gen 4 or 5"];
+        cpu_2 -> cpu_has_nosmep [label="Gen 1, 2, or 3"];
+        cpu_has_nosmep -> 4;
+        cpu_has_smep_likely -> risk_low [style=dotted];
+        
+        { rank=same; cpu_other; cpu_has_nosmep; cpu_has_smep_likely; }
+        }
+
+}

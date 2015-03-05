@@ -1,0 +1,106 @@
+
+
+             ---===[ Qubes Security Bulletin #16 ]===---
+
+                            March 5, 2015
+
+
+   Xen Hypervisor Information Leaks Vulnerabilities (XSA 121 & 122)
+
+
+Quick Summary
+==============
+
+These two bugs are in the upstream Xen (see [1] and [2] for original
+announcements). Below is the description provided by the Xen Security
+Team:
+
+| Xen Security Advisory CVE-2015-2044 / XSA-121
++-----------------------------------------------------------------------------
+| Emulation routines in the hypervisor dealing with certain system
+| devices check whether the access size by the guest is a supported one.
+| When the access size is unsupported these routines failed to set the
+| data to be returned to the guest for read accesses, so that hypervisor
+| stack contents are copied into the destination of the operation, thus
+| becoming visible to the guest.
+|
+
+| Xen Security Advisory CVE-2015-2045 / XSA-122
++-----------------------------------------------------------------------------
+| The code handling certain sub-operations of the HYPERVISOR_xen_version
+| hypercall fails to fully initialize all fields of structures
+| subsequently copied back to guest memory. Due to this hypervisor stack
+| contents are copied into the destination of the operation, thus
+| becoming visible to the guest.
+| 
+
+In other words, the bug allows a malicious HVM guest to read some
+contents of the hypervisor memory (stack).
+
+Discussion
+===========
+
+The practical impact of this bug seems to be similar to that offered
+by the XSA108, discussed in the Qubes Security Bulletin #12 [3]. In
+other words, we believe the practical impact is minor, due to lack of
+security sensitive data present on the Xen stack.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin (and also brining a few other reliability patches to Xen)
+have been uploaded to the security-testing repository:
+
+* xen packages, version 4.1.6.1-20
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+This bugs has been found by Xen Security Team, and reported via Xen
+Security mailing list ([1], [2]).
+
+
+References
+===========
+
+[1] http://xenbits.xen.org/xsa/advisory-121.html
+[2] http://xenbits.xen.org/xsa/advisory-122.html
+[3] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-012-2014.txt
+
+
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage

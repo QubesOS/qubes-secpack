@@ -1,0 +1,107 @@
+
+
+                    ---===[ Qubes Canary #2 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who undersigned this file [1] state the
+following:
+
+1. The date of issue of this canary is January 5th, 2015.
+
+2. There have been 16 Qubes Security Bulletins published so far,
+including the QSB #16.
+
+3. Qubes Master Signing Key fingerprint is:
+
+427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to them with regards to the Qubes
+OS Project (e.g. to hand out the private signing keys, or to introduce
+backdoors).
+
+5. The next such canary statement is planned to be published in the
+first week of June 2015. Special note should be taken if no new
+canary gets published by that time, or if the list of statements
+change without plausible explanation.
+
+Special announcements
+----------------------
+
+* In the recent days we've been in the process of migrating our
+infrastructure out of our private servers to public services (Git Hub,
+SF.net), as part of a larger plan to decentralize our project,
+as well as provide better integrity protection for some additional
+resources, such as the Wiki documentation.
+
+* At the same time we would like to remind that Qubes OS has been
+designed with the assumption of all the infrastructure being
+permanently compromised. This means we don't (and have never been)
+assume trust in neither our updates-serving server(s), source code
+repositories hosting servers or services, nor the servers offering
+Qubes ISO downloads.
+
+* The only reliable way to verify downloaded Qubes ISOs, or any other
+resources related to Qubes, is by verifying digital signatures on the
+files or on the git tags. The HTTPS to the server is NOT considered a
+reliable way to prove anything about the integrity of the resources
+accessed.
+
+Disclaimers & Notes
+---------------------
+
+This scheme is not infallible. Although signing the declaration makes
+it very difficult for a third party to produce arbitrary declarations,
+it does not prevent them from using force, or other means like
+blackmail, or compromise of the signers' laptops, to coerce us to
+produce false declarations.
+
+The news feed quoted below (Proof of Date) serves to demonstrate that
+this canary could not have been created prior to the date stated. It
+shows that a series of canaries were not created in advance.
+
+This declaration is merely a best effort and provided without any
+guarantees, warranty, and is not legally binding in any way to
+anybody.  None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Thu, 05 Mar 2015 13:16:58 +0000
+
+$ feedstail -1 -n5 -f {title} -u https://www.spiegel.de/international/index.rss
+Tomorrowland: How Silicon Valley Shapes Our Future
+Greeks in the Crisis: 'We Need To Explain Ourselves'
+Postwar Rape: Were Americans As Bad as the Soviets?
+Family Feud: The Tortured Relationship between Schäuble and Varoufakis
+'Risk Has Gotten Greater': German Jews Advised Against Wearing Kippah
+
+$ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+Libya Says 11 Oil Fields Non-Operational After IS Attacks
+News Analysis: U.S. Strategy in Iraq Increasingly Relies on Iran
+Erik Larson’s ‘Dead Wake,’ About the Lusitania
+Iranian Special Operatives Free Diplomat Abducted in Yemen
+U.S. Ambassador to South Korea Is Hospitalized After Knife Attack
+
+$ feedstail -1 -n5 -f {title} -u http://feeds.bbci.co.uk/news/world/rss.xml
+Activist slashes US envoy to S Korea
+Clinton ready to make emails public
+Liberia releases last Ebola patient
+Facebook rant lands man in UAE jail
+'Watergate' leak at German spy agency
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached GPG
+signatures by each of the signers, distributed together with this
+canary in qubes-secpack.git repo, and (2) via digitial signatures on
+the corresponding qubes-secpack.git repo tags.
+
+[2] Don't trust just the contents of this file blindly, go and verify
+the digital signatures!

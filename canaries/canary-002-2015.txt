@@ -9,7 +9,7 @@ Statements
 The Qubes core developers who undersigned this file [1] state the
 following:
 
-1. The date of issue of this canary is January 5th, 2015.
+1. The date of issue of this canary is March 5th, 2015.
 
 2. There have been 16 Qubes Security Bulletins published so far,
 including the QSB #16.

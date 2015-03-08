@@ -1,0 +1,209 @@
+
+
+             ---===[ Qubes Security Bulletin #18 ]===---
+
+                            March 10, 2015
+
+
+          Xen Hypervisor Instruction Emulation Bug (XSA 123)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has discovered a serious security bug (XSA 123)
+in the hypervisor instruction emulation code which might potentially
+lead to privilege escalation [1]:
+
+| Instructions with register operands ignore eventual segment overrides
+| encoded for them. Due to an insufficiently conditional assignment such
+| a bogus segment override can, however, corrupt a pointer used
+| subsequently to store the result of the instruction.
+|
+| A malicious guest might be able to read sensitive data relating to
+| other guests, or to cause denial of service on the host. Arbitrary
+| code execution, and therefore privilege escalation, cannot be
+| excluded.
+
+
+Description of the bug
+=======================
+
+The x86_emulate() function, which is internally used by the hypervisor to
+emulate guest instructions in some situations uses the following
+structure for operand representation:
+
+    /* Type, address-of, and value of an instruction's operand. */                   
+    struct operand {                                                                 
+        enum { OP_REG, OP_MEM, OP_IMM, OP_NONE } type;                               
+        unsigned int bytes;                                                          
+                                                                                     
+        /* Up to 128-byte operand value, addressable as ulong or
+    uint32_t[]. */      
+        union {                                                                      
+            unsigned long val;                                                       
+            uint32_t bigval[4];                                                      
+        };                                                                           
+                                                                                     
+        /* Up to 128-byte operand value, addressable as ulong or
+    uint32_t[]. */      
+        union {                                                                      
+            unsigned long orig_val;                                                  
+            uint32_t orig_bigval[4];                                                 
+        };                                                                           
+                                                                                     
+        union {                                                                      
+            /* OP_REG: Pointer to register field. */                                 
+            unsigned long *reg;                                                      
+            /* OP_MEM: Segment and offset. */                                        
+            struct {                                                                 
+                enum x86_segment seg;                                                
+                unsigned long    off;                                                
+            } mem;                                                                   
+        };                                                                           
+    };                           
+
+The last field is a union that could contain a pointer (*reg) to
+register field (in the hypervisor memory) OR ALTERNATIVELY
+segment/offset data as provided by the VM for the instruction. The
+x86_emulate() fills the operand structures for the
+instruction-to-be-emulated based on the VM-provided data. It tries to
+be careful and to ensure that once the union is used as segmentation
+data, it's not at the same time dereferenced as a pointer, as this
+would have rather fatal consequences. Sadly, it fails in ensuring this
+for all the cases of x86 complex instruction encodings.
+
+The Xen Security team decided to correct this problem by issuing the
+following patch:
+
+--- a/xen/arch/x86/x86_emulate/x86_emulate.c
++++ b/xen/arch/x86/x86_emulate/x86_emulate.c
+@@ -1757,7 +1757,7 @@ x86_emulate(
+         }
+     }
+
+-    if ( override_seg != -1 )
++    if ( override_seg != -1 && ea.type == OP_MEM )
+         ea.mem.seg = override_seg;
+
+     /* Early operand adjustments. */
+
+The above patch tries to correct this special case where the code
+erroneously allowed to override the *reg pointer with VM-provided
+data.
+
+Additional thoughts by Qubes Security Team
+===========================================
+
+We see several problems that concern us about this vulnerability and
+patching process:
+
+1) It seems really difficult to understand why would anybody design a
+structure like the one shown above, which uses a union to store two,
+RADICALLY DIFFERENTLY TRUSTED data: an internal pointer into
+hypervisor memory and VM-provided UNTRUSTED DATA? Such design decision
+made by one of the core hypervisor developer is certainly worrying.
+We're not sure if it would be more worrying if this was done purposely
+vs by carelessness...
+
+2) We are not entirely convinced if the way Xen Security Team decided
+to address this vulnerability is really optimal, security wise. It
+seems like a more defensive approach would be to get rid of this
+dangerous construct of reusing the same memory for both an internal
+pointer and VM-provided data. Apparently Xen developers believe that
+they can fully understand the code, with all its execution paths, for
+decoding x86 operands. This optimistic attitude seems surprising,
+given the very bug we're discussing today.
+
+3) This lack of defensive programing and perhaps over confidence (in
+ability to fully understand all the code paths) has been demonstrated
+by the Xen Security Team also previously. In the recently released XSA
+109 [2], the official patch also seemed to address the problem much
+earlier in the execution path rather than at the actual offending
+instructions, i.e. those that performed the NULL-dereference. While
+asked specifically about adding at least an additional check on these
+instructions, the Xen developers were unwilling to implement it
+implying potential performance impact.
+
+4) This is all certainly a bit disconcerting and we hope we could
+start a bit more public debate on these issues, especially among
+independent security researchers. We still believe Xen is currently
+the most security hypervisor available, mostly because of its unique
+architecture features, that are lacking in any other product we are
+aware of.
+
+FAQ
+====
+
+Q: If you know better how to patch the bug, why don't you provide your
+own patches instead of criticizing the upstream Xen developers?
+
+A: We (Qubes developers) are not really hypervisor developers. Qubes
+is only a user of Xen, not its fork! [*] Preparing patches for critical
+elements of the hypervisor requires specialized skills that are
+often outside of our expertise, not to mention we already have full
+hands of work in other, more Qubes-specific, areas.
+
+[*] While technically it is true that we do maintain our own little
+fork of the Xen hypervisor with a few custom security-related patches
+applied, this is really a situation we would like to get rid of
+eventually, rather than get more involved into.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin (and also brining a few other reliability patches to Xen)
+have been uploaded to the security-testing repository:
+
+* xen packages, version 4.1.6.1-21
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+This bugs has been found by Xen Security Team, and reported via Xen
+Security mailing list.
+
+
+References
+===========
+
+[1] http://xenbits.xen.org/xsa/advisory-123.html
+[2] http://xenbits.xen.org/xsa/advisory-109.html
+
+
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage

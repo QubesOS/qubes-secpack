@@ -37,7 +37,7 @@ e.g. via electrical short-circuiting.
 
 The XSA 124 is hinting about potential "other mechanism bypassing the
 software layers" which we take to mean e.g. BDF spoofing attacks from
-devices that can (choose to) not adhere to PIC Express specification,
+devices that can (choose to) not adhere to PCI Express specification,
 or different forms of MSI or other event injection attacks. Some of
 the Qubes developers have spent considerable amount of time
 researching efficiency of VT-d in containing attacks coming from

@@ -128,7 +128,7 @@ implying potential performance impact.
 4) This is all certainly a bit disconcerting and we hope we could
 start a bit more public debate on these issues, especially among
 independent security researchers. We still believe Xen is currently
-the most security hypervisor available, mostly because of its unique
+the most secure hypervisor available, mostly because of its unique
 architecture features, that are lacking in any other product we are
 aware of.
 

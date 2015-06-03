@@ -1,0 +1,124 @@
+
+
+                    ---===[ Qubes Canary #3 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who undersigned this file [1] state the
+following:
+
+1. The date of issue of this canary is June 3rd, 2015.
+
+2. There have been 18 Qubes Security Bulletins published so far.
+
+3. Qubes Master Signing Key fingerprint is:
+
+427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to them with regards to the Qubes
+OS Project (e.g. to hand out the private signing keys, or to introduce
+backdoors).
+
+5. The next such canary statement is planned to be published in the
+first 2 weeks of August 2015. Special note should be taken if no new
+canary gets published by that time, or if the list of statements
+change without plausible explanation.
+
+Special announcements
+----------------------
+
+* We would like to remind that Qubes OS has been designed with the
+assumption of all the infrastructure being permanently compromised.
+This means we don't (and have never been) assume trust in neither our
+updates-serving server(s), source code repositories hosting servers or
+services, nor the servers offering Qubes ISO downloads.
+
+* The only reliable way to verify downloaded Qubes ISOs, updates,
+source code, or any other resources related to Qubes, is by verifying
+digital signatures on the files or on the git tags. The HTTPS
+connection to any of our servers is NOT considered a reliable way to
+prove anything about the integrity of the resources accessed.
+
+* Joanna Rutkowska, founder and chief architect of the Qubes OS
+project, has recently handed off binary signing keys to Qubes R2 and
+R3 to Marek Marczykowski-Górecki, Qubes lead developer.
+
+* While we take reasonable steps to assure our signing keys are
+difficult to steal, users who consider themselves high-profile targets
+should realize it's not unthinkable for a powerful adversary to steal
+the keys using e.g. sophisticated physical attacks against us, and
+thus might consider building Qubes from sources (this includes both
+the ISO and updates) until we implement multi-signature scheme for
+binaries signing. Alternatively, such users should consider using Tor
+for downloading of Qubes ISOs and updates to make it difficult to
+target them selectively by such a powerful adversary and force them to
+subvert all Qubes binaries, thus increasing chances of getting caught.
+
+* Additionally, we believe it makes sense for people building Qubes
+from sources to run Qubes Builder through a Tor connection to reduce
+chances of getting potentially subverted Fedora or Debian packages
+(which are used as a base for ISO and templates building) from an
+attacker who might have got access to the Fedora or Debian Project
+signing keys somehow.
+
+* Qubes provides ease to use, robust, and reasonably secure mechanisms
+to use Tor for the above mentioned scenarios.
+
+Disclaimers & Notes
+---------------------
+
+This scheme is not infallible. Although signing the declaration makes
+it very difficult for a third party to produce arbitrary declarations,
+it does not prevent them from using force, or other means like
+blackmail, or compromise of the signers' laptops, to coerce us to
+produce false declarations.
+
+The news feed quoted below (Proof of Date) serves to demonstrate that
+this canary could not have been created prior to the date stated. It
+shows that a series of canaries were not created in advance.
+
+This declaration is merely a best effort and provided without any
+guarantees, warranty, and is not legally binding in any way to
+anybody.  None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Wed, 03 Jun 2015 08:12:26 +0000
+
+$ feedstail -1 -n5 -f {title} -u https://www.spiegel.de/international/index.rss
+Erdogan's Challenger: The Man Who Could Save Turkish Democracy
+Paid as a Pro-Kremlin Troll: 'The Hatred Spills over into the Real World'
+Breaking the Resistance: How Brussels Is Integrating Its Euro-Skeptics
+The Rebel of St. Peter's Square: Where Is Pope Francis Steering the Church?
+A Man in Full: To Hell and Back in the Chinese Healthcare System
+
+$ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+Sports Business: Sponsors React Meekly to Sepp Blatter's Resignation
+Sports of The Times: Sepp Blatter: From Defiant to Defeated in Four Fateful Days
+Sepp Blatter Decides to Resign as FIFA President in About-Face
+U.S. Surveillance in Place Since 9/11 Is Sharply Limited
+Huffington Post in Limbo at Verizon
+
+$ feedstail -1 -n5 -f {title} -u http://feeds.bbci.co.uk/news/world/rss.xml
+Blatter 'under investigation in US'
+Hopes fade in Yangtze boat rescue
+Hadron collider to turn on data tap
+Greek PM set for Brussels talks
+Boko Haram leader not in new video
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached GPG
+signatures by each of the signers, distributed together with this
+canary in qubes-secpack.git repo, and (2) via digitial signatures on
+the corresponding qubes-secpack.git repo tags.
+
+[2] Don't trust just the contents of this file blindly, go and verify
+the digital signatures!

@@ -99,7 +99,7 @@ The Rebel of St. Peter's Square: Where Is Pope Francis Steering the Church?
 A Man in Full: To Hell and Back in the Chinese Healthcare System
 
 $ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-Sports Business: Sponsors React Meekly to Sepp Blatter���s Resignation
+Sports Business: Sponsors React Meekly to Sepp Blatter's Resignation
 Sports of The Times: Sepp Blatter: From Defiant to Defeated in Four Fateful Days
 Sepp Blatter Decides to Resign as FIFA President in About-Face
 U.S. Surveillance in Place Since 9/11 Is Sharply Limited

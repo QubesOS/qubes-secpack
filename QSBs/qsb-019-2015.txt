@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #19 ]===---
 
-                            July 10, 2015
+                            July 13, 2015
 
 
           Anti Evil Maid bypass through unusual LUKS header
@@ -11,74 +11,83 @@
 Quick Summary
 ==============
 
-Rusty Bird discovered a clever attack on Anti Evil Maid using an unusual LUKS
-header. The attacker can modify a system in a way that allows them to
-steal the LUKS password, but AEM will not notice the difference. (The AEM user
-secret will be displayed as if nothing had happened.)
+Rusty Bird discovered a clever attack on Anti Evil Maid using an unusual
+LUKS header. The attacker can modify a system in a way that allows them
+to steal the LUKS password, but AEM will not notice the difference. (The
+AEM user secret will be displayed as if nothing had happened.)
 
 
 Description of the bug
 =======================
 
-Anti Evil Maid (AEM in short) is meant to detect malicious system modifications
-before the user enters their LUKS password. If a system modification is
-detected, AEM will not be able to show a user secret to the user, so the user
-should not enter the password. This is done mainly using the TPM's
-measurements of base system components. The LUKS header is _not_ one of them.
-Details in this article [1].
+Anti Evil Maid (AEM in short) is meant to detect malicious system
+modifications before the user enters their LUKS password. If a system
+modification is detected, AEM will not be able to show a user secret to
+the user, so the user should not enter the password. This is done mainly
+using the TPM's measurements of base system components. The LUKS header
+is _not_ one of them.  Details in this article [1].
 
-The LUKS header, among other things, contains the cipher used to encrypt the data. If
-the attacker changes the cipher there (or any other encryption parameter), entering the
-same password would result in an invalid master key that cannot access the encrypted
-data. LUKS's libcryptsetup would assume that the user entered a wrong password, and
+The LUKS header, among other things, contains the cipher used to encrypt
+the data. If the attacker changes the cipher there (or any other
+encryption parameter), entering the same password would result in an
+invalid master key that cannot access the encrypted data. LUKS's
+libcryptsetup would assume that the user entered a wrong password, and
 prompt for it again.
 
-But if a LUKS header contains the "cipher_null" cipher, every password will be accepted. Of
-course in such a case the data still will not be decrypted - actually the encrypted
-data will be provided without decryption. However, the important thing is that an attacker can
-prepare a LUKS header which will work with any user password, without
-actually knowing that password.
+But if a LUKS header contains the "cipher_null" cipher, every password
+will be accepted. Of course in such a case the data still will not be
+decrypted - actually the encrypted data will be provided without
+decryption. However, the important thing is that an attacker can prepare
+a LUKS header which will work with any user password, without actually
+knowing that password.
 
-The next step would be mounting the actual root file system. Since "cipher_null" was used
-in the LUKS header, the data of course will not be decrypted, so the original file
-system is not immediately accessible for the attacker. But since the disk content is not
-authenticated (because the assumption was that an attacker needs to know the LUKS password to modify the
-data in a predictable way), the attacker can replace the actual partition (or just
-a part of it) with some small file system with just a single binary (init),
-which will extract the user password from the memory, store it somewhere
-(or send it to the attacker), and then mount the original encrypted partition.
+The next step would be mounting the actual root file system. Since
+"cipher_null" was used in the LUKS header, the data of course will not
+be decrypted, so the original file system is not immediately accessible
+for the attacker. But since the disk content is not authenticated
+(because the assumption was that an attacker needs to know the LUKS
+password to modify the data in a predictable way), the attacker can
+replace the actual partition (or just a part of it) with some small file
+system with just a single binary (init), which will extract the user
+password from the memory, store it somewhere (or send it to the
+attacker), and then mount the original encrypted partition.
 
-This is all possible because the attacker, due to the null cipher, can easily
-prepare a partition which can be properly mounted regardless of the password entered.
-Then apparently cryptsetup leaves the password entered by the user in memory, so it
-is possible to extract it (*). Since the process provided by the attacker knows
-the password now, it can mount the original user partition now and pretend that
-nothing happened.
+This is all possible because the attacker, due to the null cipher, can
+easily prepare a partition which can be properly mounted regardless of
+the password entered.  Then apparently cryptsetup leaves the password
+entered by the user in memory, so it is possible to extract it (*).
+Since the process provided by the attacker knows the password now, it
+can mount the original user partition now and pretend that nothing
+happened.
 
-(*) We haven't evaluated how hard it would be to find the password location, but
-looking at a memory dump, it is present there in several places.
+(*) We haven't evaluated how hard it would be to find the password
+location, but looking at a memory dump, it is present there in several
+places.
 
 Impact
 -------
 
-Luckily, this attack can succeed only if the kernel has CONFIG_CRYPTO_NULL built in,
-or if the initrd contains the crypto_null module. This is usually not the case, and
-the attacker cannot modify them without invalidating the AEM secret.
+Luckily, this attack can succeed only if the kernel has
+CONFIG_CRYPTO_NULL built in, or if the initrd contains the crypto_null
+module. This is usually not the case, and the attacker cannot modify
+them without invalidating the AEM secret.
 
-However, if the crypto_null module was loaded at the time of AEM installation for
-some reason, then dracut (used by antievilmaid_install) would have included the
-module automatically. Dracut would also include the crypto_null module if configured for no-hostonly mode.
+However, if the crypto_null module was loaded at the time of AEM
+installation for some reason, then dracut (used by antievilmaid_install)
+would have included the module automatically. Dracut would also include
+the crypto_null module if configured for no-hostonly mode.
 
 Solution
 ---------
 
-Our solution is to include the LUKS headers in the measurements used to unseal the AEM
-user secret. This way if a LUKS header would be modified in any way, the user
-will notice the difference before actually entering a LUKS password. The LUKS
-header hash(es) extend(s) PCR 13.
+Our solution is to include the LUKS headers in the measurements used to
+unseal the AEM user secret. This way if a LUKS header would be modified
+in any way, the user will notice the difference before actually entering
+a LUKS password.  The LUKS header hash(es) extend(s) PCR 13.
 
-This also means that the user will need to reseal the AEM secret at the next system
-startup after a LUKS header modification (such as changing the password).
+This also means that the user will need to reseal the AEM secret at the
+next system startup after a LUKS header modification (such as changing
+the password).
 
 
 Patching
@@ -90,13 +99,15 @@ bulletin have been uploaded to the security-testing repository:
 * updated anti-evil-maid-dracut package, version 2.0.10
 * new tpm-extra package, version 2.0.10
 
-The packages are to be installed in Dom0 via "sudo qubes-dom0-update anti-evil-maid-dracut"
-or via the Qubes graphical manager. Then mount your Anti Evil Maid stick
-and run /usr/lib/antievilmaid/antievilmaid_install again and reboot.
+The packages are to be installed in Dom0 via "sudo qubes-dom0-update
+anti-evil-maid-dracut" or via the Qubes graphical manager. Then mount
+your Anti Evil Maid stick and run
+/usr/lib/antievilmaid/antievilmaid_install again and reboot.
 
-Afterwards, you will need to reseal your secret passphrase to new PCR values, which will
-have changed due to the new initrd. Remember to include "--pcr 13" in the
-tpm_sealdata command, as it now contains the LUKS header hash(es).
+Afterwards, you will need to reseal your secret passphrase to new PCR
+values, which will have changed due to the new initrd. Remember to
+include "--pcr 13" in the tpm_sealdata command, as it now contains the
+LUKS header hash(es).
 
 These packages will be moved to the current repository over the coming
 days once they receive more testing from the community.

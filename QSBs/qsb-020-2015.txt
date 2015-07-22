@@ -1,0 +1,290 @@
+
+
+             ---===[ Qubes Security Bulletin #20 ]===---
+
+                            July 27, 2015
+
+
+                 Fedora os-prober considered harmful
+
+
+Quick Summary
+==============
+
+Rusty Bird, while testing our patch for the AEM attack that was the
+subject of the previous bulletin (QSB #19), noticed that the
+os-prober, a standard Fedora package used for dual-boot configuration
+discovery and maintenance, is processing some of the internal Qubes
+block devices, used by the Xen backend. This might allow an attacker,
+who compromised one of the VMs, to prepare a malicious content on the
+VM's private image, which, upon processing by the Fedora os-prober
+scripts and, subsequently, Dom0 kernel filesystem modules, might lead
+to Dom0 compromise, which would be fatal.
+
+
+Description of the Bug
+=======================
+
+The default Qubes installation contains the os-prober package
+installed in Dom0. This package is used by the grub configuration
+generator (grub2-mkconfig tool, the /etc/grub.d/30_os-prober to be
+precise) to check if other systems are installed on the same machine,
+and if so then to add those systems to the grub menu. The detection is
+done by enumerating all the block devices present in the system (using
+/sys/block) and running multiple parsers on them to check if they
+match any of the known operating systems. Typically this include
+mounting of a given block device and looking for arbitrary files
+there, then possibly parsing those files to find operating system
+details (like its version or release info).
+
+We haven't found any obvious exploitable bugs in the mentioned
+parsers, but the whole process is so complex (handling filesystem
+meta-data during mount is complex enough), that we believe it is
+prudent to assume this code to be not trusted.
+
+The list of block devices in Dom0 include /dev/loop* devices, which
+are used by the Xen block backend driver to expose the private and
+root images to Qubes VMs. These devices contain data controlled by the
+VMs. Thus, if an attacker found an exploitable vulnerability in any of
+os-prober parsers or kernel filesystem module used to handle these
+devices, they could use it to compromise Dom0, which would be fatal.
+
+Such an attack would require the malicious VM to be running at the
+time of the os-prober scripts execution, as only then its private
+image is connected to a loop block device in Dom0. As the os-prober is
+called every time a new grub configuration is being updated, the
+attacker VM would need to be running when the legitimate user chose to
+install or update the kernel package in Dom0, install Anti Evil Maid,
+or decided to call grub2-mkconfig manually for whatever reason, such
+as after tweaking of the kernel configuration in Dom0. There is no way
+for the attacker to trigger execution of the os-prober scripts
+themselves.
+
+Some of the side effects of this bug might include VM data corruption:
+when the os-prober is called it tries to mount every device found in
+Dom0, which includes the above mentioned /dev/loop* devices, but which
+are, at the same time, also mounted in the corresponding VMs. In most
+cases this would mean the Dom0 kernel were to treat such filesystems
+as not cleanly unmounted and would try to "fix" them by replaying
+their journal or performing similar remediation. The VM kernel would
+see this as a sudden, unexpected disk modification, and most likely
+would not account for these modifications in subsequent fs metadata
+updates. This might lead to an inconsistent filesystem state.
+
+
+The Short-term Fix
+===================
+
+To fix this particular problem we are forcibly removing os-prober
+package. This is done by adding the "Obsoletes: os-prober" and
+"Provides: os-prober" RPM headers in our qubes-core-dom0-linux package
+[8].
+
+This approach has a side effect of not listing other OSes in the grub
+menu anymore. If a user still wanted to have such additional systems
+listed, there are alternative options, with the simplest one being to
+add such menu entries in /etc/grub.d/40_custom manually. In the
+future, we plan on supporting UEFI mode booting for Qubes OS [7],
+which should further ease such dual-boot configurations.
+
+Generally we recommend against using dual-boot configurations with
+Qubes OS as they increase the risk of introducing persistent firmware
+modifications to the platform, which could be fatal in case of some
+firmware, such as the BIOS. Thus we don't consider this feature
+limitation to be of much significance.
+
+
+The Proper Solution: Untrusted Storage Domain
+==============================================
+
+In the Qubes OS original architecture specification [1] we've
+anticipated various potential attacks coming through storage
+virtualization backends and proposed a generic solution in a from of
+an Untrusted Storage Domain (USD).
+
+There have been, however, several reasons why we have not implemented
+separate, untrusted storage domain in Qubes for all these years yet,
+the primary one being the lack of robust Trusted Boot technology,
+which is a prerequisite for a storage domain to make sense on a laptop
+system [*].
+
+Sadly (even if somehow gratifying for those who conceived the original
+Qubes architecture), this is not the first time we have seen
+security-related issues due to lack of separate storage domain in
+Qubes OS. Last year one of Qubes users [2] noticed a potential problem
+of AppVMs private images being processed by Fedora default udev rules,
+which allowed a user who opened a file manager in Dom0 (admittedly an
+action that we've been trying to discourage in Qubes) to mount AppVMs'
+private filesystems, potentially leading to a fatal system compromise.
+This has been fixed by specifically excluding loop devices, which are
+used by Xen storage backend, from being processed by udev in Dom0 [3].
+
+These two examples, again, show how hopeless it might be to try to
+secure a monolithic OS [**], such as a traditional Linux distribution,
+where it is difficult to grasp all the inter-dependencies on untrusted
+input processing.
+
+There are also other reasons which make the notion of an Untrusted
+Storage Domain attractive, such as the protection against potentially
+malicious disk controller firmware that it could offer as well. Thus,
+we decided to bring this idea back to our consideration in the roadmap
+for Qubes 4.x [4].
+
+The first step, however, is going to be the separation of all the
+graphics subsystem out of Dom0 and formation of a GUI domain (see the
+roadmap again, [4]). This will leave us with a much smaller codebase
+in Dom0, allowing to hopefully disable most of the udev/systemd
+services in Dom0. We might then even conclude such a thin Dom0
+(without graphics/X subsystem) is now simple enough to tolerate a
+storage backend there [***].
+
+It's worth stressing that a separate GUI domain, unlike Storage
+Domain, cannot really be made _untrusted_ with the current technology,
+as the graphics subsystem always "sees" all the user screen content,
+and so is capable of taking screenshots of all the secret documents
+the user decided to read on their screen, as well to record (sniff)
+other actions of the user. More over, unless some form of Split I/O is
+implemented [5], the GUI domain can also impersonate the user by
+injecting malicious keyboard and mouse events. Still, we believe
+moving GUI domain out of Dom0 can bring a lot of benefits, both
+security-wise as well maintenance-wise (e.g. allow for minimal, more
+secure Dom0, better hardware compatibility thanks to using HVM
+virtualization for the GUI domain, and hence better GPU support, and
+more).
+
+Needless to say, having a separate GUI domain is still a bit
+challenging due to the requirement for the underlying hypervisor to
+support GPU passthrough well [****].
+
+While not looking for excuses, we should repeat here that these two
+important architectural hardening steps: the separation of GUI and
+storage domains have been blocked thus far by the limitations of the
+x86 platforms (lack of robust Trusted Boot) and the Xen hypervisor
+(lack of good GPU passthrough support) which have been really beyond
+our control.
+
+[*] As explained in the referenced Qubes architecture document, a
+robust trusted boot scheme is needed for having untrusted storage
+domain on computers which have only one disk controller (which
+includes virtually all the laptops) to prevent the untrusted storage
+subsystem from modifying the system's boot path.
+
+[**] Here we intentionally refer to monolithic distribution, rather
+than just a monolithic kernel.
+
+[***] Again, for the Untrusted Storage Domain to make any sense we
+need robust Trusted Boot scheme, which is still far away on x86
+platforms.
+
+[****] Note we "only" need GPU passthrough (i.e. direct GPU device
+assignment to one select VM), rather than GPU virtualization, which is
+even more challenging to do securely.
+
+Mitigating Factors
+===================
+
+For the attack to work, the attacker would need to: (1) compromise one
+of the VMs and modify its private image, populating with malformed
+data, (2) find a vulnerability in the Dom0 kernel filesystem stacks or
+os-prober scripts that could be exploited by such malformed data
+processing, (3) wait for the legitimate user to trigger an operation
+that regenerates the GRUB2 configuration in Dom0, typically after the
+Dom0 kernel upgrade, and finally (4) ensure the VM is not shutdown
+during this time.
+
+We believe the practical exploitation of this vulnerability is thus
+very difficult (assuming no trivial bugs in os-prover scripts, which
+we might have overlooked), because the attacker would have just one
+try (one in several weeks time, or even less) to fire his or her
+kernel exploit against the hypothetical bug in filesystem processing
+code.
+
+FAQ
+====
+
+Q. Wouldn't having a locked root account in all Qubes VMs be a good
+idea, after all? This would then prevent the attacker from preparing a
+potential malicious content into private.img, making exploitation of
+this attack harder?
+
+A. Perhaps it might make some attacks on Qubes or the underlying
+hypervisor or virtualization technology slightly harder, but at the
+price of making the user interaction with the AppVMs more annoying, as
+explained in [6]. It is important to realize Qubes uses GNU/Linux in
+VMs only as "API providers" to run user Apps (or drivers and stacks),
+rather than as isolation providers. Indeed, the attack surface
+allowing user -> root escalation (or even user -> kernel) inside each
+of the VMs is so huge, it would be unwise to assume there could be any
+security boundary within the VM. A more reasonable place to implement
+defense in depth would be to make the actual applications running the
+VMs hardware to exploit, rather than trying to secure the inside-VM
+user->root escalations, which is really a hopeless process, as we
+believe.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
+
+* qubes-core-dom-linux 3.0.11 (R3.0)
+* qubes-core-dom-linux 2.0.29 (R2)
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problem discussed above:
+
+* Rusty Bird <rustybird@openmailbox.org>
+
+
+References
+===========
+
+[1] "Qubes OS Architecture", 2010, http://files.qubes-os.org/files/doc/arch-spec-0.3.pdf
+
+[2] https://groups.google.com/d/msg/qubes-users/_tkjmBa9m9w/nKMXJwMXcNkJ
+
+[3] https://github.com/qubesos/qubes-core-admin-linux/commit/5af0530
+
+[4] https://github.com/rootkovska/qubes-roadmap
+
+[5] http://blog.invisiblethings.org/2010/09/09/untrusting-your-gui-subsystem.html
+
+[6] https://www.qubes-os.org/doc/VMSudo/
+
+[7] https://github.com/QubesOS/qubes-issues/issues/794
+
+[8] https://github.com/QubesOS/qubes-core-admin-linux/commit/7fdff6a735905c73d396e9624c40756a5a4c0325
+
+--
+The Qubes Security Team
+https://qubes-os.org/doc/SecurityPage/

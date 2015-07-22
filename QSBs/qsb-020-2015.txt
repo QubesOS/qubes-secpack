@@ -1,0 +1,198 @@
+
+
+             ---===[ Qubes Security Bulletin #20 ]===---
+
+                            July 22, 2015
+
+
+                 Fedora os-prober considered harmful
+
+
+Quick Summary
+==============
+
+Rusty Bird, while testing our patch for the AEM attack that was the
+subject of the previous bulletin (QSB #19), noticed that the
+os-prober, a standard Fedora package used for dual-boot configuration
+discovery and maintenance, is processing some of the internal Qubes
+block devices, used by the Xen backend. This might allow an attacker,
+who compromised one of the VMs, to prepare a malicious content on the
+VM's private image, which, upon processing by the Fedora os-prober
+scripts and, subsequently, Dom0 kernel fs modules, might lead to Dom0
+compromise, which would be fatal.
+
+Description of the bug
+=======================
+
+TODO
+
+
+The short-term fix
+===================
+
+TODO
+
+
+The Proper solution: Untrusted Storage Domain
+==============================================
+
+In the Qubes OS original architecture specification [1] we anticipated
+various potential attacks coming through storage virtualization
+backends and proposed a generic solution in a from of Untrusted
+Storage Domain (USD).
+
+There have been, however, several reasons why we have not implemented
+separate, untrusted storage domain in Qubes for all these years yet,
+the primary one being the lack of robust trusted boot scheme, which is
+a prerequisite for a storage domain to make sense on a laptop system
+[*].
+
+Sadly (even if somehow gratifying for those who conceived the original
+architecture), this is not the first time we have seen
+security-related issues due to lack of separate storage domain in
+Qubes OS. Last year one of Qubes users [2] noticed a potential problem
+of AppVMs private images being processed by Fedora default udev rules,
+which allowed a user who opened a file manager in Dom0 (admittedly an
+action that we try to discourage in Qubes) to mount AppVMs' private
+filesystems, potentially leading to a fatal system compromise. This
+has been fixed by specifically excluding loop devices, which are used
+by Xen storage backend, from being processed by udev in Dom0 [3].
+
+These two examples, again, show how hopeless it is to try to secure a
+monolithic OS [**], such as a traditional Linux distribution, where it is
+difficult to grasp all the inter-dependencies on untrusted input
+processing being done on such systems.
+
+There are also other reasons which make the notion of Untrusted
+Storage Domain attractive, such as the protection against potentially
+malicious disk controller firmware that it can offer as well. Thus, we
+decided to bring this idea back to our consideration in the roadmap
+for Qubes 4.x [4].
+
+The first step, however, would be the separation of all the graphics
+subsystem out of Dom0 and formation of a GUI domain (see the roadmap
+again, [4]).  This will leave us with a much smaller codebase in Dom0,
+allowing to hopefully disable most of the udev/systemd services in
+Dom0. We might then even conclude such a think Dom0 (without
+graphics/X subsystem) is now simple enough to tolerate simple storage
+backend there [***].
+
+It's worth stressing that a separate GUI domain, unlike Storage
+Domain, cannot really be made _untrusted_ with current technology, as
+the graphics subsystem always "sees" all the user screen, and so is
+capable of screenshoting all the secret documents the user decided to
+read on screen, as well to record actions of the user . More over,
+unless some form of Split I/O is implemented [5], the GUI domain can
+also impersonate the user, by injecting malicious keyboard and move
+events. Still, we believe moving GUI domain out of Dom0 
+
+Needless to say, having a separate GUI domain is not easy due to the
+requirement for the underlying hypervisor to support GPU passthrough
+well [****].
+
+[*] As explained in the referenced Qubes architecture document, a
+robust trusted boot scheme is needed for having untrusted storage
+domain on computers which have only one disk controller (which
+includes virtually all the laptops) to prevent the untrusted storage
+subsystem from modifying the system's boot path.
+
+[**] Here we intentionally refer to monolithic distribution, rather
+than just a monolithic kernel.
+
+[***] Again, for the Untrusted Storage Domain to make any
+sense we need robust Trusted Boot scheme, which is still far away for
+on the x86 platform.
+
+[****] Note we "only" need GPU passthrough (i.e. direct GPU device
+assignment to one select VM), rather than GPU virtualization, which is
+even more challenging to do securely.
+
+Mitigating factors
+===================
+
+TODO
+
+FAQ
+====
+
+Q. Wouldn't having locked root account in all Qubes VMs be a good
+idea, after all? This would then prevent the attacker from preparing a
+potential malicious content into private.img, making exploitation of
+this attack harder?
+
+A. Perhaps it might make some attacks on Qubes or the underlying
+hypervisor or virtualization technology slightly harder, but at the
+price of making the user interaction with the AppVMs more annoying, as
+explained in [6]. It is important to realize Qubes uses GNU/Linux in
+VMs only as "API providers" to run user Apps (or drivers and stacks),
+rather than as isolation providers. Indeed, the attack surface
+allowing user -> root escalation (or even user -> kernel) inside each
+of the VMs is so huge, it would be unwise to assume there could be any
+security boundary within the VM.
+
+TODO
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin (and also brining a few other reliability patches to Xen)
+have been uploaded to the security-testing repository:
+
+TODO
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problem discussed above:
+
+* Rusty Bird <rustybird@openmailbox.org>
+
+
+References
+===========
+
+[1] "Qubes OS Architecture", 2010, http://files.qubes-os.org/files/doc/arch-spec-0.3.pdf
+
+[2] https://groups.google.com/d/msg/qubes-users/_tkjmBa9m9w/nKMXJwMXcNkJ
+
+[3] https://github.com/qubesos/qubes-core-admin-linux/commit/5af0530
+
+[4] https://github.com/rootkovska/qubes-roadmap
+
+[5] http://blog.invisiblethings.org/2010/09/09/untrusting-your-gui-subsystem.html
+
+[6] https://www.qubes-os.org/doc/VMSudo/
+
+
+--
+The Qubes Security Team
+http://wiki.qubes-os.org/trac/wiki/SecurityPage

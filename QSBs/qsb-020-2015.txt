@@ -24,13 +24,68 @@ compromise, which would be fatal.
 Description of the bug
 =======================
 
-TODO
+The default Qubes installation contains package os-prober installed in
+dom0. This package is used by grub configuration generator
+(grub2-mkconfig tool, /etc/grub.d/30_os-prober to be precise) to check
+if any other system is installed on the same machine and possibly add
+those systems to grub menu. This detection is done by enumerating all
+the block devices present in the system (based on /sys/block) and
+running multiple parsers on them to check if it matches any known
+operating system. Most of those parsers includes mounting given block
+device and looking for arbitrary files there, then possibly parse
+those files to find operating system details (like version).
 
+We haven't found any obvious exploitable bug in those parsers, but the
+whole process is so complex (handling filesystem metadata during mount
+is complex enough), that we believe it isn't wise to assume this code
+to be bug-free.
+
+Block devices in dom0 includes /dev/loop*, which are used by Xen block
+backend driver to provide private.img and root.img to the VMs. This
+means "all the block devices in dom0" includes devices with data
+controlled by the VMs. So, if the attacker know some exploitable
+vulnerability in any of os-prober parsers (or kernel filesystem
+module), he/she could use it to escape from a VM to dom0, which
+would be fatal.
+
+Such attach will require that at the time of calling os-prober, such
+attacking VM is running - only then its private.img is connected to
+some loop block device. The os-prober is called every time where grub
+configuration is updated. This includes:
+
+* installing/updating kernel package
+* installing Anti Evil Maid
+* calling grub2-mkconfig manually (possibly after some configuration
+  modification)
+
+Side effect of this bug could be VM data corruption. When os-prober is
+called, it mounts every device found in dom0. This includes
+before mentioned /dev/loop* devices, which are at the same time
+mounted in the VMs. In most cases it would mean that dom0 will treat
+such filesystem as not cleanly unmounted and will try to "fix" it by
+replaying journal or similar task. VM kernel will see this as sudden,
+unexpected disk modification and most likely will not account those
+modifications in further metadata updates. This will lead to
+inconsistent filesystem state.
 
 The short-term fix
 ===================
 
-TODO
+To fix this particular problem we are forcibly removing os-prober
+package. This is done by adding "Obsoletes: os-prober" and "Provides:
+os-prober" rpm headers to qubes-core-dom0-linux package
+(qubes-core-admin-linux repository).
+
+This approach will have side effect of not listing other OSes in grub
+menu anymore. If a user still want to have such additional systems
+present, there are a alternative options to do that. The simplest one
+would be adding such menu entries in /etc/grub.d/40_custom. In the
+future, we will provide UEFI support[7], which will further ease such
+dual-boot configuration.
+
+We don't recommend using dual-boot installation on the same disk
+anyway, so we don't consider this feature limitation to be
+significant.
 
 
 The Proper solution: Untrusted Storage Domain
@@ -110,7 +165,10 @@ even more challenging to do securely.
 Mitigating factors
 ===================
 
-TODO
+To have a chance to attack vulnerability described here, an attacker
+needs to control a VM running at the time of calling grub2-mkconfig
+(either by hand, or by some script). This doesn't happen very often,
+so the attacker has very few occasions to mount the attack.
 
 FAQ
 ====
@@ -136,10 +194,9 @@ Patching
 =========
 
 The specific packages that resolve the problem discussed in this
-bulletin (and also brining a few other reliability patches to Xen)
-have been uploaded to the security-testing repository:
+bulletin have been uploaded to the security-testing repository:
 
-TODO
+* qubes-core-dom-linux 3.0.11
 
 The packages are to be installed in Dom0 via qubes-dom0-update command
 or via the Qubes graphical manager.
@@ -192,6 +249,7 @@ References
 
 [6] https://www.qubes-os.org/doc/VMSudo/
 
+[7] https://github.com/QubesOS/qubes-issues/issues/794
 
 --
 The Qubes Security Team

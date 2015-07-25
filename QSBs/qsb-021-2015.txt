@@ -1,0 +1,137 @@
+
+
+             ---===[ Qubes Security Bulletin #21 ]===---
+
+                            July 27, 2015
+
+
+        Anti Evil Maid bypass through filesystem ID collision
+
+
+Quick Summary
+==============
+
+An individual named HW42 has discovered a security issue in Anti Evil
+Maid, similar to the attack described in the recent QSB #19, where an
+adversary with physical access to the system can trick the AEM
+initramfs scripts to use the root device provided by the attacker
+instead of the user's original, encrypted, volume. The AEM user secret
+would be displayed as if nothing had happened. This allows to bypass
+the additional protection that the AEM is supposed to provide.
+    
+Description of the Bug
+=======================
+
+The main task of a Linux initrd/initramfs is to find and mount the
+root filesystem.
+
+The Fedora initramfs implementation (dracut) is event-based and thus
+highly asynchronous. As a result, it is possible for two or more
+devices to compete for being assigned the same unique ID (based on
+their LVM VG name, filesystem UUID, or LABEL).
+
+The attacker can thus create a fake, unencrypted root device,
+somewhere on the unused sectors of the user's original disk, with the
+same ID as the original root volume. Because of the LUKS passphrase
+prompt, which delays the access to the (decrypted) original root
+device, the attacker's fake device will be enumerated sooner, and thus
+will always win the race for the root volume's ID (in case of an LVM,
+the fake, attacker-provided volume group would be activated).
+
+Such a fake volume would not be included in hash measurements
+performed by the AEM, and consequently its existence would not prevent
+AEM from successfully unsealing and showing the user's AEM secret.
+There would be nothing then to alert the user not to enter his or her
+LUKS passphrase.
+
+After the user entered a valid LUKS passphrase, the LUKS volume would
+be properly mounted, but since its ID was already claimed (or LVM
+volume group already activated), it would not be used as the actual
+root device for system boot. Instead, the attacker-provided fake root
+filesystem would be used, and so the attacker init scripts would be
+executed. These, in turn, could now steal the LUKS decryption key,
+store it somewhere, and pass execution to the original root filesystem
+in order to keep the attack from being easily detected.
+
+The attacker needs to know the colliding ID in order to mount this
+attack. In case of using AEM with the /boot partition stored on the
+permanent disk (as opposed to having the /boot on removable USB stick)
+this would be easy. Also, if the default disk partitioning scheme was
+used during Qubes OS installation, the volume group and the default
+root volume would get the predefined fixed names ("qubes_dom0" and
+"root", respectively).
+
+The same attack can be mounted over any other partition, including
+swap device, which can lead to having unencrypted swap, allowing to
+leak some data that way too.
+
+
+The Fix
+========
+
+To fix this problem, we've extended AEM to do some sanity checks just
+before mounting of the root filesystem, after the user enters the LUKS
+passphrase. These checks include:
+
+1. Checking if there is only one device matching "root" kernel
+parameter,
+
+2. Ensuring all the devices pointed by "root" and "rd.lvm.lv"
+parameters are on encrypted volumes.
+
+This has been implemented by the following commit:
+
+https://github.com/QubesOS/qubes-antievilmaid/commit/e53dab89ae805f8d6a4d1ad1d1f1d7bdd2e8cd99
+
+Note: the fix does not protect the swap device when it is located on a
+separate partition. In a default installation of Qubes OS this is not
+the case, as then both the root and swap are placed inside encrypted
+LVM group.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
+
+* anti-evil-maid-dracut 2.0.11
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problem discussed above:
+
+* HW42 <hw42@ipsumj.de>
+
+
+--
+The Qubes Security Team
+https://qubes-os.org/doc/SecurityPage/

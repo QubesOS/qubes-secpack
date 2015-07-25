@@ -1,0 +1,120 @@
+
+
+             ---===[ Qubes Security Bulletin #21 ]===---
+
+                            TODO, 2015
+
+
+      Anti Evil Maid bypass through filesystem ID collision
+
+
+Quick Summary
+==============
+
+HW42 discovered issue in Anti Evil Maid, similar to the one described
+in QSB #19. The attacker having physical access to the system can
+trick initramfs scripts to use root device provided by the attacker
+instead of the right, encrypted one. AEM wil not notice the change
+(The AEM user secret will be displayed as if nothing had happened.)
+This can lead to stealing user data, including LUKS master key.
+    
+Description of the bug
+=======================
+
+Initramfs main task is to find and setup root filesystem. The
+current implementation (dracut) is mostly event based, which means
+when some device is detected, the scripts tries to initialize the
+device. If there are multiple devices having the same identification,
+the first detected will have this "ID" assigned. This applies at least
+to:
+
+* LVM volume group name
+* Filesystem UUID
+* Filesystem LABEL
+
+If the attacker manages to supply unencrypted filesystem with the same
+identification as root filesystem, it will be detected by initramfs.
+Because user have not provided LUKS password at this stage yet, the
+real root filesystem is not available yet, to the fake one will be
+detected first and will claim the ID (in case of LVM, volume group
+will be activated). Such fake filesystem is not included in hash
+measurements, so AEM will still be able to unseal and show the user
+secret, as if nothing had happened. Later, when the user enters LUKS
+passphrase, the LUKS volume is mounted and the real root filesystem
+appears. But since its "ID" is already claimed (or LVM volume group
+already activated), it will not be used. Instead, the fake one,
+detected earlier, will be mounted and the initramfs will take over
+control to it.
+
+The attacker needs to know the ID to collide, but it isn't hard to get
+it from the system, because it is present in kernel command line,
+which can be obtained for example from bootloader configuration in
+/boot (if still present on the disk after AEM installation). Also if
+the default LVM configuration is used, the volume group is named
+"qubes_dom0" and the default root filesystem is on logical volume
+named "root".
+
+The same attack can be mounted over any other partition, including
+swap device, which can lead to having unencrypted swap, so some data
+could be leaked this way.
+
+
+The fix
+===================
+
+To fix this problem, we've extended AEM to do some sanity checks just
+before mounting root filesystem (after user enters LUKS passphrase).
+Those checks includes:
+1. Checking if there is only one device matching "root" kernel
+parameter.
+2. Ensuring that all devices pointed by "root" and "rd.lvm.lv"
+parameters are all on encrypted volumes.
+
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
+
+* anti-evil-maid-dracut 2.0.11
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
+
+
+Credits
+========
+
+The Qubes Security Team would like to thank the following people for
+reporting and working with us on the problem discussed above:
+
+* HW42 <hw42@ipsumj.de>
+
+
+--
+The Qubes Security Team
+https://qubes-os.org/doc/SecurityPage/

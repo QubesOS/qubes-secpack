@@ -28,79 +28,76 @@ The default Qubes installation contains package os-prober installed in
 dom0. This package is used by grub configuration generator
 (grub2-mkconfig tool, /etc/grub.d/30_os-prober to be precise) to check
 if any other system is installed on the same machine and possibly add
-those systems to the grub menu. This detection is done by enumerating all
-the block devices present in the system (using /sys/block) and
+those systems to the grub menu. This detection is done by enumerating
+all the block devices present in the system (using /sys/block) and
 running multiple parsers on them to check if it matches any known
 operating system. Most of those parsers includes mounting given block
 device and looking for arbitrary files there, then possibly parse
 those files to find operating system details (like version).
 
-We haven't found any obvious exploitable bugs in those parsers, but the
-whole process is so complex (handling filesystem metadata during mount
-is complex enough), that we believe it isn't wise to assume this code
-to be bug-free.
+We haven't found any obvious exploitable bugs in those parsers, but
+the whole process is so complex (handling filesystem metadata during
+mount is complex enough), that we believe it isn't wise to assume this
+code to be bug-free.
 
 The list of block devices in dom0 include /dev/loop* devices, which
-are used by the Xen block
-backend driver to expose private.img and root.img to Qubes VMs. These
-devices contain data
-controlled by the VMs. Thus, if an attacker found an exploitable
-vulnerability in any of os-prober parsers or kernel filesystem
-module used to handle these devices, they could use it to compromise Dom0, which
-would be fatal.
+are used by the Xen block backend driver to expose private.img and
+root.img to Qubes VMs. These devices contain data controlled by the
+VMs. Thus, if an attacker found an exploitable vulnerability in any of
+os-prober parsers or kernel filesystem module used to handle these
+devices, they could use it to compromise Dom0, which would be fatal.
 
-Such an attack would require the malicious VM to be running at the time
-of the os-prober scripts execution, as only then its private.img is connected to
-a loop block device in Dom0. As the os-prober is called every time a
-new grub configuration is being updated, the attacker VM would need to
-be running when, the legitimate user chose to install or update the kernel package in Dom0,
-install Anti Evil Maid, or decided to call grub2-mkconfig manually for
-whatever reason, such as after tweaking of kernel configuration in
-Dom0. There is no way for the attacker to trigger execution of the
-os-prober scripts themselves.
+Such an attack would require the malicious VM to be running at the
+time of the os-prober scripts execution, as only then its private.img
+is connected to a loop block device in Dom0. As the os-prober is
+called every time a new grub configuration is being updated, the
+attacker VM would need to be running when, the legitimate user chose
+to install or update the kernel package in Dom0, install Anti Evil
+Maid, or decided to call grub2-mkconfig manually for whatever reason,
+such as after tweaking of kernel configuration in Dom0. There is no
+way for the attacker to trigger execution of the os-prober scripts
+themselves.
 
 Some of the side effects of this bug might include VM data corruption,
-as when the os-prober is
-called it tries to mount every device found in Dom0, which includes
-the above mentioned /dev/loop* devices, but which are, at the same
-time,
-mounted in the VMs also. In most cases this would mean the Dom0 kernel
-were to treat
-such filesystems as not cleanly unmounted and would try to "fix" them by
-replaying their journal or performing similar remediation. The VM
-kernel would see this as a sudden,
-unexpected disk modification, and most likely would not account for these
-modifications in subsequent fs metadata updates. This might lead to
-an inconsistent filesystem state.
+as when the os-prober is called it tries to mount every device found
+in Dom0, which includes the above mentioned /dev/loop* devices, but
+which are, at the same time, mounted in the VMs also. In most cases
+this would mean the Dom0 kernel were to treat such filesystems as not
+cleanly unmounted and would try to "fix" them by replaying their
+journal or performing similar remediation. The VM kernel would see
+this as a sudden, unexpected disk modification, and most likely would
+not account for these modifications in subsequent fs metadata updates.
+This might lead to an inconsistent filesystem state.
 
 The Short-term Fix
 ===================
 
 To fix this particular problem we are forcibly removing os-prober
-package. This is done by adding the "Obsoletes: os-prober" and "Provides:
-os-prober" RPM headers in our qubes-core-dom0-linux package [8].
+package. This is done by adding the "Obsoletes: os-prober" and
+"Provides: os-prober" RPM headers in our qubes-core-dom0-linux package
+[8].
 
 This approach has a side effect of not listing other OSes in the grub
 menu anymore. If a user still wanted to have such additional systems
-listed, there are alternative options, with the simplest one
-being to add such menu entries in /etc/grub.d/40_custom manually. In the
+listed, there are alternative options, with the simplest one being to
+add such menu entries in /etc/grub.d/40_custom manually. In the
 future, we plan on supporting UEFI mode booting for Qubes OS [7],
 which should further ease such dual-boot configuration.
 
-Generally we recommend against using dual-boot
-configurations with Qubes OS as they increase the risk of introducing
-persistent firmware modifications to the platform, which could be
-fatal in case of some firmware, such as the BIOS, thus we don't consider this feature limitation to be
-of much significance.
+Generally we recommend against using dual-boot configurations with
+Qubes OS as they increase the risk of introducing persistent firmware
+modifications to the platform, which could be fatal in case of some
+firmware, such as the BIOS, thus we don't consider this feature
+limitation to be of much significance.
 
 
 The Proper Solution: Untrusted Storage Domain
 ==============================================
 
-In the Qubes OS original architecture specification [1] we've anticipated
-various potential attacks coming through storage virtualization
-backends and proposed a generic solution in a from of an Untrusted
-Storage Domain (USD).
+In the Qubes OS original architecture specification [1] we've
+anticipated various potential attacks coming through storage
+virtualization backends and proposed a generic solution in a from of
+an Untrusted Storage Domain (USD).
 
 There have been, however, several reasons why we have not implemented
 separate, untrusted storage domain in Qubes for all these years yet,
@@ -114,15 +111,15 @@ security-related issues due to lack of separate storage domain in
 Qubes OS. Last year one of Qubes users [2] noticed a potential problem
 of AppVMs private images being processed by Fedora default udev rules,
 which allowed a user who opened a file manager in Dom0 (admittedly an
-action that we've been trying to discourage in Qubes) to mount AppVMs' private
-filesystems, potentially leading to a fatal system compromise. This
-has been fixed by specifically excluding loop devices, which are used
-by Xen storage backend, from being processed by udev in Dom0 [3].
+action that we've been trying to discourage in Qubes) to mount AppVMs'
+private filesystems, potentially leading to a fatal system compromise.
+This has been fixed by specifically excluding loop devices, which are
+used by Xen storage backend, from being processed by udev in Dom0 [3].
 
-These two examples, again, show how hopeless it might be to try to secure a
-monolithic OS [**], such as a traditional Linux distribution, where it is
-difficult to grasp all the inter-dependencies on untrusted input
-processing.
+These two examples, again, show how hopeless it might be to try to
+secure a monolithic OS [**], such as a traditional Linux distribution,
+where it is difficult to grasp all the inter-dependencies on untrusted
+input processing.
 
 There are also other reasons which make the notion of an Untrusted
 Storage Domain attractive, such as the protection against potentially
@@ -134,27 +131,26 @@ The first step, however, will be the separation of all the graphics
 subsystem out of Dom0 and formation of a GUI domain (see the roadmap
 again, [4]).  This will leave us with a much smaller codebase in Dom0,
 allowing to hopefully disable most of the udev/systemd services in
-Dom0. We might then even conclude such a thin Dom0 (without
-graphics/X subsystem) is now simple enough to tolerate simple storage
-backend there [***].
+Dom0. We might then even conclude such a thin Dom0 (without graphics/X
+subsystem) is now simple enough to tolerate simple storage backend
+there [***].
 
 It's worth stressing that a separate GUI domain, unlike Storage
 Domain, cannot really be made _untrusted_ with current technology, as
-the graphics subsystem always "sees" all the user screen content, and so is
-capable of taking screenshots all the secret documents the user decided to
-read on their screen, as well to record (sniff) actions of the user. More over,
-unless some form of Split I/O is implemented [5], the GUI domain can
-also impersonate the user by injecting malicious keyboard and mouse
-events. Still, we believe moving GUI domain out of Dom0 can bring a
-lot of benefits, both security-wise as well maintenance-wise (e.g.
-allow for minimal, more secure Dom0, better hardware compatibility
-thanks to using HVM virtualization for the GUI domain, and hence
-better GPU support, and more).
+the graphics subsystem always "sees" all the user screen content, and
+so is capable of taking screenshots all the secret documents the user
+decided to read on their screen, as well to record (sniff) actions of
+the user. More over, unless some form of Split I/O is implemented [5],
+the GUI domain can also impersonate the user by injecting malicious
+keyboard and mouse events. Still, we believe moving GUI domain out of
+Dom0 can bring a lot of benefits, both security-wise as well
+maintenance-wise (e.g.  allow for minimal, more secure Dom0, better
+hardware compatibility thanks to using HVM virtualization for the GUI
+domain, and hence better GPU support, and more).
 
 Needless to say, having a separate GUI domain is still a bit
-challenging due to the
-requirement for the underlying hypervisor to support GPU passthrough
-well [****].
+challenging due to the requirement for the underlying hypervisor to
+support GPU passthrough well [****].
 
 While not looking for excuses, we should repeat here that these two
 important architectural hardening steps: the separation of GUI and
@@ -172,9 +168,9 @@ subsystem from modifying the system's boot path.
 [**] Here we intentionally refer to monolithic distribution, rather
 than just a monolithic kernel.
 
-[***] Again, for the Untrusted Storage Domain to make any
-sense we need robust Trusted Boot scheme, which is still far away
-on x86 platforms.
+[***] Again, for the Untrusted Storage Domain to make any sense we
+need robust Trusted Boot scheme, which is still far away on x86
+platforms.
 
 [****] Note we "only" need GPU passthrough (i.e. direct GPU device
 assignment to one select VM), rather than GPU virtualization, which is

@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #20 ]===---
 
-                            July 22, 2015
+                            July 27, 2015
 
 
                  Fedora os-prober considered harmful

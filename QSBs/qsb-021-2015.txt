@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #21 ]===---
 
-                            July 21, 2015
+                            July 27, 2015
 
 
         Anti Evil Maid bypass through filesystem ID collision
@@ -81,7 +81,7 @@ parameters are on encrypted volumes.
 
 This has been implemented by the following commit:
 
-TODO
+https://github.com/QubesOS/qubes-antievilmaid/commit/e53dab89ae805f8d6a4d1ad1d1f1d7bdd2e8cd99
 
 Patching
 =========

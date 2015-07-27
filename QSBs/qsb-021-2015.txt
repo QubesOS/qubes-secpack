@@ -83,6 +83,11 @@ This has been implemented by the following commit:
 
 https://github.com/QubesOS/qubes-antievilmaid/commit/e53dab89ae805f8d6a4d1ad1d1f1d7bdd2e8cd99
 
+Warning: the fix *does not* protect swap device when it is on separate
+partition. Only the case when swap (and possibly others) are inside
+encrypted LVM volume group, the same as root device. This is default
+Qubes configuration.
+
 Patching
 =========
 

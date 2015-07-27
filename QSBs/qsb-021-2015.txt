@@ -83,10 +83,10 @@ This has been implemented by the following commit:
 
 https://github.com/QubesOS/qubes-antievilmaid/commit/e53dab89ae805f8d6a4d1ad1d1f1d7bdd2e8cd99
 
-Warning: the fix *does not* protect swap device when it is on separate
-partition. Only the case when swap (and possibly others) are inside
-encrypted LVM volume group, the same as root device. This is default
-Qubes configuration.
+Note: the fix does not protect the swap device when it is located on a
+separate partition. In a default installation of Qubes OS this is not
+the case, as then both the root and swap are placed inside encrypted
+LVM group.
 
 Patching
 =========

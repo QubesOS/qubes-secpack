@@ -223,7 +223,8 @@ Patching
 The specific packages that resolve the problem discussed in this
 bulletin have been uploaded to the security-testing repository:
 
-* qubes-core-dom-linux 3.0.11
+* qubes-core-dom-linux 3.0.11 (R3.0)
+* qubes-core-dom-linux 2.0.29 (R2)
 
 The packages are to be installed in Dom0 via qubes-dom0-update command
 or via the Qubes graphical manager.
@@ -278,8 +279,8 @@ References
 
 [7] https://github.com/QubesOS/qubes-issues/issues/794
 
-[8] TODO: os-prober removing commit
+[8] https://github.com/QubesOS/qubes-core-admin-linux/commit/7fdff6a735905c73d396e9624c40756a5a4c0325
 
 --
 The Qubes Security Team
-http://wiki.qubes-os.org/trac/wiki/SecurityPage
+https://qubes-os.org/doc/SecurityPage/

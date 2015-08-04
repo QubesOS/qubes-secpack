@@ -1,0 +1,113 @@
+
+
+                    ---===[ Qubes Canary #4 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who undersigned this file [1] state the
+following:
+
+1. The date of issue of this canary is August 6, 2015.
+
+2. There have been 21 Qubes Security Bulletins published so far.
+
+3. Qubes Master Signing Key fingerprint is:
+
+427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to them with regards to the Qubes
+OS Project (e.g. to hand out the private signing keys, or to introduce
+backdoors).
+
+5. The next such canary statement is planned to be published in the
+first 2 weeks of October 2015. Special note should be taken if no new
+canary gets published by that time, or if the list of statements
+change without plausible explanation.
+
+Special announcements
+----------------------
+
+* We have opened a Twitter news channel for the project: @QubesOS
+
+* We would like to remind that Qubes OS has been designed with the
+assumption of all the infrastructure being permanently compromised.
+This means we don't assume trust in neither our updates-serving
+servers, source code repositories-hosting servers or services, nor the
+servers offering Qubes ISO downloads.
+
+* The only reliable way to verify downloaded Qubes ISOs, updates,
+source code, or any other resources related to Qubes, is by verifying
+digital signatures on the files or on the git tags. The HTTPS
+connection to any of our servers is NOT considered a reliable way to
+prove anything about the integrity of the resources accessed.
+
+* That being said, given the growing interest in Qubes OS from the
+less technical audience in the recent months, we have undertaken some
+efforts to transition to a slightly more trustworthy infrastructure
+for our ISO-serving servers. The two official servers for Qubes
+installation ISOs are now: 1) mirror.kernel.org, generously provided
+by the Linux Foundation, and 2) our own ftp.qubes-os.org physically
+hosted and managed in the EU by contributors to the project.
+
+1. https://mirrors.kernel.org/qubes/iso/
+2. https://ftp.qubes-os.org/iso/
+
+Disclaimers & Notes
+---------------------
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force, or other
+means like blackmail, or compromise of the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feed quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries were not created in advance.
+
+This declaration is merely a best effort and provided without any
+guarantees, warranty, and is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Thu, 06 Aug 2015 12:37:46 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+Mikhail Gorbachev: US Military an 'Insurmountable Obstacle to a Nuclear-Free World'
+Iranian Hostage Crisis: West Germany's Secret Role in Ending the Drama
+Office Beasts: Venomous Employees a €10 Billion Problem in Germany
+Erdogan's Cynical Game: Is Turkey Creeping Toward Civil War?
+Turkey's Demirtas: 'Erdogan Is Capable of Setting Country on Fire'
+
+$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+G.O.P. Matchup Coverage: What the Candidates Need to Do
+Cuban Youth See New U.S. Embassy, but Same Old Drab Life
+Sinosphere Blog: Orphan’s Essay Sets Off Debate About Poverty in China
+S.E.C. Approves Rule on C.E.O. Pay Ratio
+Spain Says Banker’s Seized Picasso Will Head Back Home
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
+MH370 families vent anger at inquiry
+Egypt to open Suez Canal expansion
+Hiroshima marks 70 years since bomb
+Suicide bomber hits Saudi mosque
+Australia admits refugee turn-back
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached GPG
+signatures by each of the signers, distributed together with this
+canary in qubes-secpack.git repo, and (2) via digitial signatures on
+the corresponding qubes-secpack.git repo tags.
+
+[2] Don't trust just the contents of this file blindly, go and verify
+the digital signatures!

@@ -9,7 +9,7 @@ Statements
 The Qubes core developers who undersigned this file [1] state the
 following:
 
-1. The date of issue of this canary is August TODO, 2015.
+1. The date of issue of this canary is August 5, 2015.
 
 2. There have been 21 Qubes Security Bulletins published so far.
 
@@ -31,55 +31,45 @@ Special announcements
 
 * We have opened a Twitter news channel for the project: @QubesOS
 
-Disclaimers & Notes
----------------------
-
-We would like to remind that Qubes OS has been designed with the
+* We would like to remind that Qubes OS has been designed with the
 assumption of all the infrastructure being permanently compromised.
-This means we don't (and have never been) assume trust in neither our
-updates-serving server(s), source code repositories hosting servers or
-services, nor the servers offering Qubes ISO downloads.
+This means we don't assume trust in neither our updates-serving
+servers, source code repositories-hosting servers or services, nor the
+servers offering Qubes ISO downloads.
 
-The only reliable way to verify downloaded Qubes ISOs, updates,
+* The only reliable way to verify downloaded Qubes ISOs, updates,
 source code, or any other resources related to Qubes, is by verifying
 digital signatures on the files or on the git tags. The HTTPS
 connection to any of our servers is NOT considered a reliable way to
 prove anything about the integrity of the resources accessed.
 
-While we take reasonable steps to assure our signing keys are
-difficult to steal, users who consider themselves high-profile targets
-should realize it's not unthinkable for a powerful adversary to steal
-the keys using e.g. sophisticated physical attacks against us, and
-thus might consider building Qubes from sources (this includes both
-the ISO and updates) until we implement multi-signature scheme for
-binaries signing. Alternatively, such users should consider using Tor
-for downloading of Qubes ISOs and updates to make it difficult to
-target them selectively by such a powerful adversary and force them to
-subvert all Qubes binaries, thus increasing chances of getting caught.
+* That being said, given the growing interest in Qubes OS from the
+less technical audience in the recent months, we have undertaken some
+efforts to transition to a slightly more trustworthy infrastructure
+for our ISO-serving servers. The two official servers for Qubes
+installation ISOs are now: 1) mirror.kernel.org, generously provided
+by the Linux Foundation, and 2) our own ftp.qubes-os.org physically
+hosted and managed by a befriended people in the EU.
 
-Additionally, we believe it makes sense for people building Qubes
-from sources to run Qubes Builder through a Tor connection to reduce
-chances of getting potentially subverted Fedora or Debian packages
-(which are used as a base for ISO and templates building) from an
-attacker who might have got access to the Fedora or Debian Project
-signing keys somehow.
+1. https://ftp.qubes-os.org/iso/
+2. https://mirrors.kernel.org/qubes/iso/
 
-Qubes provides ease to use, robust, and reasonably secure mechanisms
-to use Tor for the above mentioned scenarios.
+Disclaimers & Notes
+---------------------
 
-This scheme is not infallible. Although signing the declaration makes
-it very difficult for a third party to produce arbitrary declarations,
-it does not prevent them from using force, or other means like
-blackmail, or compromise of the signers' laptops, to coerce us to
-produce false declarations.
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force, or other
+means like blackmail, or compromise of the signers' laptops, to coerce
+us to produce false declarations.
 
-The news feed quoted below (Proof of Date) serves to demonstrate that
-this canary could not have been created prior to the date stated. It
-shows that a series of canaries were not created in advance.
+The news feed quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries were not created in advance.
 
 This declaration is merely a best effort and provided without any
 guarantees, warranty, and is not legally binding in any way to
-anybody.  None of the signers should be ever held legally responsible
+anybody. None of the signers should be ever held legally responsible
 for any of the statements made here.
 
 
@@ -87,16 +77,29 @@ Proof of freshness
 -------------------
 
 $ date -R -u
-TODO
+Wed, 05 Aug 2015 08:43:03 +0000
 
 $ feedstail -1 -n5 -f {title} -u https://www.spiegel.de/international/index.rss
-TODO
+Iranian Hostage Crisis: West Germany's Secret Role in Ending the Drama
+Office Beasts: Venomous Employees a €10 Billion Problem in Germany
+Erdogan's Cynical Game: Is Turkey Creeping Toward Civil War?
+Turkey's Demirtas: 'Erdogan Is Capable of Setting Country on Fire'
+The Dreadful Saviors: Feared Shiite Militias Battle Islamic State in Iraq
 
 $ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-TODO
+India Floods Derail Two Trains, Killing at Least 20
+Friends of Joe Biden Worry a Run for President Could Bruise His Legacy
+New York Officials Move to Regulate Towers Tied to Legionnaires’ Disease Outbreak
+Puerto Rico Has Another Debt Worry on Horizon
+Obama Begins Campaign in Congress for Iran Nuclear Deal
 
 $ feedstail -1 -n5 -f {title} -u http://feeds.bbci.co.uk/news/world/rss.xml
-TODO
+Flash flood derails India trains
+Experts to examine 'MH370 wing part'
+Loss of world's rarest ape charted
+S Korea ex-first lady visits North
+Lake Victoria collision kills two
+
 
 Footnotes
 ----------

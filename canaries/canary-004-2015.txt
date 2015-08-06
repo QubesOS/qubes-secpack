@@ -49,7 +49,7 @@ efforts to transition to a slightly more trustworthy infrastructure
 for our ISO-serving servers. The two official servers for Qubes
 installation ISOs are now: 1) mirror.kernel.org, generously provided
 by the Linux Foundation, and 2) our own ftp.qubes-os.org physically
-hosted and managed by a befriended people in the EU.
+hosted and managed in the EU by contributors to the project.
 
 1. https://ftp.qubes-os.org/iso/
 2. https://mirrors.kernel.org/qubes/iso/

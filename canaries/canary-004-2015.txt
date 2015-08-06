@@ -9,7 +9,7 @@ Statements
 The Qubes core developers who undersigned this file [1] state the
 following:
 
-1. The date of issue of this canary is August 5, 2015.
+1. The date of issue of this canary is August 6, 2015.
 
 2. There have been 21 Qubes Security Bulletins published so far.
 
@@ -77,28 +77,28 @@ Proof of freshness
 -------------------
 
 $ date -R -u
-Wed, 05 Aug 2015 08:43:03 +0000
+Thu, 06 Aug 2015 12:37:46 +0000
 
-$ feedstail -1 -n5 -f {title} -u https://www.spiegel.de/international/index.rss
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+Mikhail Gorbachev: US Military an 'Insurmountable Obstacle to a Nuclear-Free World'
 Iranian Hostage Crisis: West Germany's Secret Role in Ending the Drama
 Office Beasts: Venomous Employees a €10 Billion Problem in Germany
 Erdogan's Cynical Game: Is Turkey Creeping Toward Civil War?
 Turkey's Demirtas: 'Erdogan Is Capable of Setting Country on Fire'
-The Dreadful Saviors: Feared Shiite Militias Battle Islamic State in Iraq
 
-$ feedstail -1 -n5 -f {title} -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-India Floods Derail Two Trains, Killing at Least 20
-Friends of Joe Biden Worry a Run for President Could Bruise His Legacy
-New York Officials Move to Regulate Towers Tied to Legionnaires’ Disease Outbreak
-Puerto Rico Has Another Debt Worry on Horizon
-Obama Begins Campaign in Congress for Iran Nuclear Deal
+$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+G.O.P. Matchup Coverage: What the Candidates Need to Do
+Cuban Youth See New U.S. Embassy, but Same Old Drab Life
+Sinosphere Blog: Orphan’s Essay Sets Off Debate About Poverty in China
+S.E.C. Approves Rule on C.E.O. Pay Ratio
+Spain Says Banker’s Seized Picasso Will Head Back Home
 
-$ feedstail -1 -n5 -f {title} -u http://feeds.bbci.co.uk/news/world/rss.xml
-Flash flood derails India trains
-Experts to examine 'MH370 wing part'
-Loss of world's rarest ape charted
-S Korea ex-first lady visits North
-Lake Victoria collision kills two
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
+MH370 families vent anger at inquiry
+Egypt to open Suez Canal expansion
+Hiroshima marks 70 years since bomb
+Suicide bomber hits Saudi mosque
+Australia admits refugee turn-back
 
 
 Footnotes

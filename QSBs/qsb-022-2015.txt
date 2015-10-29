@@ -76,11 +76,11 @@ the L2_DISALLOW_MASK macro:
 
 and also how the base_disallow_mask gets initialized:
 
-void __init arch_init_memory(void)
-{
-    (...)
-    /* Basic guest-accessible flags: PRESENT, R/W, USER, A/D, AVAIL[0,1,2] */
-    base_disallow_mask = ~(_PAGE_PRESENT|_PAGE_RW|_PAGE_USER|
+    void __init arch_init_memory(void)
+    {
+        (...)
+        /* Basic guest-accessible flags: PRESENT, R/W, USER, A/D, AVAIL[0,1,2] */
+        base_disallow_mask = ~(_PAGE_PRESENT|_PAGE_RW|_PAGE_USER|
                            _PAGE_ACCESSED|_PAGE_DIRTY|_PAGE_AVAIL);
  
 
@@ -112,43 +112,42 @@ for superpages has been added [2].
 Additional thoughts by the Qubes Security Team
 ===============================================
 
-Admittedly this is subtle bug, because there is no immediately buggy
-code that could be spotted immediately. The bug emerges only if one
-looks at a bigger picture of logic flows (compare also QSB #09 for a
-somehow similar situation).
+Admittedly this is subtle bug, because there is no buggy code that
+could be spotted immediately. The bug emerges only if one looks at a
+bigger picture of logic flows (compare also QSB #09 for a somehow
+similar situation).
 
 On the other hand, it is really shocking that such a bug has been
-lurking in such a core element of the hypervisor for so many years. In
-our opinion the Xen project should rethink their coding guidelines and
-try to come up with practices and perhaps additional mechanisms that
-would not let similar flaws to plague the hypervisor ever again
-(assert-like mechanisms perhaps?). Otherwise the whole project makes
-no sense, at least to those who would like to use Xen for
-security-sensitive work. Sadly.
+lurking in the core of the hypervisor for so many years. In our
+opinion the Xen project should rethink their coding guidelines and try
+to come up with practices and perhaps additional mechanisms that would
+not let similar flaws to plague the hypervisor ever again (assert-like
+mechanisms perhaps?). Otherwise the whole project makes no sense, at
+least to those who would like to use Xen for security-sensitive work.
 
 Specifically, it worries us that, in the last 7 years (i.e. all the
 time when the bug was sitting there having a good time) so much
 engineering and development effort has been put into adding all sorts
 of new features and whatnots, yet no serious effort to improve Xen
-security effectively. Because, of course, there have been many more
+security effectively. Because there have been, of course, many more
 security bugs found in Xen over the last years (as the numbering of
 this XSA suggests). True, majority of these didn't affect Qubes OS,
 sometimes by pure luck, sometimes because of the extra prudence we
-took, many other times because of the architectural decisions we made.
-Nevertheless, the bugs in Xen are being found regularly, and this is
-no good news.  For a type I hypervisor of the age and maturity of Xen,
-this simply should not be happening. If it does, it suggests the
-development process is not prioritizing security.
+applied, many other times because of the architectural decisions we
+made.  Nevertheless, the bugs in Xen are being found regularly, and
+this is no good news. For a type-1 hypervisor of the age and maturity
+of Xen, this simply should not be happening. If it does, it suggests
+the development process is not prioritizing security.
 
 This bug might also be considered an argument for the view of ditching
 of para-virtualized (PV) VMs, and switch to HVMs, or better yet: PVH
 VMs for better isolation. This seems to be a valid argument indeed,
-but only if the underlying processor also supports SLAT (e.g. EPT), we
-believe. Otherwise the complexity of the hypervisor code needed to
-implement Shadow Paging offsets any potential benefits of using
-CPU-assisted virtualization, such as VT-x. Luckily it seems majority
-of the recent modern laptops does support SLAT, so this might be the
-direction we go for Qubes 4.
+but only if the underlying processor also supports SLAT (e.g. EPT).
+Otherwise the complexity of the hypervisor code needed to implement
+Shadow Paging offsets any potential benefits of using CPU-assisted
+virtualization, such as VT-x. Luckily it seems majority of the recent
+modern laptops does support SLAT, so this might be the direction we go
+for Qubes 4.
 
 Patching
 =========

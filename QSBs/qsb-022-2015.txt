@@ -1,0 +1,186 @@
+
+
+             ---===[ Qubes Security Bulletin #22 ]===---
+
+                            October 29, 2015
+
+
+     Critical Xen bug in PV memory virtualization code (XSA 148)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has announced a critical security bug (XSA 148)
+in the hypervisor code handling memory virtualization for the PV VMs
+[1]:
+
+| The code to validate level 2 page table entries is bypassed when
+| certain conditions are satisfied.  This means that a PV guest can
+| create writeable mappings using super page mappings.
+| 
+| Such writeable mappings can violate Xen intended invariants for pages
+| which Xen is supposed to keep read-only.
+
+The above is a political way of stating the bug is a very critical
+one. Probably the worst we have seen affecting the Xen hypervisor,
+ever. Sadly.
+
+Description of the Bug
+=======================
+
+The bug is in the mod_l2_entry() function which handles requests from
+the PV guests to update their page table mappings:
+
+    /* Update the L2 entry at pl2e to new value nl2e. pl2e is within frame pfn. */
+    static int mod_l2_entry(l2_pgentry_t *pl2e, 
+                            l2_pgentry_t nl2e, 
+                            unsigned long pfn,
+                            int preserve_ad,
+                            struct vcpu *vcpu)
+    {
+        l2_pgentry_t ol2e;
+        struct domain *d = vcpu->domain;
+        struct page_info *l2pg = mfn_to_page(pfn);
+        unsigned long type = l2pg->u.inuse.type_info;
+        int rc = 0;
+    
+        if ( unlikely(!is_guest_l2_slot(d, type, pgentry_ptr_to_slot(pl2e))) )
+        {
+            //...
+        }
+    
+        if ( unlikely(__copy_from_user(&ol2e, pl2e, sizeof(ol2e)) != 0) )
+            return -EFAULT;
+    
+        if ( l2e_get_flags(nl2e) & _PAGE_PRESENT )
+        {
+            if ( unlikely(l2e_get_flags(nl2e) & L2_DISALLOW_MASK) )
+            {
+                //...
+            }
+    
+            /* Fast path for identical mapping and presence. */
+            if ( !l2e_has_changed(ol2e, nl2e, _PAGE_PRESENT) )
+            {
+                adjust_guest_l2e(nl2e, d);
+                if ( UPDATE_ENTRY(l2, pl2e, ol2e, nl2e, pfn, vcpu, preserve_ad) )
+                    return 0;
+                return -EBUSY;
+            }
+
+The above code becomes buggy only if we also look at the definition of
+the L2_DISALLOW_MASK macro:
+
+    #define L2_DISALLOW_MASK (base_disallow_mask & ~_PAGE_PSE)
+
+and also how the base_disallow_mask gets initialized:
+
+void __init arch_init_memory(void)
+{
+    (...)
+    /* Basic guest-accessible flags: PRESENT, R/W, USER, A/D, AVAIL[0,1,2] */
+    base_disallow_mask = ~(_PAGE_PRESENT|_PAGE_RW|_PAGE_USER|
+                           _PAGE_ACCESSED|_PAGE_DIRTY|_PAGE_AVAIL);
+ 
+
+We see the attacker might request setting of the (PSE | RW) bits in
+the L2 PDE (which is possible thanks to L2_DISALLOW_MASK not excluding
+the PSE bit, something which has been added to support the superpage
+mappings for the PV guests), thus making the whole L1 table accessible
+to the guest with R/W rights (now seen as a large 2MB page), and
+modify one or more of the PTEs there to point to an arbitrary MFN the
+attacker feels like having access to.
+
+Now that would not be all fatal, if the attacker had no way of
+tricking Xen into treating this (now under the attacker's control)
+super-page back as a valid table of PTEs. Sadly, there is nothing to
+stop her from doing that. Thus we end up with Xen now treating the
+attacker-filled memory as a set of valid PTEs for the (PV) guest. This
+means the guest, by referencing the addresses mapped by these pages,
+is now really accessing whatever MFNs the attacker decided to write
+into the PTEs. In other words, the guest can access now all the
+system's memory. Reliably.
+
+The attack works irrespectively of whether the opt_allow_superpage is
+true or not.
+
+The bug has been introduced a while ago, so to say, when the support
+for superpages has been added [2].
+
+
+Additional thoughts by the Qubes Security Team
+===============================================
+
+Admittedly this is subtle bug, because there is no immediately buggy
+code that could be spotted immediately. The bug emerges only if one
+looks at a bigger picture of logic flows (compare also QSB #09 for a
+somehow similar situation).
+
+On the other hand, it is really shocking that such a bug has been
+lurking in such a core element of the hypervisor for so many years. In
+our opinion the Xen project should rethink their coding guidelines and
+try to come up with practices and perhaps additional mechanisms that
+would not let similar flaws to plague the hypervisor ever again
+(assert-like mechanisms perhaps?). Otherwise the whole project makes
+no sense, at least to those who would like to use Xen for
+security-sensitive work. Sadly.
+
+Specifically, it worries us that, in the last 7 years (i.e. all the
+time when the bug was sitting there having a good time) so much
+engineering and development effort has been put into adding all sorts
+of new features and whatnots, yet no serious effort to improve Xen
+security effectively. Because, of course, there have been many more
+security bugs found in Xen over the last years (as the numbering of
+this XSA suggests). True, majority of these didn't affect Qubes OS,
+sometimes by pure luck, sometimes because of the extra prudence we
+took, many other times because of the architectural decisions we made.
+Nevertheless, the bugs in Xen are being found regularly, and this is
+no good news.  For a type I hypervisor of the age and maturity of Xen,
+this simply should not be happening. If it does, it suggests the
+development process is not prioritizing security.
+
+This bug might also be considered an argument for the view of ditching
+of para-virtualized (PV) VMs, and switch to HVMs, or better yet: PVH
+VMs for better isolation. This seems to be a valid argument indeed,
+but only if the underlying processor also supports SLAT (e.g. EPT), we
+believe. Otherwise the complexity of the hypervisor code needed to
+implement Shadow Paging offsets any potential benefits of using
+CPU-assisted virtualization, such as VT-x. Luckily it seems majority
+of the recent modern laptops does support SLAT, so this might be the
+direction we go for Qubes 4.
+
+Patching
+=========
+
+Exceptionally, given the significance of the bug, we decided to upload
+the patched packages directly to the current repository, omitting the
+usual 1-week period of having the packages lay in the security-testing
+repository.
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the current repository:
+
+* TODO
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+TODO: mention additional Xen packages for other patches?
+
+Credits
+========
+
+This bugs has been made available to us by Xen Security Team via the
+Xen pre-discourse list.
+
+References
+===========
+
+[1] http://xenbits.xen.org/xsa/advisory-148.html
+
+[2] http://xenbits.xenproject.org/gitweb/?p=xen.git;a=commit;h=bd1cd81d648447eafd80f5e49cc568e35b5985dd
+
+--
+The Qubes Security Team
+https://qubes-os.org/doc/SecurityPage/

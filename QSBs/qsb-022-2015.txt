@@ -161,7 +161,7 @@ repository.
 The specific packages that resolve the problem discussed in this
 bulletin have been uploaded to the current repository:
 
-* xen packages, version 4.2.3-8 (R3.0)
+* xen packages, version 4.4.3-8 (R3.0)
 * xen packages, version 4.1.6.1-22 (R2)
 
 The packages are to be installed in Dom0 via qubes-dom0-update command

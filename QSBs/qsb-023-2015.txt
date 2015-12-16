@@ -118,6 +118,7 @@ We think only one problem of those we've found might be classified as a
 potential code execution vulnerability in the frontend. The following code is a
 fragment from xennet_tx_buf_gc() function from the Xen network frontend:
 
+
     for (cons = queue->tx.rsp_cons; cons != prod; cons++) {
         struct xen_netif_tx_response *txrsp;
     
@@ -197,5 +198,3 @@ References
 --
 The Qubes Security Team
 https://qubes-os.org/doc/SecurityPage/
-
-<!--- vim: set filetype=markdown : -->

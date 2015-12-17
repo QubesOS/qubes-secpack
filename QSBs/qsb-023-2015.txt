@@ -121,7 +121,7 @@ fragment from xennet_tx_buf_gc() function from the Xen network frontend:
 
     for (cons = queue->tx.rsp_cons; cons != prod; cons++) {
         struct xen_netif_tx_response *txrsp;
-    
+
         txrsp = RING_GET_RESPONSE(&queue->tx, cons);
         // ...
         id  = txrsp->id;
@@ -168,8 +168,58 @@ thoroughly analyze, and several vulnerabilities which might lead to a DoS [5][6]
 Patching
 =========
 
-TODO
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
 
+For Qubes R2:
+
+* New Dom0 kernel packages (kernel-3.12.40-3, kernel-qubes-vm-3.12.40-3)
+* New Xen packages (xen-4.1.6.1-24)
+* New libvchan package (qubes-libvchan-xen-2.2.12)
+
+For Qubes R3.0:
+
+* New Dom0 kernel packages (kernel-3.18.17-8, kernel-qubes-vm-3.18.17-8, kernel-3.19.8-101)
+* New Xen packages (xen-4.4.3-11, xen-libs-4.4.3-11)
+
+For Qubes R3.1:
+
+* New Dom0 kernel packages (kernel-4.1.13-7)
+* New Xen packages (xen-4.6.0-11, xen-libs-4.6.0-11)
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager. Also all the templates needs
+updating for new xen-libs package (qubes-libvchan-xen in case of Qubes
+R2).
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+About Qubes Security Testing Repository
+----------------------------------------
+
+The security-testing is a new Qubes package repository that has been
+introduced recently. It is disabled by default, and its purpose is to
+allow better and wider testing of security critical updates, before
+they make it to the "current" (default) repository.
+
+This allows the users (rather than Qubes developers) to make the
+tradeoffs of whether to install security updates early vs. wait until
+they get more tested by the community. This accounts for the fact that
+Qubes developers have limited ability to perform thorough testing
+themselves. To help with the process we provide detailed analysis of
+the security problems addressed by each QSB.
+
+The security-testing repo definition is provided by the latest
+core-agent-linux package (version 2.1.49) for the VMs, and
+qubes-release-2-11 for Dom0. These packages are already available in
+the default current repository.
 
 Credits
 ========
@@ -186,13 +236,13 @@ OS Project.
 References
 ===========
 
-[1] TODO: XSA-155
+[1] http://xenbits.xen.org/xsa/advisory-155.html
 [2] https://github.com/QubesOS/qubes-doc/blob/master/developers/coding-style.md#security-coding-guidelines 
 [3] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-001-2011.txt#L92
-[4] TODO: XSA-166
-[5] TODO: XSA-165
-[6] TODO: XSA-157
-[7] TODO: XSA-159
+[4] http://xenbits.xen.org/xsa/advisory-166.html
+[5] http://xenbits.xen.org/xsa/advisory-165.html
+[6] http://xenbits.xen.org/xsa/advisory-157.html
+[7] http://xenbits.xen.org/xsa/advisory-159.html
 
 
 --

@@ -1,11 +1,11 @@
 
 
-                  ---===[ Qubes Security Bulletin #23 ]===---
+             ---===[ Qubes Security Bulletin #23 ]===---
 
-                               December 17, 2015
+                          December 17, 2015
 
 
-     Race condition bugs in Xen code (XSA-155 and XSA-166), other Xen bugs 
+Race condition bugs in Xen code (XSA-155 and XSA-166), other Xen bugs 
 
 
 Quick Summary

@@ -216,10 +216,6 @@ Qubes developers have limited ability to perform thorough testing
 themselves. To help with the process we provide detailed analysis of
 the security problems addressed by each QSB.
 
-The security-testing repo definition is provided by the latest
-core-agent-linux package (version 2.1.49) for the VMs, and
-qubes-release-2-11 for Dom0. These packages are already available in
-the default current repository.
 
 Credits
 ========

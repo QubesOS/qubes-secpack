@@ -208,8 +208,8 @@ R2).
 A system restart will be required afterwards.
 
 If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR14 will change because of a new
-xen.gz binary.
+passphrase to new PCR values, as PCR18+19 will change because of new
+Xen and kernel binaries, and because of the regenerated initramfs.
 
 These packages will be moved to the current repository over the coming
 days once they receive more testing from the community.

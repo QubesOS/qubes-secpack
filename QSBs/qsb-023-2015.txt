@@ -96,7 +96,7 @@ we should also consider the frontends, not just the backends, for potential
 vulnerabilities. This might give an impression that in this case Qubes offers
 worse security than a standard deployment of Xen. That would be a false
 conclusion, however. We should stress that a vulnerability in a frontend can
-only be exposed by an already compromised backend, which means that a
+only be exploited by an already compromised backend, which means that a
 non-decomposed Xen system must have been already fatally compromised...
 
 In any case, we have analyzed the code for the Xen network and block frontends
@@ -153,15 +153,15 @@ Apart for the XSA-155 discussed above, the Xen Security Team has also announced
 several other advisories, all of which seem even more theoretical, or have been
 classified as DoS only.
 
-Among these the XSA-166 [3] deserves some attention as it seems to be another
+Among these the XSA-166 [4] deserves some attention as it seems to be another
 example of the double fetch problem, this time applied to the hypervisor
 operating on data exposed by an HVM guest, but according to the analysis
-performed by the Xen team the attacker seems to be theoretical only (in addition
+performed by the Xen team the attack seems to be theoretical only (in addition
 to requiring a chained attack to a stub domain first).
 
-Others bugs disclosed and patched today include: the XSA-165 [4] with a
+Others bugs disclosed and patched today include: the XSA-165 [5] with a
 potential leak of the FPU stack and XMM registers, which we haven't got time to
-thoroughly analyze, and several vulnerabilities which might lead to a DoS [5][6]
+thoroughly analyze, and several vulnerabilities which might lead to a DoS [6][7]
 (we generally treat DoS-only vulnerabilities as normal bugfixes)
 
 

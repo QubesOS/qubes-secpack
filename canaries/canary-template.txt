@@ -1,6 +1,6 @@
 
 
-                    ---===[ Qubes Canary #5 ]===---
+                    ---===[ Qubes Canary #_ ]===---
 
 
 Statements
@@ -9,9 +9,9 @@ Statements
 The Qubes core developers who have digitally signed this file [1]
 state the following:
 
-1. The date of issue of this canary is October 1, 2015.
+1. The date of issue of this canary is _____  __, ____.
 
-2. There have been 21 Qubes Security Bulletins published so far.
+2. There have been __ Qubes Security Bulletins published so far.
 
 3. The Qubes Master Signing Key fingerprint is:
 
@@ -22,7 +22,7 @@ OS Project (e.g. to hand out the private signing keys or to introduce
 backdoors).
 
 5. We plan to publish the next of these canary statements in the
-first two weeks of January 2016. Special note should be taken if no new
+first two weeks of _____ ____. Special note should be taken if no new
 canary is published by that time or if the list of statements
 changes without plausible explanation.
 
@@ -58,28 +58,14 @@ Proof of freshness
 -------------------
 
 $ date -R -u
-Thu, 01 Oct 2015 07:13:42 +0000
 
 $ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
-VW Scandal: Time for German Industry to Abandon Its Arrogance
-'Fairview': Latest Snowden Doc Shows NSA Spied on German Intelligence
-To Progress and Back: The Rise and Fall of Erdogan's Turkey
-Pippi Longstocking's Creator: Wartime Diaries Reveal the True Astrid Lindgren
-Mother Angela: Merkel's Refugee Policy Divides Europe
 
 $ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-Manhattan Apartment Prices Near Million-Dollar Mark, Reports Say
-Francis in America: Pope Francis, the Kentucky Clerk and Culture Wars Revisited
-Hillary Clinton Camp Is Making Moves to Check Joe Biden
-Pacific Trade Deal Talks Resume, Under Fire From U.S. Presidential Hopefuls
-First Draft: Hillary Clinton Raises $28 Million for Presidential Campaign
 
 $ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
-Afghan forces 'regain Kunduz control'
-Russia and US military to talk on Syria
-'Good bacteria' key to stopping asthma
-Iran Hajj death toll rises to 464
-Trump: I would send Syria refugees home
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
 
 
 Footnotes

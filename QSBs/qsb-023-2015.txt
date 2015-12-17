@@ -256,4 +256,4 @@ References
 
 --
 The Qubes Security Team
-https://qubes-os.org/doc/SecurityPage/
+https://www.qubes-os.org/security/

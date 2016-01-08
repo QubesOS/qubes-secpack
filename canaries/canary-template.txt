@@ -17,23 +17,24 @@ state the following:
 
 427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
 
-4. No warrants have ever been served to us with regard to the Qubes
-OS Project (e.g. to hand out the private signing keys or to introduce
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
 backdoors).
 
-5. We plan to publish the next of these canary statements in the
-first two weeks of _____ ____. Special note should be taken if no new
-canary is published by that time or if the list of statements
-changes without plausible explanation.
+5. We plan to publish the next of these canary statements in the first
+two weeks of _____ ____. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
 
 Special announcements
 ----------------------
 
-* We would like to remind you that Qubes OS has been designed under the
-assumption that all relevant infrastructure is permanently compromised.
-This means that we assume NO trust in any of the servers or services
-which host or provide any Qubes-related data, in particular, software
-updates, source code repositories, and Qubes ISO downloads.
+* We would like to remind you that Qubes OS has been designed under
+the assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
 
 Disclaimers and notes
 ----------------------
@@ -53,28 +54,18 @@ guarantee or warranty. It is not legally binding in any way to
 anybody. None of the signers should be ever held legally responsible
 for any of the statements made here.
 
-
 Proof of freshness
 -------------------
 
-$ date -R -u
-
-$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
-
-$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-
-$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
-
-$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
-
+TODO
 
 Footnotes
 ----------
 
 [1] This file should be signed in two ways: (1) via detached PGP
 signatures by each of the signers, distributed together with this
-canary in the qubes-secpack.git repo, and (2) via digital signatures on
-the corresponding qubes-secpack.git repo tags. [2]
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
 
-[2] Don't just trust the contents of this file blindly!
-Verify the digital signatures!
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

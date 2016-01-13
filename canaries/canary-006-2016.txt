@@ -15,7 +15,7 @@ state the following:
 
 3. The Qubes Master Signing Key fingerprint is:
 
-427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
 
 4. No warrants have ever been served to us with regard to the Qubes OS
 Project (e.g. to hand out the private signing keys or to introduce

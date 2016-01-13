@@ -9,7 +9,7 @@ Statements
 The Qubes core developers who have digitally signed this file [1]
 state the following:
 
-1. The date of issue of this canary is January 8, 2016.
+1. The date of issue of this canary is January 13, 2016.
 
 2. There have been 23 Qubes Security Bulletins published so far.
 
@@ -68,35 +68,36 @@ Proof of freshness
 -------------------
 
 $ date -R -u
-Fri, 08 Jan 2016 13:58:04 +0000
+Wed, 13 Jan 2016 11:47:19 +0000
 
 $ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
-Cologne Assaults: Police Report Outlines 'Chaotic and Shameful' New Year's Eve
-Boardroom Quotas: The Slow Pace of Gender Equality in Corporate Germany
-Terror Expert Charles Lister: 'Islamic State Is a Convenient Obsession'
-New Year's Eve Attacks: Dozens of Women Sexually Assaulted in Cologne
-Brexit Danger: The EU Strategy to Keep Britain from Leaving
+Mini-Republics: A Syrian Village Seeks to Survive amid Carnage
+An Attack on Democracy?: Worries over Poland Mount in Brussels and Berlin
+Chaos and Violence: How New Year's Eve in Cologne Has Changed Germany
+An Interview with Cologne's Mayor: 'I Have Been Subjected to a Ton of Ridicule and Criticism'
+Mobs and Counter-Mobs: Pitfalls, Prejudice and the Cologne Sexual Assaults
 
 $ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
-U.S. Economy Added 292,000 Jobs in December; Unemployment Rate at 5%
-China, in Rebuke, Suggests U.S. Worsened Ties With North Korea
-First Draft: Chris Christie Says Hillary Clinton Would Cut Marco Rubio’s ‘Heart Out’
-Fingerprint of Fugitive in Paris Attacks Is Found in Brussels Apartment
-Currency Devaluations by Asian Tigers Could Hinder Global Growth
+Suicide Bombing Near Polio Center in Pakistan Kills at Least 16
+Feature: The Trials of Alice Goffman
+Desna Journal: Glass Beads Made in Czech Village Adorn Bodies of the World’s Tribes
+Belgium Identifies 3 Houses Used to Prepare for Paris Attacks
+Iran Says It Has Released U.S. Sailors Accused of ‘Trespassing’
 
 $ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
-Paris attacks suspect's 'hideout found'
-IS militant 'executes own mother'
-Asylum seekers among Cologne suspects
-Swiss woman kidnapped in Timbuktu
-Ethiopia 'kills 140 Oromo protesters'
+Iran frees US sailors held in Gulf
+Obama urges optimism for 'anxious' US
+Employers 'can read private emails'
+Fifa sacks secretary general Valcke
+Danish MPs consider tough migrant laws
 
 $ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
-Turkish police detain pro-Kurdish opposition members in Istanbul raid
-Erdogan says attempted Islamic State attack vindicates Iraq deployment
-Pressure grows on China to rein in North Korea; South launches propaganda barrage
-Special forces target Islamic State in Hawija, Iraq official says
-Belgium says found possible Paris attacks bomb factory in December raid
+China's Ai Weiwei bedecks beard with Lego bricks after firm backs down
+Sweden asks to question Assange, waits for Ecuador answer
+Turkey detains three Russians suspected of Islamic State ties after Istanbul bomb: media
+Iran released U.S. sailors in international waters
+Hackers bring down Thai websites over British murders verdict
+
 
 Footnotes
 ----------

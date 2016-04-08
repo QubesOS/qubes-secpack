@@ -1,0 +1,101 @@
+
+
+                    ---===[ Qubes Canary #7 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is April 8th, 2016.
+
+2. There have been 23 Qubes Security Bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
+backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+two weeks of June 2016. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
+
+Special announcements
+----------------------
+
+0. We would like to remind you that Qubes OS has been designed under
+the assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
+
+Disclaimers and notes
+----------------------
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other
+means, like blackmail or compromising the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feeds quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Fri, 08 Apr 2016 07:31:43 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+With Friends Like These...: Erdogan's Assault on Freedom and Democracy
+Opinion: America's Election Shame
+Sharia Villages: Bosnia's Islamic State Problem
+Spying on Friends?: Atmosphere of Distrust Hinders EU Anti-Terror Cooperation
+Greece: Endgame for the IMF-EU Feud over Greece's Debt
+
+$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+Profits Dry Up for Turkey’s Migrant Brokers
+Bernie Sanders and Hillary Clinton Turn to Attacks on Credentials
+Hillary Clinton’s MetroCard Adventure: Swipe. Wince. Repeat.
+E.M. Nathanson, 88, Author of ‘The Dirty Dozen’
+Need to Hide Some Income? You Don’t Have to Go to Panama
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
+Migrant deportations to Turkey resume
+Argentina leader has 'nothing to hide'
+Pope to make key marriage pronouncement
+US policeman 'body-slams girl, 12'
+Beijing hotel assault suspect arrested
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
+Greece ferries migrants to Turkey under EU pact
+Australia to strip dual nationals involved in terror of citizenship
+Seven killed, 15 injured in Sinai blasts
+Greece ferries second boat of migrants to Turkey under EU pact
+Peru's Mendoza seen tied with Fujimori in run-off scenario
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

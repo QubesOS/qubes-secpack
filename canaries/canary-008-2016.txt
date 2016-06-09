@@ -1,0 +1,101 @@
+
+
+                    ---===[ Qubes Canary #8 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is June 10, 2016.
+
+2. There have been 23 Qubes Security Bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
+backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+two weeks of September 2016. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
+
+Special announcements
+----------------------
+
+* We would like to remind you that Qubes OS has been designed under
+the assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
+
+Disclaimers and notes
+----------------------
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other
+means, like blackmail or compromising the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feeds quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Thu, 09 Jun 2016 17:03:44 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+NATO Chief Jens Stoltenberg: 'We Don't Want a New Cold War'
+Unimaginable Horrors: The War-Crimes Lawyer Hunting Syrian War Criminals
+CNN Host on US Election: 'It's Gonna Be Really Nasty'
+'No Editorial Content, No Fact-Checking': CNN Anchor Criticizes US Coverage of Trump
+Interactive Globe: A Worldwide Survey of Extreme Poverty
+
+$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+The 2016 Race: There Are More White Voters Than People Think. That’s Good News for Trump.
+Historic Import of Hillary Clinton’s Victory Is One More Source of Division
+Isn’t the Primary Over? Why Bernie Sanders Won’t Quit
+On Washington: Donald Trump’s Advice to Panicked Republicans: Man Up
+Your Daily Mini Crossword
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
+Italy politics: Silvio Berlusconi to have heart surgery
+Muhammad Ali memorial begins with Muslim prayer service
+Europe migrant crisis: Doubt cast on identity of 'smuggler' extradited to Italy
+Ethiopia base in Somalia attacked by al-Shabab
+Tel Aviv shooting: Israel suspends Palestinian permits
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
+After deadly Tel Aviv attack, Israel suspends Palestinian permits
+Libyan forces fight Islamic State in Sirte, predict they will seize city soon
+U.S.-backed forces tighten grip around Islamic State in Syria's Manbij
+Pope to visit Auschwitz during trip to Poland in July
+From welfare to barmaids' cleavages: UK views on EU not always accurate, poll finds
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

@@ -1,0 +1,55 @@
+#!/usr/bin/python
+
+import argparse
+import sys
+
+parser = argparse.ArgumentParser(
+    description=('Combine signatures of independently signed multi-signature transactions. '
+        'It uses electrum python module, so you need to have electrum installed.'),
+    epilog='Use raw transaction format - one long line per transaction'
+)
+parser.add_argument('input', nargs='?', default='-',
+    help='input file, use \'-\' for standard input (default)')
+parser.add_argument('output', nargs='?', default='-',
+    help='output file, use \'-\' for standard output (default)')
+parser.add_argument('--quiet', '-q', action='store_true', default=False,
+    help='Suppress progress messages')
+
+def main():
+    args = parser.parse_args()
+
+    try:
+        import electrum.transaction
+    except ImportError:
+        parser.error('ERROR: Electrum not installed')
+
+    if args.input == '-':
+        input = sys.stdin
+    else:
+        input = open(args.input, 'r')
+    if args.output == '-':
+        output = sys.stdout
+    else:
+        output = open(args.output, 'w')
+
+    counter = 1
+    first_tx = input.readline()
+    if not args.quiet:
+        print >>sys.stderr, "Loading transaction no {}".format(counter)
+    tx = electrum.transaction.Transaction(first_tx.strip())
+    counter += 1
+
+    for input_tx in input.readlines():
+        input_tx = input_tx.strip()
+        # skip empty lines and comments
+        if not input_tx or input_tx.startswith('#'):
+            continue
+        if not args.quiet:
+            print >>sys.stderr, "Loading transaction no {}".format(counter)
+        tx.update_signatures(input_tx)
+        counter += 1
+    output.write(tx.raw + '\n')
+
+
+if __name__ == '__main__':
+    main()

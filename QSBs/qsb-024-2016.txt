@@ -1,0 +1,176 @@
+
+
+             ---===[ Qubes Security Bulletin #24 ]===---
+
+                            July 26, 2016
+
+
+     Critical Xen bug in PV memory virtualization code (XSA 182)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has announced a critical security bug (XSA 182)
+in the hypervisor code handling memory virtualization for the PV VMs
+[1]:
+
+| The PV pagetable code has fast-paths for making updates to
+| pre-existing pagetable entries, to skip expensive re-validation in
+| safe cases (e.g.  clearing only Access/Dirty bits).  The bits
+| considered safe were too broad, and not actually safe.
+|  
+| A malicious PV guest administrator can escalate their privilege to that
+| of the host.
+
+If this sounds familiar to the infamous XSA 148 bug which was
+disclosed last year [2], it is because it is indeed a very similar
+type of vulnerability, in almost the same piece of Xen hypervisor
+code, the code that implements PV memory virtualization. Like XSA 148,
+this seems to be a fatal security bug which regrettably affects Qubes
+OS.
+
+An attacker who exploits this bug can break Qubes-provided isolation.
+This means that if an attacker has already exploited another
+vulnerability, e.g. in a Web Browser or Networking or USB stack, then
+the attacker would be able to compromise the whole Qubes system.
+
+
+Description and analysis of the bug
+====================================
+
+The buggy code is present in all mod_l{1..4}_entry() functions, which
+are responsible for processing requests from the PV guests to update
+their page table mappings. An interested reader is directed to the
+original advisory and patch for more details [1].
+
+We have originally concluded that this bug was exploitable in a
+relatively simple and reliable way, similarly to what we concluded for
+the previously mentioned XSA 148 [2]. Based on this opinion we decided
+to treat this as a security critical bug.
+
+But after writing down the draft of this bulletin yesterday, which
+included a proposed attack sketch in this section, the other member of
+the Qubes Security Team pointed out flaws in the theorized
+exploitation.
+
+In response the first person updated her exploitation sketch this
+morning. But then further constraints were found (by the second
+member) which likely make this second exploitation scenario also
+unfeasible. This same person suggested later, however, the original
+attack scenario might actually be feasible, pointing to
+special-purpose memory structures which might constitute a good
+candidate for manipulation thanks to the bug...
+
+Xen's extensive use of constructs such as:
+
+    #define l3_disallow_mask(d) (!is_pv_32bit_domain(d) ? \
+                             base_disallow_mask : 0xFFFFF198U)
+
+... make it difficult to reliably reason about validity of certain
+invariants, such as whether given flags could, or could not be,
+requested by the guest, especially when one considers a full 4-level
+hierarchical page-walking code.
+
+In conclusion we have been unable to reach a consensus about practical
+exploitability of this bug. In order to be on the safe side, we
+decided to continue treating it as critical bug nevertheless. After
+all, the bug does violate some fundamental assumptions about
+immutability of certain memory mapping structures. The mere fact we
+were unable to come up with an agreeable exploitation sketch within
+the last 24 hours should not be treated as a mitigation factor. The
+rest of this bulletin is written with an assumption the bug is
+critical indeed.
+
+Admittedly a reasonable thing for us to have done would be to attempt
+to write an actual proof-of-concept exploit and see if it worked.
+However, because of the unfortunate timing of when it was realized
+that exploitation might be more tricky than we thought (i.e.
+yesterday evening), we have not been able to work on an exploit.
+
+
+Thoughts about Xen security
+============================
+
+This bug, being the second critical bug in the Xen PV virtualization
+code publicly discussed in a relatively short period of time, cannot
+simply be shrugged off, patched, and forgotten. It begs for answers to
+critical questions, such as: 1) has Xen been written by competent
+developers? 2) how many more bugs of this caliber are we going to
+witness in the future?  3) what can or should we do to protect against
+such gaping holes?
+
+An observant reader will be quick to point out that it may have been a
+mistake for Qubes to embrace paravirtualization (PV) as the default
+mode of isolation. Indeed, both the bug we're discussing today, as
+well as the previously mentioned XSA 148, both present a
+hard-to-ignore argument that PV might be too complex of a technology
+for security-critical applications.
+
+But years ago, when we were designing Qubes OS, we believed PV offered
+an edge over full virtualization (HVM) because it didn't require
+Shadow Page Tables handling code, an arguably even more complex
+approach to memory virtualization. But as nearly all recent processors
+support so-called Second Level Address Translation (SLAT), or Intel
+EPT, this argument has lost its merit. SLAT (EPT) is an extension to
+Intel VT-x virtualization, which originally was capable of only CPU
+virtualization but not memory virtualization.
+
+Consequently, we have decided to move to hardware memory
+virtualization for the upcoming Qubes 4.0 release [4]. We believe this
+is the best _generic_ solution we can afford to implement in the near
+future (in addition to patching this very bug, of course).
+
+A more radical reader might be of the opinion that we should
+completely replace Xen with some other hypervisor. Such an opinion is
+surely not unfounded, as we have previously expressed our
+disappointment in the Xen security process [5]. Sadly, not much has
+improved over the past several months. Moreover, even though Qubes is
+now based on a hypervisor-abstracting architecture ("Odyssey"), which
+should make switching to a different VMM a relatively easy task, the
+primary problem that remains is the lack of a good alternative
+hypervisor to which we could move [6].
+
+
+Patching
+=========
+
+As an exceptional measure, given the significance of this bug, we have
+uploaded the patched packages directly to the current repository,
+bypassing the usual one-week waiting period during which new packages
+normally reside in the security-testing repository.
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the current repositories for all
+supported Qubes OS versions.
+
+Qubes OS 3.0:
+ - Multiple Xen packages, version 4.4.3-12
+
+Qubes OS 3.1 and 3.2:
+ - Multiple Xen packages, version 4.6.1-20
+
+The packages can be installed in dom0 via the qubes-dom0-update command
+or via the Qubes VM Manager.
+
+
+Credits
+========
+
+This bug has been made available to us by the Xen Security Team via
+the Xen pre-disclosure list [1]. Please see the original announcement
+for any credits.
+
+
+References
+===========
+[1] http://xenbits.xen.org/xsa/advisory-182.html
+[2] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-022-2015.txt
+[3] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=4aa62e269f14fde75d21f878bb42201f913062a0
+[4] https://github.com/QubesOS/qubes-issues/issues/2185
+[5] https://lists.xen.org/archives/html/xen-devel/2015-11/msg00601.html
+[6] https://www.qubes-os.org/doc/user-faq/#what-about-this-othernew-microkernelhypervisor
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

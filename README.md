@@ -8,6 +8,7 @@ about the Qubes OS Project. It includes the following:
  * Qubes Security Bulletins (`QSBs/`)
  * Qubes warrant canaries (`canaries/`)
  * Qubes Bitcoin fund information (`fund/`)
+ * Qubes ISO digests (`digests/`)
 
 The files contained in this repository can be verified in two ways:
 

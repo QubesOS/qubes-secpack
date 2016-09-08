@@ -1,0 +1,69 @@
+
+
+             ---===[ Qubes Security Bulletin #25 ]===---
+
+                          September 8, 2016
+
+
+            Xen bug in event channel handling code (XSA 188)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has announced a security bug (XSA 188)
+in the hypervisor FIFO event channel handling code[1]:
+
+| When the EVTCHNOP_init_control operation is called with a bad guest
+| frame number, it takes an error path which frees a control structure
+| without also clearing the corresponding pointer.  Certain subsequent
+| operations (EVTCHNOP_expand_array or another EVTCHNOP_init_control),
+| upon finding the non-NULL pointer, continue operation assuming it
+| points to allocated memory.
+
+| A malicious guest administrator can crash the host, leading to a DoS.
+| Arbitrary code execution (and therefore privilege escalation), and
+| information leaks, cannot be excluded.
+
+Only the Xen version used in Qubes 3.0 is affected. Qubes 3.1 and
+newer are not affected by this bug.
+
+Announcement time and EOL of Qubes 3.0
+======================================
+
+The bug has been announced a day before end of life for Qubes 3.0[2].
+Because of this we have decided to not write detailed analysis, but
+still release updated packages.
+
+This is the last security fix released for Qubes 3.0. We recommend to
+upgrade all systems to newer (still supported) version.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been uploaded to the security-testing repository:
+
+For Qubes R3.0:
+ - Multiple Xen packages, version 4.4.3-13
+
+The packages can be installed in dom0 via the qubes-dom0-update command
+or via the Qubes VM Manager.
+
+
+Credits
+========
+
+This bug has been made available to us by the Xen Security Team via
+the Xen pre-disclosure list [1]. Please see the original announcement
+for any credits.
+
+
+References
+===========
+[1] http://xenbits.xen.org/xsa/advisory-188.html
+[2] https://www.qubes-os.org/doc/supported-versions/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -11,12 +11,13 @@
 Quick Summary
 ==============
 
-Rusty Bird has discovered that an application can trick the Qubes GUI daemon
-into not drawing colored borders (or any decorations at all) around the windows it handles.
-This could allow an application to pretend to have a different
-label than the one it was assigned, which means that it could pretend to belong to another VM or even dom0. The bug can
-be also used to present fake whole-screen content (even without
-`allow_fullscreen` permission).
+Rusty Bird has discovered that an application can trick the Qubes GUI
+daemon into not drawing colored borders (or any decorations at all)
+around the windows it handles. This could allow an application to
+pretend to have a different label than the one it was assigned, which
+means that it could pretend to belong to another VM or even dom0. The
+bug can be also used to present fake whole-screen content (even
+without `allow_fullscreen` permission).
 
 
 Details of the bug
@@ -25,19 +26,19 @@ Details of the bug
 Background information
 ----------------------
 
-The X11 protocol allows an application to decide
-whether its windows should be managed by the window manager or not. This
-includes drawing window decorations (such as the title bar and borders) and managing the window's
-position. When the window has the `override_redirect` property[1] set, it
-will not be managed by the window manager. This is used for windows
-like tooltips and menus.
+The X11 protocol allows an application to decide whether its windows
+should be managed by the window manager or not. This includes drawing
+window decorations (such as the title bar and borders) and managing
+the window's position. When the window has the `override_redirect`
+property[1] set, it will not be managed by the window manager. This is
+used for windows like tooltips and menus.
 
-The Qubes GUI daemon (the process responsible for displaying windows exposed
-by VMs) allows a VM to use such windows, but since the window
-manager doesn't manage such windows, the Qubes GUI daemon must take care of them
-itself. This includes drawing colored borders and ensuring that
-windows do not hide themselves outside of the visible screen area.
-
+The Qubes GUI daemon (the process responsible for displaying windows
+exposed by VMs) allows a VM to use such windows, but since the window
+manager doesn't manage such windows, the Qubes GUI daemon must take
+care of them itself. This includes drawing colored borders and
+ensuring that windows can't hide their borders outside of the visible
+screen area.
 
 Problem description
 --------------------
@@ -45,9 +46,9 @@ Problem description
 The Qubes GUI daemon keeps track of window properties, including
 `override_redirect`, and uses this information to decide whether it
 needs to add colored borders and/or make sure the window is fully
-on-screen (so that an application does not try to hide its border off-screen). The bug discussed
-here is in handling changes to the `override_redirect` flag. Here is the relevant
-code:
+on-screen (so that an application does not try to hide its border
+off-screen). The bug discussed here is in handling changes to the
+`override_redirect` flag. Here is the relevant code:
 
 	/* handle VM message: MSG_MAP
 	 * Map a window with given parameters */
@@ -65,11 +66,12 @@ code:
 			fix_menu(g, vm_window);
 		(void) XMapWindow(g->display, vm_window->local_winid);
 
-When a VM application makes a request to unset this flag, the GUI daemon unsets it in
-its local data structure, but it does not unset it on the real X window. The
-result is that the GUI daemon stops handling the border and position of the
-window, but the window manager does not take over this job.
-This bug has been present since the introduction of the GUI daemon[2].
+When a VM application makes a request to unset this flag, the GUI
+daemon unsets it in its local data structure, but it does not unset it
+on the real X window. The result is that the GUI daemon stops handling
+the border and position of the window, but the window manager does not
+take over this job. This bug has been present since the introduction
+of the GUI daemon[2].
 
 
 Patching
@@ -84,10 +86,10 @@ For Qubes 3.1:
 For Qubes 3.2:
 * qubes-gui-dom0 version 3.2.5
 
-The packages are to be installed in dom0 via the qubes-dom0-update command
-or via the Qubes VM Manager. After installation, it is necessary
-to restart each of the VMs for changes to take effect. Rebooting the
-host system is not necessary.
+The packages are to be installed in dom0 via the `qubes-dom0-update`
+command or via the Qubes VM Manager. After installation, it is
+necessary to restart each of the VMs for changes to take effect.
+Rebooting the host system is not necessary.
 
 
 Credits
@@ -99,11 +101,10 @@ problem discussed above.
 
 
 References
-------------
+===========
 
 [1] https://tronche.com/gui/x/xlib/window/attributes/override-redirect.html
 [2] https://github.com/QubesOS/qubes-gui-daemon/commit/38497199397636069088df2b9fe88ecc02db2ddb
-
 
 --
 The Qubes Security Team

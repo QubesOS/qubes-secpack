@@ -16,7 +16,7 @@ daemon into not drawing colored borders (or any decorations at all)
 around the windows it handles. This could allow an application to
 pretend to have a different label than the one it was assigned, which
 means that it could pretend to belong to another VM or even dom0. The
-bug can be also used to present fake whole-screen content (even
+bug could also be used to present fake whole-screen content (even
 without `allow_fullscreen` permission).
 
 
@@ -30,7 +30,7 @@ The X11 protocol allows an application to decide whether its windows
 should be managed by the window manager or not. This includes drawing
 window decorations (such as the title bar and borders) and managing
 the window's position. When the window has the `override_redirect`
-property[1] set, it will not be managed by the window manager. This is
+property [1] set, it will not be managed by the window manager. This is
 used for windows like tooltips and menus.
 
 The Qubes GUI daemon (the process responsible for displaying windows
@@ -71,62 +71,62 @@ daemon unsets it in its local data structure, but it does not unset it
 on the real X window. The result is that the GUI daemon stops handling
 the border and position of the window, but the window manager does not
 take over this job. This bug has been present since the introduction
-of the GUI daemon[2].
+of the GUI daemon [2].
 
 Mitigation factors
 ===================
 
-Depending on which Window Manager is used in dom0 (there are a few
-supported by Qubes OS, with Xfce4 being the default one in the 3.2
-release), thanks to the architecture of the Qubes GUI virtualization,
+Thanks to the architecture of Qubes' GUI virtualization,
 there are certain keyboard shortcuts that are always intercepted by
-the Window Manager and which cannot be masked, nor intercepted by any
-of the VMs.
+the window manager and that cannot be masked or intercepted by any
+of the VMs. The specific key combinations depend on which window
+manager is used in dom0. (There are a few supported by Qubes OS, with
+Xfce4 being the default one in the 3.2 release).
 
-For example Alt-Tab is one such default shortcut that (in case of both
+For example, Alt-Tab is one default shortcut that (in both
 Xfce4 and Kwin) pops up the Window/Application switcher. Another
 popular shortcut (for Kwin only) is Ctrl-F8 (or Ctrl-F9), which shows
-an "Expose-like" effect, presenting all windows and screens
+an "Expose"-like effect, presenting all windows and screens
 side-by-side.
 
 While the switcher (or "Expose" effect) might or might not ignore
 windows with the `override_redirect` flag (e.g. we found that Kwin's
-"Present Windows" effect treats them as normal windows, while Xfce4
+"Present Windows" effect treats them as normal windows, while the Xfce4
 application switcher ignores them), at the very least it is able to
 enumerate/identify all the _legitimate_ windows, together with
 indicating their owning VM's name and position on the screen.
 
-In most cases this should provide enough evidence to the user that
+In most cases, this should provide enough evidence to the user that
 something is not quite right, e.g. that a malicious
-`override_redirect` window was trying to emulate some password-asking
-windows of some security-sensitive AppVM or dom0 (perhaps a windows
-asking for passphrase for the backup). Of course this requires the
-user to hit Alt-Tab or use an Expose-like effect, before e.g.
+`override_redirect` window is trying to emulate a password prompt window
+in a security-sensitive AppVM or in dom0 (perhaps one
+asking for the passphrase for a backup). Of course, this requires the
+user to hit Alt-Tab or use an Expose-like effect
 entering a sensitive password into a dialog box, a practice that we
-have been recommending for quite some time in fact [3].
+have been recommending for quite some time [3].
 
-GUI DoS'ing vs GUI spoofing
+GUI DoSing vs. GUI spoofing
 ============================
 
-For completeness we shall also mention a related problem, namely "GUI
-DoS'ing" (from Denial Of Service attacks).
+For completeness, we also mention a related problem, namely "GUI
+DoSing" (from Denial of Service attacks).
 
 The bug discussed in this bulletin allows for GUI _spoofing_, but
-there are also a number of ways how -- specifically using large
-windows with `override_redirect` flag -- a malicious AppVM could be
-used to mount a rather annoying DoS-like attack against the user GUI.
-Again, due to how Window Manager treats `override_redirect` windows,
-i.e. by definition, most manager do not offer an easy way to
-force-close them.
+there are also a number of ways in which a malicious AppVM can be
+used to mount a rather annoying DoS-like attack against the GUI,
+specifically by using large windows with the `override_redirect` flag.
+As explained above, `override_redirect` windows are not managed by the
+window manager, so the window manager cannot offer the user any easy way
+to forcibly close them.
 
-In case of Qubes OS it should always be possible to launch a dom0
-terminal (e.g. using Alt-F2 shortcut in Xfce4 or KDE environments) and
-(perhaps typing blindly because the popped up window might be obscured
-by the malicious `override_redirect` window) and kill all the
-`qubes-guid` processes, or perhaps specific AppVM(s) (e.g. `qvm-kill
-untrusted-web`).
+Nonetheless, in Qubes OS it should always be possible to launch a dom0
+terminal (e.g. using the Alt-F2 shortcut in Xfce4 or KDE environments)
+which can be used to kill all the `qubes-guid` processes or to kill
+specific AppVM(s) (e.g. `qvm-kill untrusted-web`). (Note, however, that
+this may require typing blindly into the terminal if it is being obscured
+by the malicious `override_redirect` window.)
 
-Admittedly Qubes should offer a more user-friendly solution to deal
+Admittedly, Qubes should offer a more user-friendly solution to deal
 with such GUI DoS attacks, and we've been aware of this problem for
 quite some time now [4].
 

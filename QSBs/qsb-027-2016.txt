@@ -1,0 +1,171 @@
+
+
+             ---===[ Qubes Security Bulletin #27 ]===---
+
+                          November 22, 2016
+
+
+      Xen 64-bit bit test instruction emulation broken (XSA 195)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has discovered a serious security bug (XSA 195)
+in the hypervisor instruction emulation code which might potentially
+lead to privilege escalation [1]:
+
+| When Xen needs to emulate [BT, or BT{C,R,S}] instruction (...) the
+| memory address and register operand are recalculated internally to
+| Xen. In this process, the high bits of an intermediate expression
+| were discarded, leading to both the memory location and the register
+| operand being wrong.
+|  
+| The wrong memory location would have only a guest local effect
+| (either access to an unintended location, or a fault delivered to
+| the guest), whereas the wrong register value could lead to either a
+| host crash or an unintended host memory access.
+
+There have been also a few other Xen-related bugs that are being
+disclosed today by the Xen team [2], most likely with none or only
+minor impacts on Qubes OS (e.g. information leaks from the hypervisor
+memory, which might ease exploitation of other potential bugs, but
+unlikely to reveal any information from other VMs).
+
+Description of the bug
+=======================
+
+The x86_emulate() function, which is internally used by the hypervisor
+to emulate guest instructions in some situations, contains an
+arithmetic bug resulting from implicit type conversions between 64-bit
+and 32-bit integers:
+
+    byte_offset = op_bytes + (((-src.val-1) >> 3) & ~(op_bytes-1));
+    ea.mem.off += (src.val >> 3) & ~(op_bytes - 1);
+
+The '1' immediate above should have been suffixed by 'L', letting the
+compiler know it should not be clamped to 32-bit, which in turn causes
+the above expressions to incorrectly allow for huge offsets when
+emulating the BT* instructions.
+
+A malicious VM can trigger a condition in which: 1) the execution of
+the BT* instruction will be intercepted and emulated by the
+hypervisor, and 2) the calculated offset will fall far beyond the page
+mapped by the hypervisor for the purpose of emulating the instruction
+(the hypervisor needs to map a page from the guest to emulate the BT
+instruction when the destination operand is a memory address). This
+will likely lead to the host crash, but a possibility of exploiting
+this bug for privilege escalation cannot be excluded.
+
+The Xen Security team has pointed out in a discussion with us that a
+reliable exploitation will likely be complicated by the uncertainty of
+the Xen stack absolute address, as the emulated opcodes will use
+stack-relative addressing, which, among other things, would also
+depend on which VCPU the attacker's VM happens to be currently
+scheduled on.
+
+Impact
+=======
+
+In theory this is a critical bug allowing full privilege escalation
+from a gust to the hypervisor, but for the reasons described above
+reliable exploitation might not be trivial. Nevertheless, one should
+never underestimate creativity of exploit authors, and thus should
+assume the bug is exploitable and patch immediately, just to stay on
+the safe side.
+
+More discussion
+===============
+
+This is the second serious bug in Xen's x86_emulate() that has
+affected Qubes OS. The first such bug has been described in QSB18
+(March 2015).
+
+It's tempting to think that instruction emulation (on x86) might be
+required only for PV guests and could be ditched for HVM guests,
+specifically those using SLAT (HAP in Xen parlance). Sadly this
+doesn't seem to be feasible. The main culprit, as pointed out by Xen
+developers, is the MMIO virtualization. And while it might be possible
+to run some HVM guests without the need for instruction emulator, this
+doesn't seem feasible for the VMs with assigned PCI devices. This is
+rather unfortunate, especially for Qubes OS, as the VMs with PCI
+devices assigned, such as the USB or Network VMs, are often considered
+untrusted.
+
+Apparently the x86 architecture cannot escape its clumsiness despite
+all the efforts by Intel to add new technologies on top of it.
+
+Another solution might be to attempt to isolate the x86 instruction
+emulator, similarly to how the I/O emulator is already isolated in a
+dedicated stub domain on Qubes OS (thanks to Xen stub domains). The
+Xen Security Team pointed out, however, that this has already been
+attempted in the past, but the effort was ultimately gave up on, due
+to apparently an increase of the interface complexity required to make
+that work. It's unclear what the performance impact of such a change
+might be.
+
+On the other hand though some other, arguably more experimental,
+hypervisors, such as Nova [3], do isolate instruction-emulating code,
+together with most of the VMM functionality, away from the
+(micro)hypervisor. Again, it's unclear to us what the performance (or
+other) impact might be of that solution, but it surely looks
+interesting from the security point of view (at least considering x86
+platform).
+
+On the positive side though, the bug has been found by the Xen
+Security Team during the internal effort for improving critical code
+security, and the team promises even more efforts in the near future
+to further improve the hypervisor code quality.
+
+We shall stress one more time that the instruction emulator
+(implemented by the x86_emulate() function on Xen) discussed in this
+bulletin should not be confused with the I/O device emulator
+(typically implemented by the qemu process on many virtualization
+systems). The latter is already well isolated on Qubes OS, thanks to
+Xen's stub domain features.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin (and also brining a few other reliability patches to Xen)
+have been uploaded to the security-testing repository:
+
+* xen packages, version TODO
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR14 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+Credits
+========
+
+This bugs has been found by Xen Security Team, and reported via Xen
+Security mailing list.
+
+Additionally, we would like to thank members of the Xen Security Team
+for discussing with us the details of the bugs as well as sharing
+their thoughts on possible future workarounds.
+
+We also would like to thank Norman Feske of Genode Labs for explaining
+to us how does the Nova hypervisor handle x86 instruction emulation.
+
+
+References
+===========
+
+[1] http://xenbits.xen.org/xsa/advisory-195.html
+[2] http://xenbits.xen.org/xsa/
+[3] http://hypervisor.org/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

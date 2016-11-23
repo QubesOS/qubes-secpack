@@ -132,7 +132,7 @@ bulletin (and also brining a few other reliability patches to Xen)
 have been uploaded to the security-testing repository:
 
 For Qubes 3.1 and 3.2:
-* xen packages, version 4.6.3-22
+* xen packages, version 4.6.3-24
 
 The packages are to be installed in Dom0 via qubes-dom0-update command
 or via the Qubes graphical manager.

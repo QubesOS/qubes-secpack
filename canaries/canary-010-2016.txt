@@ -1,0 +1,101 @@
+
+
+                    ---===[ Qubes Canary #10 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is December  13, 2016.
+
+2. There have been 27 Qubes Security Bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
+backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+two weeks of March 2017. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
+
+Special announcements
+----------------------
+
+* We would like to remind you that Qubes OS has been designed under
+the assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
+
+Disclaimers and notes
+----------------------
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other
+means, like blackmail or compromising the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feeds quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Tue, 13 Dec 2016 10:43:25 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+Unchained: The Man Behind Football Leaks
+Money, Money, Money: Football Leaks Shows Us that Football Is Sick
+'A Wretched Image': Why Özil Had To Pay 2.8 Million in Back Taxes
+Germany's Divided Conservatives: Merkel Critics Deal a Blow to Chancellor
+Shell Game: Ronaldo, Mourinho and the Paper Trail to the Caribbean
+
+$ feedstail -1 -n5 -f '{title}' -u http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml
+Split Over Donald Trump Threatens to Tilt Republican States
+Donald Trump Berates Paul Ryan and ‘Disloyal’ Republicans
+Donald Trump Faltering? Die-Hard Fans Refuse to Buy It
+Group’s Tactic on Hillary Clinton: Sue Her Again and Again
+The 2016 Race: How One 19-Year-Old Illinois Man Is Distorting National Polling Averages
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.bbci.co.uk/news/world/rss.xml
+Aleppo civilians 'shot on the spot' - UN
+Donald Trump: 'No new business deals' during presidency
+Indonesia blasphemy case: Emotional scenes as Ahok trial begins
+Venezuela closes border with Colombia 'to destroy mafia'
+Burmese army linked to Rohingya village arson, rights group says
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
+Syrian army takes over Aleppo areas quit by rebels: military source
+U.S. says 'one China' policy should not be used as bargaining chip
+Exclusive: Top U.S. spy agency has not embraced CIA assessment on Russia hacking - sources
+Russia's opposition leader Navalny plans to run for president in 2018
+Netanyahu says Israel 'mightier' as first F-35 fighter jets arrive
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

@@ -1,0 +1,158 @@
+
+
+             ---===[ Qubes Security Bulletin #28 ]===---
+
+                          December 17, 2016
+
+
+                Debian update mechanism vulnerability
+
+
+Quick Summary
+==============
+
+The Debian Security Team has announced a security bug (DSA-3733-1) in
+the signature verification of repository metadata, which might
+potentially lead to privilege escalation [1]:
+
+| Jann Horn of Google Project Zero discovered that APT, the high level
+| package manager, does not properly handle errors when validating
+| signatures on InRelease files. An attacker able to man-in-the-middle
+| HTTP requests to an apt repository that uses InRelease files
+| (clearsigned Release files), can take advantage of this flaw to
+| circumvent the signature of the InRelease file, leading to arbitrary
+| code execution.
+
+
+Description of the bug
+=======================
+
+Debian APT repository format include InRelease file, which is
+cleasigned Release file. APT while verifying the file split it into
+`Release` and `Release.gpg` to verify signature. But then it split
+again initial `InRelease` file to strip the signature (and potential
+leading or trailing garbage) to get actual `Release` file. Jann Horn
+discovered that even though APT use exactly the same code to split the
+file in both cases, it can be tricked to output different results in
+those two calls. The loop processing input looks like this:
+
+    bool SplitClearSignedFile(std::string const &InFile, FileFd * const ContentFile,
+          std::vector<std::string> * const ContentHeader, FileFd * const SignatureFile)
+    {
+       FILE *in = fopen(InFile.c_str(), "r");
+       if (in == NULL)
+          return _error->Errno("fopen", "can not open %s", InFile.c_str());
+	(...)
+	   char *buf = NULL;
+	   size_t buf_size = 0;
+	   while (getline(&buf, &buf_size, in) != -1)
+	   {
+
+	(...)
+
+According to the getline documentation, it may return -1 only in case of:
+
+ - invalid arguments
+ - end of file
+
+Authors believe that arguments are correct, so the only other case
+considered is end of file. But apparently '-1' may be also triggered by
+out of memory error. This will result in output file being truncated.
+If that happen during second InRelease split, before finding beginning
+of the signed data (part which would be normally discarded), the
+found (unverified) data will be used as Release file directly.
+
+Attacker controlling some repository (either by breaking into that
+server, or performing man-in-the-middle attack) may try to exploit
+this vulnerability to substitute some package with a malicious one.
+A package may contain post-installation scripts, which will be run
+automatically by apt, resulting in compromise of the system - in case
+of Qubes OS - this particular template, and consequently later all VMs
+based on it.
+
+To trigger out of memory condition during one but not the other call,
+discoverer use[2] very long lines, which may not fit into limited
+address space on 32-bit system, additionally constrained by ASLR.
+This attack vector allow successful exploitation in about 1/4 tries.
+
+The same attack vector isn't feasible for 64-bit systems (such as
+Qubes VMs), because address space is much larger - especially larger
+than available memory. But attacker may try to hit real out of memory
+condition. This is much less reliable approach and should be easy to
+spot by the user - operation will likely take very long time and disk
+will be used extensively (because of writing data to swap).
+
+Impact
+=======
+
+In theory this bug allows to take over any Debian 8 or Debian 9
+template (which include also Whonix templates[3]), and consequently any
+VM based on it. But for the reasons explained above, configuration
+used in Qubes OS incidentally makes it hard to exploit. Nevertheless,
+one should never underestimate creativity of exploit authors, and thus
+should assume the bug is exploitable and patch immediately, just to
+stay on the safe side.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin has been released by Debian Security Team to appropriate
+repository. See upstream advisory[1] for more details.
+
+As the bug affect Debian templates itself, just applying update may
+not be enough if it is already compromised. Users, especially those
+using Debian-based VMs for sensitive tasks, should removing the
+template and installing fresh one. This is documented as "Manual
+Reinstallation Method" in Qubes documentation[5]. 
+
+Fixed apt packages are included in:
+
+* qubes-template-debian-8-TODO
+
+Please note that simplified template reinstallation method described
+in documentation is not sufficient, because it will download old, still
+vulnerable template.
+
+Alternative patching, for less sensitive templates
+==================================================
+
+If you don't use Debian-based VMs for any sensitive tasks you may
+choose to just install fixed apt packages.
+
+As the bug is present in update mechanism itself, special case should
+be taken during performing the update:
+
+1. Open terminal in affected template.
+2. Download repository metadata:
+
+    sudo apt-get update
+
+3. Verify if none of downloaded `InRelease` file contain lines longer
+than 1024[4]:
+
+    wc -L /var/lib/apt/lists/*InRelease
+
+4. If not, continue with update:
+
+    sudo apt-get dist-upgrade
+
+Credits
+========
+
+This bugs has been found by Jonn Horn of Google Project Zero and
+reported to Debian Security Team.
+
+References
+===========
+
+[1] https://www.debian.org/security/2016/dsa-3733
+[2] https://bugs.launchpad.net/ubuntu/+source/apt/+bug/1647467
+[3] https://www.whonix.org/wiki/CVE-2016-1252
+[4] https://lists.debian.org/debian-security/2016/12/msg00010.html
+[5]
+https://www.qubes-os.org/doc/reinstall-template/#manual-reinstallation-method
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

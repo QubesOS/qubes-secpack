@@ -13,7 +13,18 @@ Quick Summary
 
 The Debian Security Team has announced a security bug (DSA-3733-1) in
 the signature verification of repository metadata, which might
-potentially lead to privilege escalation [1]:
+potentially lead to privilege escalation [1] within a Debian-based VM
+or VM template. The bug does _not_ allow to escape from a VM or to
+attack other parts of the Qubes system, such as Dom0, hypervisor, nor
+any of the other VMs (except for those based on the affected Debian
+template). Nevertheless we decided to release this bulletin, because
+if a template VM is affected, than all the AppVMs (qubes) based on
+that particular template are affected.
+
+Description of the bug
+=======================
+
+As described in [1]:
 
 | Jann Horn of Google Project Zero discovered that APT, the high level
 | package manager, does not properly handle errors when validating
@@ -22,10 +33,6 @@ potentially lead to privilege escalation [1]:
 | (clearsigned Release files), can take advantage of this flaw to
 | circumvent the signature of the InRelease file, leading to arbitrary
 | code execution.
-
-
-Description of the bug
-=======================
 
 Debian APT repository format include InRelease file, which is
 cleasigned Release file. APT while verifying the file split it into

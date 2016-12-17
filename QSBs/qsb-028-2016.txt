@@ -169,6 +169,9 @@ Please note that simplified template reinstallation method described
 in documentation is not sufficient, because it will download old, still
 vulnerable template.
 
+If you have a custom Debian-based template(s), you need to remove it
+too and clone again from the one just reinstalled.
+
 Alternative patching, for less sensitive templates
 ==================================================
 
@@ -178,7 +181,7 @@ choose to just install fixed apt packages.
 As the bug is present in update mechanism itself, special case should
 be taken during performing the update:
 
-1. Open terminal in affected template.
+1. Open terminal in affected template(s).
 2. Download repository metadata:
 
     sudo apt-get update

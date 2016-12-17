@@ -198,6 +198,12 @@ Credits
 This bugs has been found by Jonn Horn of Google Project Zero and
 reported to Debian Security Team.
 
+Discussion of the bug and exploitation provided by Marek
+Marczykowski-Górecki of the Qubes OS project.
+
+Additional discussion of bug importance for Qubes OS by Joanna
+Rutkowska of Qubes OS project.
+
 References
 ===========
 

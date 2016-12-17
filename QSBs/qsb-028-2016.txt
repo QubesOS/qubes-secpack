@@ -100,6 +100,54 @@ one should never underestimate creativity of exploit authors, and thus
 should assume the bug is exploitable and patch immediately, just to
 stay on the safe side.
 
+Additional Discussion
+======================
+
+Normally we do not release Qubes Security Bulletins (QSB) to addresses
+vulnerabilities that affect only insides of the VMs, while not
+allowing to directly affect the rest of the Qubes OS system, i.e. to
+undermine Qubes security model.
+
+For example, we do not release QSBs to address bugs in Firefox or
+Linux kernel USB stacks, because Qubes OS has actually been designed
+with the primary assumption that in a typical desktop OS there will be
+countless of such bugs anyway and the humankind will never be able to
+patch all of them promptly (i.e. before developers introduce another
+bugs). This, in fact, is the very reason we created Qubes OS, which
+uses the Security by Compartmentalization approach instead.
+
+The Debian updater bug discussed today is, however, somehow special.
+While indeed a bug affecting the inside of the VM only, it might
+directly allow to compromise Qubes template VMs, which are used as a
+basis to create the actual AppVMs which operate on the user data. If
+the template gets compromised than all the VMs based on the particular
+template will get compromised.
+
+In Qubes OS we take special precautions to make templates difficult to
+compromise. This include e.g. default networking rules (as imposed by
+default firewall VM(s)) to prevent any networking connectivity for the
+template. We only make one exception: allow template to connect to
+so-called Update Proxy (which runs in the firewall VM), which allows
+the template VM to retrieve repository metadata and the actual
+(signed) packages (RPMs or DEBs).
+
+In case of the bug discussed here, this very template updating
+mechanism might get compromised despite our efforts to secure this
+very part. Hence the QSB.
+
+We should however point out that Qubes OS does make a good job in
+handling this kind of a vulnerability. Indeed, instead of the need to
+reinstall the whole system from scratch, on Qubes OS one needs to only
+reinstall (one of) the template(s).
+
+If one is further afraid that a potential attacker might have
+compromised not only the root filesystem of the template, but also
+attempted to infect some of the user files in home directories (e.g.
+~/.bashrc or a Web browser profile directory) Qubes allows to mount
+each of the suspected AppVM private images into another (trusted) VM,
+based on our Fedora or patched Debian template, for "offline" analysis
+and cleanup, allowing to preserve user data.
+
 Patching
 =========
 

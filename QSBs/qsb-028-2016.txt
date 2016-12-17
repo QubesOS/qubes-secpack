@@ -166,26 +166,32 @@ appropriate repository. See the upstream advisory [1] for more details.
 As the bug affects Debian-based templates themselves, just applying
 updates may not be enough, if those VMs are already compromised. Users,
 especially those using Debian-based VMs for sensitive tasks, should
-remove all affected templates and install fresh ones. This is
-documented as the "Manual Reinstallation Method" in the Qubes
+remove all affected templates and install fresh ones. This also applies
+to any customized Debian-based templates. Users with customized Debian-
+based templates should first note their customizations, remove the
+potentially compromised templates, install fresh templates, clone
+them, and reapply their customizations to the cloned templates.
+
+The procedure for removing affected templates and installing fresh ones
+is documented as the "Manual Reinstallation Method" in the Qubes
 documentation on reinstalling TemplateVMs [5]. (Please note that the
 simplified template reinstallation method described in the
-documentation using `--action=reinstall` is not sufficient, since it
-will download the old, vulnerable template.)
+documentation, which uses `--action=reinstall`, is not sufficient,
+since it will download the old, vulnerable template.)
 
 Fixed APT packages are included in:
 
 * qubes-template-debian-8-TODO
 
-Alternative patching, for less sensitive templates
+Alternative patching, for non-critical TemplateVMs
 ===================================================
 
-Users who do not rely on Debian-based VMs for any sensitive tasks may
-instead opt choose just to install fixed APT packages. As the bug is
-present in the update mechanism itself, special care should be taken
-while performing the update:
+Users who do not rely on Debian-based VMs for any critical tasks may
+instead opt just to install fixed APT packages. As the bug is present
+in the update mechanism itself, special care should be taken while
+performing the update:
 
-1. Open a terminal in the affected template.
+1. Open a terminal in the affected TemplateVM.
 
 2. Download repository metadata:
 
@@ -200,6 +206,8 @@ while performing the update:
    update:
 
     sudo apt-get dist-upgrade
+
+Repeat this procedure for every non-critical affected TemplateVM.
 
 Credits
 ========

@@ -184,12 +184,12 @@ Fixed APT packages are included in templates listed below:
 For Qubes 3.2:
 * qubes-template-debian-8-3.0.6-201612171620
 * qubes-template-whonix-gw-3.0.6-201612182342
-* qubes-template-whonix-ws-3.0.6-201612182205
+* qubes-template-whonix-ws-3.0.6-201612190628
 
 For Qubes 3.1:
 * qubes-template-debian-8-3.0.6-201612171837
 * qubes-template-whonix-gw-3.0.6-201612190009
-* qubes-template-whonix-ws-3.0.6-201612190131
+* qubes-template-whonix-ws-3.0.6-201612190633
 
 
 Alternative patching, for non-critical TemplateVMs

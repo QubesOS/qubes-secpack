@@ -179,9 +179,18 @@ simplified template reinstallation method described in the
 documentation, which uses `--action=reinstall`, is not sufficient,
 since it will download the old, vulnerable template.)
 
-Fixed APT packages are included in:
+Fixed APT packages are included in templates listed below:
 
-* qubes-template-debian-8-TODO
+For Qubes 3.2:
+* qubes-template-debian-8-3.0.6-201612171620
+* qubes-template-whonix-gw-3.0.6-201612182342
+* qubes-template-whonix-ws-3.0.6-201612182205
+
+For Qubes 3.1:
+* qubes-template-debian-8-3.0.6-201612171837
+* qubes-template-whonix-gw-3.0.6-201612190009
+* qubes-template-whonix-ws-3.0.6-201612190131
+
 
 Alternative patching, for non-critical TemplateVMs
 ===================================================

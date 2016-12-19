@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #28 ]===---
 
-                          December 17, 2016
+                          December 19, 2016
 
 
                 Debian update mechanism vulnerability

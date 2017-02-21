@@ -37,7 +37,7 @@ References
 ------------
 
 1) The official Xen.org advisory:
-http://lists.xen.org/archives/html/xen-devel/2012-06/msg00670.html
+http://lists.xen.org/archives/html/xen-devel/2012-06/msg00673.html
 
 2) A complete list of all Qubes Security bulletins (2010-2012):
 http://wiki.qubes-os.org/trac/wiki/SecurityBulletins

@@ -29,15 +29,17 @@ plausible explanation.
 Special announcements
 ----------------------
 
-* We would like to remind you that Qubes OS has been designed under
-the assumption that all relevant infrastructure is permanently
+None.
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently
 compromised.  This means that we assume NO trust in any of the servers
 or services which host or provide any Qubes-related data, in
 particular, software updates, source code repositories, and Qubes ISO
 downloads.
-
-Disclaimers and notes
-----------------------
 
 This canary scheme is not infallible. Although signing the declaration
 makes it very difficult for a third party to produce arbitrary

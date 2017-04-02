@@ -1,0 +1,98 @@
+
+
+             ---===[ Qubes Security Bulletin #29 ]===---
+
+                          April 4, 2017
+
+
+      Critical Xen bug in PV memory virtualization code (XSA 212)
+
+
+Quick Summary
+==============
+
+The Xen Security Team has discovered a serious security bug (XSA 212)
+in the hypervisor code handling memory virtualization for the PV VMs
+[1]:
+
+| The XSA-29 fix introduced an insufficient check on XENMEM_exchange
+| input, allowing the caller to drive hypervisor memory accesses outside
+| of the guest provided input/output arrays.
+| 
+| A malicious or buggy 64-bit PV guest may be able to access all of
+| system memory, allowing for all of privilege escalation, host crashes,
+| and information leaks.
+
+An attacker who exploits this bug can break Qubes-provided isolation.
+This means that if an attacker has already exploited another
+vulnerability, e.g. in a Web Browser or Networking or USB stack, then
+the attacker would be able to compromise the whole Qubes system.
+
+Description of the bug
+=======================
+
+TODO
+
+
+Impact
+=======
+
+TODO
+
+Availability of patches
+========================
+
+Patched packages will be uploaded to security-testing repository
+shortly after publishing this advisory, as soon as will be built. This
+is because we want the build process to be transparent, which include
+publishing build logs and building from publicly available sources.
+Recently we've implemented and published new build infrastructure[3]
+which enforce those properties. This means, using new build
+infrastructure force us to push the sources to a public repository
+first. But we can't do that until embargo for the advisory expire[4]. 
+
+Thanks to the new infrastructure, it's also much easier for us handle
+updates. Because of this, we've decided to release fixed packages
+for Qubes OS 3.1, even though it was recently announced EOL. Both
+Qubes OS 3.1 and Qubes OS 3.2 use the same Xen version, so it require
+exactly zero additional work from us.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin will be uploaded to the security-testing repository:
+
+For Qubes 3.1 and 3.2:
+* xen packages, version 4.6.4-26
+
+The packages are to be installed in Dom0 via qubes-dom0-update command
+or via the Qubes graphical manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18 will change because of a new
+xen.gz binary.
+
+These packages will be moved to the current repository over the coming
+days once they receive more testing from the community.
+
+Credits
+========
+
+This bugs has been found by Xen Security Team, and reported via Xen
+Security mailing list.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-212.html
+[2] https://xenbits.xen.org/xsa/
+[3] https://github.com/QubesOS/qubes-infrastructure/
+[4] https://www.xenproject.org/security-policy.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

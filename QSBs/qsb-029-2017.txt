@@ -40,8 +40,7 @@ This is another bug resulting from over-complex memory virtualization
 required for PV virtualization in Xen.
 
 As already announced last year [5], the upcoming Qubes OS 4.0 will not
-use PV virtualization anymore and switch entirely to HVM-based
-virtualization:
+use PV virtualization anymore and switch to HVM-based virtualization:
 
 | One of the most important security improvements that we plan to
 introduce with | the release of Qubes 4 is to ditch paravirtualization

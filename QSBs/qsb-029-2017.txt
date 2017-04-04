@@ -5,15 +5,15 @@
                           April 4, 2017
 
 
-      Critical Xen bug in PV memory virtualization code (XSA 212)
+      Critical Xen bug in PV memory virtualization code (XSA-212)
 
 
 Quick Summary
 ==============
 
-The Xen Security Team has discovered a serious security bug (XSA 212)
-in the hypervisor code handling memory virtualization for the PV VMs
-[1]:
+The Xen Security Team has discovered a serious security bug (XSA-212)
+in the hypervisor code handling memory virtualization for
+paravirtualized (PV) VMs [1]:
 
 | The XSA-29 fix introduced an insufficient check on XENMEM_exchange
 | input, allowing the caller to drive hypervisor memory accesses outside
@@ -25,20 +25,20 @@ in the hypervisor code handling memory virtualization for the PV VMs
 
 An attacker who exploits this bug can break Qubes-provided isolation.
 This means that if an attacker has already exploited another
-vulnerability, e.g. in a Web Browser or Networking or USB stack, then
-the attacker would be able to compromise the whole Qubes system.
+vulnerability, e.g. in a Web browser or networking or USB stack, then
+the attacker would be able to compromise a whole Qubes system.
 
 Description of the bug
 =======================
 
 Arguments of XENMEM_exchange hypercall contains array of page numbers
 to be exchanged and array for exchanged page numbers. Validation of
-those arrays (supposedly living in guest memory) assume certain memory
-layout - that Xen memory is just above non-canonical addresses and
-also assume that array accesses are sequential starting from beginning
-of the array. With this assumption, validation code check only
-address of the first array element and assume (thanks to
-sequential access) that further code will hit non-canonical address
+those arrays (supposedly living in guest memory) assumes a certain
+memory layout -- that Xen memory is just above non-canonical addresses.
+It also assumes that array accesses are sequential starting from the
+beginning of the array. With this assumption, validation code checks
+only the address of the first array element and assumes (thanks to
+sequential access) that further code will hit a non-canonical address,
 resulting in page fault, before reaching Xen memory.
 
 Relevant part of xen/include/asm-x86/x86_64/uaccess.h:
@@ -60,27 +60,27 @@ Relevant part of xen/include/asm-x86/x86_64/uaccess.h:
     #define array_access_ok(addr, count, size) \
         (access_ok(addr, (count)*(size)))
 
-Unfortunately this assumption is false in XENMEM_exchange - caller of
-this hypercall have full control from which place array processing
-starts (using exch.nr_exchanged argument). This means the caller can
-trick Xen hypervisor to read input page numbers from Xen memory area
-or write exchanged page numbers into Xen memory area. Attacker does
-not directly control values written there, but using for example
-balloon driver, can influence what pages will be available in the
-system and later chosen for allocation by XENMEM_exchange.
+Unfortunately, this assumption is false in XENMEM_exchange. The caller
+of this hypercall has full control over the place at which array
+processing starts (using the exch.nr_exchanged argument). This means
+that the caller can the trick Xen hypervisor into reading input page
+numbers from the Xen memory area or write exchanged page numbers into
+the Xen memory area. The attacker does not directly control values
+written there, but using, for example, balloon driver, can influence
+what pages will be available in the system and later chosen for
+allocation by XENMEM_exchange.
 
-This means that sufficiently determined attacker can use this bug to
-write arbitrary data into arbitrary place in Xen memory, and use this
-to take full control over the system.
+This means that a sufficiently determined attacker can use this bug to
+write arbitrary data into arbitrary places in Xen memory and thereby
+take full control of the system.
 
 Discussion
 ===========
 
-This is another bug resulting from over-complex memory virtualization
-required for PV virtualization in Xen.
-
-As already announced last year [5], the upcoming Qubes OS 4.0 will not
-use PV virtualization anymore and switch to HVM-based virtualization:
+This is another bug resulting from the overly-complex memory
+virtualization required for PV in Xen. As we announced last year [5],
+the upcoming Qubes OS 4.0 will no longer use PV. Instead, we will be
+switching to HVM-based virtualization:
 
 | One of the most important security improvements that we plan to
 | introduce with the release of Qubes 4 is to ditch paravirtualization
@@ -98,28 +98,31 @@ use PV virtualization anymore and switch to HVM-based virtualization:
 | regrettably did affect Qubes OS. Consequently, we will be requiring
 | SLAT support of all certified hardware for Qubes OS 4 and later.
 
-At the same time, we would like to point out that Qubes OS has so far
-been affected by less than 10% of the publicly disclosed Xen bugs, as
-tracked by the recently created Xen Security Advisory (XSA) Tracker
-[6].
+At the same time, we would like to point out that the security of Qubes
+OS has so far been affected by less than 10% of publicly disclosed Xen
+bugs, as tracked by the recently created Xen Security Advisory (XSA)
+Tracker [6].
 
 Availability of patches
 ========================
 
-Patched packages will be uploaded to security-testing repository
-shortly after publishing this advisory, as soon as will be built. This
-is because we want the build process to be transparent, which include
-publishing build logs and building from publicly available sources.
-Recently we've implemented and published new build infrastructure[3]
-which enforce those properties. This means, using new build
-infrastructure force us to push the sources to a public repository
-first. But we can't do that until embargo for the advisory expire[4]. 
+Patched packages will be built and uploaded to the security-testing
+repository shortly after this advisory is published. We have recently
+implemented and published the details of a new, transparent build
+infrastructure. [3] In this new infrastructure, the source code for
+packages is pushed to a public repository, and logs from the build
+process are also publicly published. However, the Xen security policy
+does not permit us to make this data public until after the XSA-212
+embargo has been lifted. [4] While we have already privately built
+and tested these packages, we must wait until the embargo has been
+lifted before transparently building the public packages using our
+new infrastructure.
 
 Thanks to the new infrastructure, it's also much easier for us handle
 updates. Because of this, we've decided to release fixed packages
-for Qubes OS 3.1, even though it was recently announced EOL. Both
-Qubes OS 3.1 and Qubes OS 3.2 use the same Xen version, so it require
-exactly zero additional work from us.
+for Qubes OS 3.1, even though it recently reached EOL. Both Qubes OS
+3.1 and Qubes OS 3.2 use the same Xen version, so this requires no
+additional work.
 
 Patching
 =========
@@ -128,24 +131,24 @@ The specific packages that resolve the problem discussed in this
 bulletin will be uploaded to the security-testing repository:
 
 For Qubes 3.1 and 3.2:
-* xen packages, version 4.6.4-26
+* Xen packages, version 4.6.4-26
 
-The packages are to be installed in Dom0 via qubes-dom0-update command
-or via the Qubes graphical manager.
+The packages are to be installed in Dom0 via the qubes-dom0-update
+command or via the Qubes VM Manager.
 
 A system restart will be required afterwards.
 
 If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18 will change because of a new
+passphrase to new PCR values, as PCR18 will change due to the new
 xen.gz binary.
 
-These packages will be moved to the current repository over the coming
-days once they receive more testing from the community.
+These packages will migrate to the current (stable) repository over
+the coming days after being tested by the community.
 
 Credits
 ========
 
-This bugs has been found by Xen Security Team, and reported via Xen
+This bug was found by the Xen Security Team and reported via the Xen
 Security mailing list.
 
 

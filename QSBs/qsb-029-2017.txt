@@ -31,7 +31,47 @@ the attacker would be able to compromise the whole Qubes system.
 Description of the bug
 =======================
 
-TODO
+Arguments of XENMEM_exchange hypercall contains array of page numbers
+to be exchanged and array for exchanged page numbers. Validation of
+those arrays (supposedly living in guest memory) assume certain memory
+layout - that Xen memory is just above non-canonical addresses and
+also assume that array accesses are sequential starting from beginning
+of the array. With this assumption, validation code check only
+address of the first array element and assume (thanks to
+sequential access) that further code will hit non-canonical address
+resulting in page fault, before reaching Xen memory.
+
+Relevant part of xen/include/asm-x86/x86_64/uaccess.h:
+
+    /*
+     * Valid if in +ve half of 48-bit address space, or above Xen-reserved area.
+     * This is also valid for range checks (addr, addr+size). As long as the
+     * start address is outside the Xen-reserved area, sequential accesses
+     * (starting at addr) will hit a non-canonical address (and thus fault)
+     * before ever reaching VIRT_START.
+     */
+    #define __addr_ok(addr) \
+        (((unsigned long)(addr) < (1UL<<47)) || \
+         ((unsigned long)(addr) >= HYPERVISOR_VIRT_END))
+
+    #define access_ok(addr, size) \
+        (__addr_ok(addr) || is_compat_arg_xlat_range(addr, size))
+
+    #define array_access_ok(addr, count, size) \
+        (access_ok(addr, (count)*(size)))
+
+Unfortunately this assumption is false in XENMEM_exchange - caller of
+this hypercall have full control from which place array processing
+starts (using exch.nr_exchanged argument). This means the caller can
+trick Xen hypervisor to read input page numbers from Xen memory area
+or write exchanged page numbers into Xen memory area. Attacker does
+not directly control values written there, but using for example
+balloon driver, can influence what pages will be available in the
+system and later chosen for allocation by XENMEM_exchange.
+
+This means that sufficiently determined attacker can use this bug to
+write arbitrary data into arbitrary place in Xen memory, and use this
+to take full control over the system.
 
 Discussion
 ===========

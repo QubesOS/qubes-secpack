@@ -148,8 +148,8 @@ the coming days after being tested by the community.
 Credits
 ========
 
-This bug was found by the Xen Security Team and reported via the Xen
-Security mailing list.
+This issue was discovered by Jann Horn of Google Project Zero and reported to
+Xen Security Team.
 
 
 References

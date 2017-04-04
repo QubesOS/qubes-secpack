@@ -43,22 +43,20 @@ As already announced last year [5], the upcoming Qubes OS 4.0 will not
 use PV virtualization anymore and switch to HVM-based virtualization:
 
 | One of the most important security improvements that we plan to
-introduce with | the release of Qubes 4 is to ditch paravirtualization
-(PV) technology and | replace it with hardware-enforced memory
-virtualization, which recent processors | have made possible thanks to
-so-called Second Level Address Translation (SLAT), | also known as EPT
-in Intel parlance. SLAT (EPT) is an extension to Intel VT-x |
-virtualization, which originally was capable of only CPU
-virtualization but not | memory virtualization and hence required a
-complex Shadow Page Tables approach | (which we believed back then was
-actually less attractive than the PV | approach). We hope that
-embracing SLAT-based memory virtualization will allow us | to prevent
-disastrous security bugs, such as the infamous XSA 148, publicly |
-disclosed in October of last year, which  unlike many other major Xen
-bugs | regrettably did affect Qubes OS. Consequently, we will be
-requiring SLAT support | of all certified hardware for Qubes OS 4 and
-later.
-
+| introduce with the release of Qubes 4 is to ditch paravirtualization
+| (PV) technology and replace it with hardware-enforced memory
+| virtualization, which recent processors have made possible thanks to
+| so-called Second Level Address Translation (SLAT), also known as EPT
+| in Intel parlance. SLAT (EPT) is an extension to Intel VT-x
+| virtualization, which originally was capable of only CPU
+| virtualization but not memory virtualization and hence required a
+| complex Shadow Page Tables approach (which  we believed back then  was
+| actually less attractive than the PV approach). We hope that embracing
+| SLAT-based memory virtualization will allow us to prevent disastrous
+| security bugs, such as the infamous XSA 148, publicly disclosed in
+| October of last year, which  unlike many other major Xen bugs
+| regrettably did affect Qubes OS. Consequently, we will be requiring
+| SLAT support of all certified hardware for Qubes OS 4 and later.
 
 At the same time, we would like to point out that Qubes OS has so far
 been affected by less than 10% of the publicly disclosed Xen bugs, as

@@ -63,7 +63,7 @@ Relevant part of xen/include/asm-x86/x86_64/uaccess.h:
 Unfortunately, this assumption is false in XENMEM_exchange. The caller
 of this hypercall has full control over the place at which array
 processing starts (using the exch.nr_exchanged argument). This means
-that the caller can the trick Xen hypervisor into reading input page
+that the caller can trick the Xen hypervisor into reading input page
 numbers from the Xen memory area or write exchanged page numbers into
 the Xen memory area. The attacker does not directly control values
 written there, but using, for example, balloon driver, can influence
@@ -101,7 +101,7 @@ switching to HVM-based virtualization:
 At the same time, we would like to point out that the security of Qubes
 OS has so far been affected by less than 10% of publicly disclosed Xen
 bugs, as tracked by the recently created Xen Security Advisory (XSA)
-Tracker [6].
+Tracker. [6]
 
 Availability of patches
 ========================
@@ -148,8 +148,8 @@ the coming days after being tested by the community.
 Credits
 ========
 
-This issue was discovered by Jann Horn of Google Project Zero and reported to
-Xen Security Team.
+This issue was discovered by Jann Horn of Google Project Zero and
+reported to the Xen Security Team.
 
 
 References

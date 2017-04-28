@@ -1,0 +1,129 @@
+
+
+             ---===[ Qubes Security Bulletin #30 ]===---
+
+                          May 2, 2017
+
+
+ Critical Xen bugs related to PV memory virtualization (XSA-213, XSA-214)
+
+
+Quick Summary
+==============
+
+Today the Xen Security Team has disclosed two bugs related to PV
+memory handling affecting Qubes OS:
+
+Xen Security Advisory XSA-213[1]:
+
+|   x86: 64bit PV guest breakout via pagetable use-after-mode-change
+|
+| 64-bit PV guests typically use separate (root) page tables for their
+| kernel and user modes.  Hypercalls are accessible to guest kernel
+| context only, which certain hypercall handlers make assumptions on.
+| The IRET hypercall (replacing the identically name CPU instruction)
+| is used by guest kernels to transfer control from kernel mode to user
+| mode.  If such an IRET hypercall is placed in the middle of a multicall
+| batch, subsequent operations invoked by the same multicall batch may
+| wrongly assume the guest to still be in kernel mode.  If one or more of
+| these subsequent operations involve operations on page tables, they may
+| be using the wrong root page table, confusing internal accounting.  As
+| a result the guest may gain writable access to some of its page tables.
+
+
+Xen Security Advisory XSA-214[2]:
+
+|          grant transfer allows PV guest to elevate privileges
+| 
+| The GNTTABOP_transfer operation allows one guest to transfer a page to
+| another guest.  The internal processing of this, however, does not
+| include zapping the previous type of the page being transferred.  This
+| makes it possible for a PV guest to transfer a page previously used as
+| part of a segment descriptor table to another guest while retaining the
+| "contains segment descriptors" property.
+| 
+| If the destination guest is a PV one of different bitness, it may gain
+| access to segment descriptors it is not normally allowed to have, like
+| 64-bit code segments in a 32-bit PV guest.
+| 
+| If the destination guest is a HVM one, that guest may freely alter the
+| page contents and then hand the page back to the same or another PV
+| guest.
+| 
+| In either case, if the destination PV guest then inserts that page into
+| one of its own descriptor tables, the page still having the designated
+| type results in validation of its contents being skipped.
+
+
+An attacker who exploits any of those bugs can break Qubes-provided
+isolation.  This means that if an attacker has already exploited
+another vulnerability, e.g. in a Web browser or networking or USB
+stack, then the attacker would be able to compromise a whole Qubes
+system.
+
+The second bug require cooperation of two VMs of different type, which
+somehow limits is applicability.
+
+The Xen Security Team have also announced a third advisory today:
+XSA-215 "possible memory corruption via failsafe callback"[3]. We
+believe its impact is limited to the hardware beyond of scope of Qubes
+OS:
+
+| Only x86 systems with physical memory extending to a configuration
+| dependent boundary (5Tb or 3.5Tb) may be affected.  Whether they are
+| actually affected depends on actual physical memory layout.
+
+
+Availability of patches
+========================
+
+Patched packages will be built and uploaded to the security-testing
+repository shortly after this advisory is published. We have recently
+implemented and published the details of a new, transparent build
+infrastructure. [4] In this new infrastructure, the source code for
+packages is pushed to a public repository, and logs from the build
+process are also publicly published. However, the Xen security policy
+does not permit us to make this data public until after the embargo
+has been lifted. [5] While we have already privately built and tested
+these packages, we must wait until the embargo has been lifted before
+transparently building the public packages using our new
+infrastructure.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin will be uploaded to the security-testing repository:
+
+For Qubes 3.2:
+* Xen packages, version 4.6.4-27
+
+The packages are to be installed in Dom0 via the qubes-dom0-update
+command or via the Qubes VM Manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18 will change due to the new
+xen.gz binary.
+
+These packages will migrate to the current (stable) repository over
+the coming days after being tested by the community.
+
+Credits
+========
+
+TODO
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-213.html
+[2] https://xenbits.xen.org/xsa/advisory-214.html
+[3] https://xenbits.xen.org/xsa/advisory-215.html
+[4] https://github.com/QubesOS/qubes-infrastructure/
+[5] https://www.xenproject.org/security-policy.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

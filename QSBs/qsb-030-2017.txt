@@ -2,47 +2,46 @@
 
              ---===[ Qubes Security Bulletin #30 ]===---
 
-                          May 2, 2017
+                             May 2, 2017
 
 
- Critical Xen bugs related to PV memory virtualization (XSA-213, XSA-214)
+Critical Xen bugs related to PV memory virtualization (XSA-213, XSA-214)
 
 
-Quick Summary
-==============
+Summary
+========
 
-Today the Xen Security Team has disclosed two bugs related to PV
-memory handling affecting Qubes OS: XSA-213[1] and XSA-214[2].
+Today the Xen Security Team has disclosed two bugs related to PV memory
+handling affecting Qubes OS: XSA-213 [1] and XSA-214 [2].
 
-An attacker who exploits any of those bugs can break Qubes-provided
-isolation.  This means that if an attacker has already exploited
-another vulnerability, e.g. in a Web browser or networking or USB
-stack, then the attacker would be able to compromise a whole Qubes
-system.
+An attacker who exploits either of these bugs can break Qubes-provided
+isolation. This means that if an attacker has already exploited another
+vulnerability, e.g. in a Web browser or networking or USB stack, then
+the attacker would be able to compromise a whole Qubes system.
 
 Technical details
 ==================
 
-Xen Security Advisory XSA-213[1]:
+Xen Security Advisory XSA-213 [1]:
 
 |   x86: 64bit PV guest breakout via pagetable use-after-mode-change
 |
 | 64-bit PV guests typically use separate (root) page tables for their
-| kernel and user modes.  Hypercalls are accessible to guest kernel
+| kernel and user modes. Hypercalls are accessible to guest kernel
 | context only, which certain hypercall handlers make assumptions on.
 | The IRET hypercall (replacing the identically name CPU instruction)
 | is used by guest kernels to transfer control from kernel mode to user
-| mode.  If such an IRET hypercall is placed in the middle of a multicall
+| mode. If such an IRET hypercall is placed in the middle of a multicall
 | batch, subsequent operations invoked by the same multicall batch may
-| wrongly assume the guest to still be in kernel mode.  If one or more of
+| wrongly assume the guest to still be in kernel mode. If one or more of
 | these subsequent operations involve operations on page tables, they may
-| be using the wrong root page table, confusing internal accounting.  As
+| be using the wrong root page table, confusing internal accounting. As
 | a result the guest may gain writable access to some of its page tables.
 
 
-Xen Security Advisory XSA-214[2]:
+Xen Security Advisory XSA-214 [2]:
 
-|          grant transfer allows PV guest to elevate privileges
+|   grant transfer allows PV guest to elevate privileges
 | 
 | The GNTTABOP_transfer operation allows one guest to transfer a page to
 | another guest.  The internal processing of this, however, does not
@@ -63,21 +62,22 @@ Xen Security Advisory XSA-214[2]:
 | one of its own descriptor tables, the page still having the designated
 | type results in validation of its contents being skipped.
 
-The second bug require cooperation of two VMs of different type, which
-somehow limits is applicability.
+The second bug requires cooperation between two VMs of different types,
+which somewhat limits its applicability.
 
-The Xen Security Team have also announced a third advisory today:
-XSA-215 "possible memory corruption via failsafe callback"[3]. We
-believe its impact is limited to the hardware beyond of scope of Qubes
-OS:
+The Xen Security Team also announced a third advisory today: XSA-215
+"possible memory corruption via failsafe callback"[3].
 
 | Only x86 systems with physical memory extending to a configuration
 | dependent boundary (5Tb or 3.5Tb) may be affected.  Whether they are
 | actually affected depends on actual physical memory layout.
 
+We believe this bug is extremely unlikely to affect any Qubes users due
+to the very high hardware requirements (5Tb or 3.5Tb of physical
+memory).
 
-Availability of patches
-========================
+Patching
+=========
 
 Patched packages will be built and uploaded to the security-testing
 repository shortly after this advisory is published. We have recently
@@ -85,108 +85,107 @@ implemented and published the details of a new, transparent build
 infrastructure. [4] In this new infrastructure, the source code for
 packages is pushed to a public repository, and logs from the build
 process are also publicly published. However, the Xen security policy
-does not permit us to make this data public until after the embargo
-has been lifted. [5] While we have already privately built and tested
-these packages, we must wait until the embargo has been lifted before
-transparently building the public packages using our new
-infrastructure.
-
-More thoughts from the Qubes Security Team
-===========================================
-
-The XSA-213 vulnerability looks like another example from the infamous
-collection of fatal, reliably exploitable bugs in Xen. In the nearly 8-years of
-history of the Qubes project, this seems to be the 4th of such bugs (previous
-included: XSA-148[12], XSA-182[13], XSA-212[14]). Incidentally all of these
-fatal bugs have been in Xen mechanisms for handling of memory virtualization for
-Para-Virtualized (PV) VMs.
-
-Some might argue that having 4 fatal bugs (admittedly there were more bugs [15],
-which we don't consider _that_ fatal though) in 8 years is a reasonably good
-result, especially compared to other desktop systems. We -- The Qubes OS
-Security Team, however, have been deeply upset by each and every of these bugs.
-In fact, after we learned about the 2nd of these, 10 months ago, we immediately
-decided to move away from using PV-based VMs in Qubes 4.x and migrate to
-hardware-based virtualization-only (HVM) VMs [6].
-
-Of course, the switch from PV to HVM has been a major undertaking and has
-introduced a delay for the release of the Qubes 4.0. This task is now complete
-[7], but we still need another 1-2 months to release 4.0-rc1, because finishing
-up some other minor issues.
-
-Additionally, we originally hoped we could transition to running all the Linux
-VMs in a so called PVH mode of virtualization, where the I/O emulator is not
-needed at all, but it turned out the Linux kernel is not quite ready for this.
-So, in Qubes 4.0 we will use the classic HVM mode, where the I/O emulator is
-sandboxed within... a PV VM (which is also the case when one runs Windows AppVMs
-on Qubes 3.x). This makes it possible for an attacker to chain attacks: one for
-QEMU with another hypothetical for PV virtualization, to break out of a VM. But
-the good news are that, with the work we have done in 4.0 to transition from PV
-to HVM, the next step transition to PVH should be trivial, and we hope to
-introduce it in 4.1, once the upstream Linux supports it.
-
-But meanwhile, i.e. before we decided to ditch PV virtualization, and the time
-when we've planned to release Qubes 4.0 (and then 4.1 with full PVH), two other
-fatal Xen bugs were discovered: one released last month (XSA 212[9]), and the
-one we discuss today (XSA 213). To provide our users with an ability to somehow
-address these problems, we decided recently to introduce so called "Paranoid
-Backup Recovery" mode [10], which we believe is a meaningful way for users to
-recover from potential compromises on Qubes OS.
-
-Many readers will undoubtedly keep repeating the question: why not ditch Xen and
-use some other hypervisor, if Xen is so buggy? Well, first of all, all public
-hypervisors have security issues, and it's unclear if Xen is really _that_
-buggy. Second, and most importantly, we don't see any good alternative at this
-moment. Xen has some unique architectural features, such as support for running
-network and storage backends within _unprivileged_ VMs, which other, popular
-VMMs do not. Finally, unlike many research projects, Xen is mature enough to
-support all sorts of features that are a must when running on a laptop, such as
-power management, and reasonable compatibility with most BIOSes.
-
-But then again, in principle, Xen is a mere technicality in Qubes OS
-architecture. One day we might replace it with something else, and thanks to our
-generalized architecture we introduced in Qubes 3.0 [11] and then took even
-further in Qubes 4.0 (e.g. [16]), the users and admins might not even notice!
-
-
-Patching
-=========
+does not permit us to make this data public until after the embargo has
+been lifted. [5] While we have already privately built and tested these
+packages, we must wait until the embargo has been lifted before
+transparently building the public packages using our new infrastructure.
 
 The specific packages that resolve the problem discussed in this
-bulletin will be uploaded to the security-testing repository:
+bulletin are as follows:
 
-For Qubes 3.2:
-* Xen packages, version 4.6.4-27
+  For Qubes 3.2:
+  - Xen packages, version 4.6.5-27
 
-The packages are to be installed in Dom0 via the qubes-dom0-update
+The packages are to be installed in dom0 via the qubes-dom0-update
 command or via the Qubes VM Manager.
 
 A system restart will be required afterwards.
 
 If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18 will change due to the new
-xen.gz binary.
+passphrase to new PCR values, as PCR18 will change due to the new xen.gz
+binary.
 
-These packages will migrate to the current (stable) repository over
-the coming days after being tested by the community.
+These packages will migrate to the current (stable) repository over the
+coming days after being tested by the community.
+
+Commentary
+===========
+
+XSA-213 is a fatal, reliably exploitable bug in Xen. In the nearly
+eight-year history of the Qubes OS project, there have been four such
+bugs: XSA-148 [12], XSA-182 [13], XSA-212 [14], and now XSA-213.
+Coincidentally, all of these fatal bugs have been in Xen mechanisms for
+handling memory virtualization for paravirtualized (PV) VMs.
+
+Some might argue that having only four fatal bugs (among other non-fatal
+ones [15]) in 8 years is a reasonably good result, especially compared
+to other desktop systems. We, however, have been deeply upset by each
+and every of these bugs. In fact, after we learned of the second of
+these (XSA-212) 10 months ago, we immediately began working on a way to
+move away from using PV-based VMs and toward using only hardware-based
+virtualization (HVM) VMs in Qubes 4.x [6].
+
+The switch from PV to HVM has been a major undertaking and has
+introduced a delay in the release of Qubes 4.0. This undertaking is now
+complete, however [7], and Qubes 4.0-rc1 will be released in the next
+1-2 months, after we've finished up with some remaining minor issues.
+
+We originally hoped we could transition to running all Linux VMs in a
+so-called PVH mode of virtualization, where the I/O emulator is not
+needed at all, but it turned out the Linux kernel is not quite ready for
+this. So, in Qubes 4.0, we will use the classic HVM mode, where the I/O
+emulator is sandboxed within... a PV VM (which is also the case when one
+runs Windows AppVMs on Qubes 3.x). This makes it possible for an
+attacker to chain attacks: one for QEMU with another hypothetical for PV
+virtualization, to break out of a VM. But the good news is that, with
+the work we have done in 4.0 to transition from PV to HVM, the final
+step to transition to PVH should be trivial, and we hope to introduce it
+in 4.1, once the upstream Linux kernel supports it.
+
+Since we began working on ditching PV virtualization 10 months ago, two
+more fatal Xen bugs were published: one last month (XSA 212 [9]) and the
+one we discuss today (XSA 213). To provide our users with some means of
+addressing these problems, we've recently introduced "Paranoid Backup
+Recovery" mode [10], which we believe is a meaningful way for users to
+recover from potential compromises on Qubes OS.
+
+Many readers will undoubtedly continue asking, "If Xen is so buggy, why
+not ditch it for some other hypervisor?" First, all public hypervisors
+have security issues, and it's unclear whether Xen is any buggier than
+the other available options. Second, and most importantly, we don't see
+any good alternative at this moment. Xen has some unique architectural
+features, such as support for running network and storage backends
+within _unprivileged_ VMs, which other, popular VMMs do not. Finally,
+unlike many research projects, Xen is mature enough to support all sorts
+of features that are necessary when running on a laptop, such as power
+management and reasonable compatibility with most BIOSes.
+
+In principle, however, Xen is an interchangeable component within the
+Qubes OS architecture. One day, we might replace it with something else,
+and thanks to the generalized architecture we introduced in Qubes 3.0
+[11] and took even further in Qubes 4.0 (e.g. [16]), Qubes users and
+admins might not even notice!
 
 Credits
 ========
 
-TODO
+See original Xen Security Advisories:
+
+ - XSA-213 [1]
+ - XSA-214 [2]
 
 References
 ===========
 
-[1] https://xenbits.xen.org/xsa/advisory-213.html
-[2] https://xenbits.xen.org/xsa/advisory-214.html
-[3] https://xenbits.xen.org/xsa/advisory-215.html
-[4] https://github.com/QubesOS/qubes-infrastructure/
-[5] https://www.xenproject.org/security-policy.html
-[6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-024-2016.txt
-[7] https://github.com/QubesOS/qubes-issues/issues/2185
-[8] https://www.qubes-os.org/news/2016/07/21/new-hw-certification-for-q4/
-[9] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-029-2017.txt
+[1]  https://xenbits.xen.org/xsa/advisory-213.html
+[2]  https://xenbits.xen.org/xsa/advisory-214.html
+[3]  https://xenbits.xen.org/xsa/advisory-215.html
+[4]  https://github.com/QubesOS/qubes-infrastructure/
+[5]  https://www.xenproject.org/security-policy.html
+[6]  https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-024-2016.txt
+[7]  https://github.com/QubesOS/qubes-issues/issues/2185
+[8]  https://www.qubes-os.org/news/2016/07/21/new-hw-certification-for-q4/
+[9]  https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-029-2017.txt
 [10] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 [11] https://blog.invisiblethings.org/2015/04/23/qubes-30rc1-and-roadmap.html
 [12] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-022-2015.txt

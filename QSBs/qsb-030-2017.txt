@@ -12,7 +12,16 @@ Quick Summary
 ==============
 
 Today the Xen Security Team has disclosed two bugs related to PV
-memory handling affecting Qubes OS:
+memory handling affecting Qubes OS: XSA-213[1] and XSA-214[2].
+
+An attacker who exploits any of those bugs can break Qubes-provided
+isolation.  This means that if an attacker has already exploited
+another vulnerability, e.g. in a Web browser or networking or USB
+stack, then the attacker would be able to compromise a whole Qubes
+system.
+
+Technical details
+==================
 
 Xen Security Advisory XSA-213[1]:
 
@@ -53,13 +62,6 @@ Xen Security Advisory XSA-214[2]:
 | In either case, if the destination PV guest then inserts that page into
 | one of its own descriptor tables, the page still having the designated
 | type results in validation of its contents being skipped.
-
-
-An attacker who exploits any of those bugs can break Qubes-provided
-isolation.  This means that if an attacker has already exploited
-another vulnerability, e.g. in a Web browser or networking or USB
-stack, then the attacker would be able to compromise a whole Qubes
-system.
 
 The second bug require cooperation of two VMs of different type, which
 somehow limits is applicability.

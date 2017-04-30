@@ -91,6 +91,64 @@ these packages, we must wait until the embargo has been lifted before
 transparently building the public packages using our new
 infrastructure.
 
+More thoughts from the Qubes Security Team
+===========================================
+
+The XSA-213 vulnerability looks like another example from the infamous
+collection of fatal, reliably exploitable bugs in Xen. In the nearly 8-years of
+history of the Qubes project, this seems to be the 4th of such bugs (previous
+included: XSA-148[12], XSA-182[13], XSA-212[14]). Incidentally all of these
+fatal bugs have been in Xen mechanisms for handling of memory virtualization for
+Para-Virtualized (PV) VMs.
+
+Some might argue that having 4 fatal bugs (admittedly there were more bugs [15],
+which we don't consider _that_ fatal though) in 8 years is a reasonably good
+result, especially compared to other desktop systems. We -- The Qubes OS
+Security Team, however, have been deeply upset by each and every of these bugs.
+In fact, after we learned about the 2nd of these, 10 months ago, we immediately
+decided to move away from using PV-based VMs in Qubes 4.x and migrate to
+hardware-based virtualization-only (HVM) VMs [6].
+
+Of course, the switch from PV to HVM has been a major undertaking and has
+introduced a delay for the release of the Qubes 4.0. This task is now complete
+[7], but we still need another 1-2 months to release 4.0-rc1, because finishing
+up some other minor issues.
+
+Additionally, we originally hoped we could transition to running all the Linux
+VMs in a so called PVH mode of virtualization, where the I/O emulator is not
+needed at all, but it turned out the Linux kernel is not quite ready for this.
+So, in Qubes 4.0 we will use the classic HVM mode, where the I/O emulator is
+sandboxed within... a PV VM (which is also the case when one runs Windows AppVMs
+on Qubes 3.x). This makes it possible for an attacker to chain attacks: one for
+QEMU with another hypothetical for PV virtualization, to break out of a VM. But
+the good news are that, with the work we have done in 4.0 to transition from PV
+to HVM, the next step transition to PVH should be trivial, and we hope to
+introduce it in 4.1, once the upstream Linux supports it.
+
+But meanwhile, i.e. before we decided to ditch PV virtualization, and the time
+when we've planned to release Qubes 4.0 (and then 4.1 with full PVH), two other
+fatal Xen bugs were discovered: one released last month (XSA 212[9]), and the
+one we discuss today (XSA 213). To provide our users with an ability to somehow
+address these problems, we decided recently to introduce so called "Paranoid
+Backup Recovery" mode [10], which we believe is a meaningful way for users to
+recover from potential compromises on Qubes OS.
+
+Many readers will undoubtedly keep repeating the question: why not ditch Xen and
+use some other hypervisor, if Xen is so buggy? Well, first of all, all public
+hypervisors have security issues, and it's unclear if Xen is really _that_
+buggy. Second, and most importantly, we don't see any good alternative at this
+moment. Xen has some unique architectural features, such as support for running
+network and storage backends within _unprivileged_ VMs, which other, popular
+VMMs do not. Finally, unlike many research projects, Xen is mature enough to
+support all sorts of features that are a must when running on a laptop, such as
+power management, and reasonable compatibility with most BIOSes.
+
+But then again, in principle, Xen is a mere technicality in Qubes OS
+architecture. One day we might replace it with something else, and thanks to our
+generalized architecture we introduced in Qubes 3.0 [11] and then took even
+further in Qubes 4.0 (e.g. [16]), the users and admins might not even notice!
+
+
 Patching
 =========
 
@@ -125,6 +183,17 @@ References
 [3] https://xenbits.xen.org/xsa/advisory-215.html
 [4] https://github.com/QubesOS/qubes-infrastructure/
 [5] https://www.xenproject.org/security-policy.html
+[6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-024-2016.txt
+[7] https://github.com/QubesOS/qubes-issues/issues/2185
+[8] https://www.qubes-os.org/news/2016/07/21/new-hw-certification-for-q4/
+[9] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-029-2017.txt
+[10] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+[11] https://blog.invisiblethings.org/2015/04/23/qubes-30rc1-and-roadmap.html
+[12] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-022-2015.txt
+[13] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-024-2016.txt
+[14] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-029-2017.txt
+[15] https://www.qubes-os.org/security/bulletins/
+[16] https://www.qubes-os.org/doc/mgmt/
 
 --
 The Qubes Security Team

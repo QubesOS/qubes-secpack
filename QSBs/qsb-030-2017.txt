@@ -111,19 +111,18 @@ coming days after being tested by the community.
 Commentary
 ===========
 
-XSA-213 is a fatal, reliably exploitable bug in Xen. In the nearly
-eight-year history of the Qubes OS project, there have been four such
-bugs: XSA-148 [12], XSA-182 [13], XSA-212 [14], and now XSA-213.
-Coincidentally, all of these fatal bugs have been in Xen mechanisms for
-handling memory virtualization for paravirtualized (PV) VMs.
+XSA-213 is a fatal, reliably exploitable bug in Xen. In the nearly eight-year
+history of the Qubes OS project, we have become aware of four bugs of this
+calibre: XSA-148 [12], XSA-182 [13], XSA-212 [14], and now XSA-213.
+Coincidentally, all of these fatal bugs have been in Xen mechanisms for handling
+memory virtualization for paravirtualized (PV) VMs.
 
-Some might argue that having only four fatal bugs (among other non-fatal
-ones [15]) in 8 years is a reasonably good result, especially compared
-to other desktop systems. We, however, have been deeply upset by each
-and every of these bugs. In fact, after we learned of the second of
-these (XSA-212) 10 months ago, we immediately began working on a way to
-move away from using PV-based VMs and toward using only hardware-based
-virtualization (HVM) VMs in Qubes 4.x [6].
+Some might argue that having only four fatal bugs (among other not-that-fatal
+ones [15]) in 8 years is a reasonably good result, especially compared to other
+desktop systems. We, however, have been deeply upset by each and every of these
+bugs. In fact, after we learned of the second of these (XSA-212) 10 months ago,
+we immediately began working on a way to move away from using PV-based VMs and
+toward using only hardware-based virtualization (HVM) VMs in Qubes 4.x [6].
 
 The switch from PV to HVM has been a major undertaking and has
 introduced a delay in the release of Qubes 4.0. This undertaking is now

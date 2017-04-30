@@ -156,7 +156,7 @@ The specific packages that resolve the problem discussed in this
 bulletin will be uploaded to the security-testing repository:
 
 For Qubes 3.2:
-* Xen packages, version 4.6.4-27
+* Xen packages, version 4.6.5-27
 
 The packages are to be installed in Dom0 via the qubes-dom0-update
 command or via the Qubes VM Manager.
@@ -173,7 +173,10 @@ the coming days after being tested by the community.
 Credits
 ========
 
-TODO
+See original Xen Security Advisories:
+
+ - XSA-213[1]
+ - XSA-214[2]
 
 References
 ===========

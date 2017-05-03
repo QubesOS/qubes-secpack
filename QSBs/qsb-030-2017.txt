@@ -120,7 +120,7 @@ memory virtualization for paravirtualized (PV) VMs.
 Some might argue that having only four fatal bugs (among other not-that-fatal
 ones [15]) in 8 years is a reasonably good result, especially compared to other
 desktop systems. We, however, have been deeply upset by each and every of these
-bugs. In fact, after we learned of the second of these (XSA-212) 10 months ago,
+bugs. In fact, after we learned of the second of these (XSA-182) 10 months ago,
 we immediately began working on a way to move away from using PV-based VMs and
 toward using only hardware-based virtualization (HVM) VMs in Qubes 4.x [6].
 

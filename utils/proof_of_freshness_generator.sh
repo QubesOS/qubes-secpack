@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 export PS4="\n$ "

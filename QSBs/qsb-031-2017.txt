@@ -1,0 +1,259 @@
+
+
+             ---===[ Qubes Security Bulletin #31 ]===---
+
+                            June 20, 2017
+
+
+Xen hypervisor vulnerabilities with unresearched impact (XSA 216-224)
+
+Summary
+========
+
+Today the Xen Security Team has disclosed several Xen Security
+Advisories (XSA 216-224). Impact ranges from leaks to system crashes
+and potential privilege escalations. See also our commentary below.
+
+Technical details
+==================
+
+Xen Security Advisories 216 [1]:
+
+|  blkif responses leak backend stack data
+|
+| The block interface response structure has some discontiguous fields.
+| Certain backends populate the structure fields of an otherwise
+| uninitialized instance of this structure on their stacks, leaking
+| data through the (internal or trailing) padding field.
+|
+| A malicious unprivileged guest may be able to obtain sensitive
+| information from the host or other guests.
+
+Xen Security Advisories 217 [2]:
+
+|  page transfer may allow PV guest to elevate privilege
+| 
+| Domains controlling other domains are permitted to map pages owned by
+| the domain being controlled.  If the controlling domain unmaps such a
+| page without flushing the TLB, and if soon after the domain being
+| controlled transfers this page to another PV domain (via
+| GNTTABOP_transfer or, indirectly, XENMEM_exchange), and that third
+| domain uses the page as a page table, the controlling domain will have
+| write access to a live page table until the applicable TLB entry is
+| flushed or evicted.  Note that the domain being controlled is
+| necessarily HVM, while the controlling domain is PV.
+| 
+| A malicious pair of guests may be able to access all of system memory,
+| allowing for all of privilege escalation, host crashes, and
+| information leaks.
+
+Xen Security Advisories 218 [3]:
+
+|  Races in the grant table unmap code
+|
+| * When a grant had been mapped twice by a backend domain, and then
+| unmapped by two concurrent unmap calls, the frontend may be informed
+| that the page had no further mappings when the first call completed rather
+| than when the second call completed.
+| 
+| * A race triggerable by an unprivileged guest could cause a grant
+| maptrack entry for grants to be "freed" twice.  The ultimate effect of
+| this would be for maptrack entries for a single domain to be re-used.
+|
+| For the first issue, for a short window of time, a malicious backend
+| could still read and write memory that the frontend thought was its
+| own again.  Depending on the usage, this could be either an
+| information leak, or a backend-to-frontend privilege escalation.
+| 
+| The second issue is more difficult to analyze. It can probably cause
+| reference counts to leak, preventing memory from being freed on domain
+| destruction (denial-of-service), but information leakage or host
+| privilege escalation cannot be ruled out.
+
+Xen Security Advisories 219 [4]:
+
+|  x86: insufficient reference counts during shadow emulation
+| 
+| When using shadow paging, writes to guest pagetables must be trapped and
+| emulated, so the shadows can be suitably adjusted as well.
+| 
+| When emulating the write, Xen maps the guests pagetable(s) to make the final
+| adjustment and leave the guest's view of its state consistent.
+| 
+| However, when mapping the frame, Xen drops the page reference before
+| performing the write.  This is a race window where the underlying frame can
+| change ownership.
+| 
+| One possible attack scenario is for the frame to change ownership and to be
+| inserted into a PV guest's pagetables.  At that point, the emulated write will
+| be an unaudited modification to the PV pagetables whose value is under guest
+| control.
+| 
+| A malicious pair of guests may be able to elevate their privilege to that of
+| Xen.
+
+Xen Security Advisories 220 [5]:
+
+| x86: PKRU and BND* leakage between vCPU-s
+|
+| There is an information leak, of control information mentioning
+| pointers into guest address space; this may weaken address space
+| randomisation and make other attacks easier.
+| 
+| When an innocent guest acquires leaked state, it will run with
+| incorrect protection state.  This could weaken the protection intended
+| by the MPX or PKU features, making other attacks easier which would
+| otherwise be excluded; and the incorrect state could also cause a
+| denial of service by preventing legitimate accesses.
+
+Xen Security Advisories 221 [6]:
+
+|  NULL pointer deref in event channel poll
+| 
+| When polling event channels, in general arbitrary port numbers can be
+| specified.  Specifically, there is no requirement that a polled event
+| channel ports has ever been created.  When the code was generalised
+| from an earlier implementation, introducing some intermediate
+| pointers, a check should have been made that these intermediate
+| pointers are non-NULL.  However, that check was omitted.
+| 
+| A malicious or buggy guest may cause the hypervisor to access
+| addresses it doesn't control, usually leading to a host crash (Denial
+| of Service).  Information leaks cannot be excluded.
+
+Xen Security Advisories 222 [7]:
+
+|  stale P2M mappings due to insufficient error checking
+| 
+| Certain actions require removing pages from a guest's P2M
+| (Physical-to-Machine) mapping.  When large pages are in use to map
+| guest pages in the 2nd-stage page tables, such a removal operation may
+| incur a memory allocation (to replace a large mapping with individual
+| smaller ones).  If this allocation fails, these errors are ignored by
+| the callers, which would then continue and (for example) free the
+| referenced page for reuse.  This leaves the guest with a mapping to a
+| page it shouldn't have access to.
+| 
+| The allocation involved comes from a separate pool of memory created
+| when the domain is created; under normal operating conditions it never
+| fails, but a malicious guest may be able to engineer situations where
+| this pool is exhausted.
+| 
+| A malicious guest may be able to access memory it doesn't own,
+| potentially allowing privilege escalation, host crashes, or
+| information leakage.
+
+Xen Security Advisories 224 [8]:
+
+|  grant table operations mishandle reference counts
+| 
+| * If a grant is mapped with both the GNTMAP_device_map and
+| GNTMAP_host_map flags, but unmapped only with host_map, the device_map
+| portion remains but the page reference counts are lowered as though it
+| had been removed. This bug can be leveraged cause a page's reference
+| counts and type counts to fall to zero while retaining writeable
+| mappings to the page.
+| 
+| * Under some specific conditions, if a grant is mapped with both the
+| GNTMAP_device_map and GNTMAP_host_map flags, the operation may not
+| grab sufficient type counts.  When the grant is then unmapped, the
+| type count will be erroneously reduced.  This bug can be leveraged
+| cause a page's reference counts and type counts to fall to zero while
+| retaining writeable mappings to the page.
+| 
+| * When a grant reference is given to an MMIO region (as opposed to a
+| normal guest page), if the grant is mapped with only the
+| GNTMAP_device_map flag set, a mapping is created at host_addr anyway.
+| This does *not* cause reference counts to change, but there will be no
+| record of this mapping, so it will not be considered when reporting
+| whether the grant is still in use.
+| 
+| For the worst issue, a PV guest could gain a writeable mapping of its
+| own pagetable, allowing it to escalate its privileges to that of the
+| host.
+
+Commentary from the Qubes Security Team
+========================================
+
+The bugs discussed today seem difficult to exploit in practice.
+
+Each require either some race condition to win (XSA 217, 218, 219),
+control over more than one VM (XSA 218, 219), some memory allocation,
+which is normally beyond attacker's control, to fail or happen in some
+specific way (XSA 216, 217, 218, 219, 222, 224?), or a combination of
+these.
+
+Additionally some bugs are believed to be limited to being leaks or
+DoS only (XSA 216, 221), or affecting only intra-VM-security (XSA
+220).
+
+Also, it's worth pointing out that 7 out of 8 of the bugs discussed
+here (with XSA 222 being the exception) do not affect when running
+only fully-virtualized PVH guests (which is where we have been going
+to with Qubes 4.x, see [9]).
+
+Compromise Recovery
+====================
+
+Starting with Qubes 3.2 we offer Paranoid Backup Restore Mode, which
+has been designed specifically to aid to help with recovery of a
+(potentially) compromised Qubes system. Thus, if you believe your
+system might have got compromised (perhaps because of the bugs
+discussed in this bulletin), then you should read and follow the
+procedure described here:
+
+https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+
+Patching
+=========
+
+Patched packages will be built and uploaded to the security-testing
+repository shortly after this advisory is published. We have recently
+implemented and published the details of a new, transparent build
+infrastructure. [4] In this new infrastructure, the source code for
+packages is pushed to a public repository, and logs from the build
+process are also publicly published. However, the Xen security policy
+does not permit us to make this data public until after the embargo has
+been lifted. [5] While we have already privately built and tested these
+packages, we must wait until the embargo has been lifted before
+transparently building the public packages using our new infrastructure.
+
+The specific packages that resolve the problem discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version TODO
+
+The packages are to be installed in dom0 via the qubes-dom0-update
+command or via the Qubes VM Manager.
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18 will change due to the new xen.gz
+binary.
+
+These packages will migrate to the current (stable) repository over the
+coming days after being tested by the community.
+
+Credits
+========
+
+See original Xen Security Advisories.
+
+References
+===========
+
+[1]  https://xenbits.xen.org/xsa/advisory-216.html
+[2]  https://xenbits.xen.org/xsa/advisory-217.html
+[3]  https://xenbits.xen.org/xsa/advisory-218.html
+[4]  https://xenbits.xen.org/xsa/advisory-219.html
+[5]  https://xenbits.xen.org/xsa/advisory-220.html
+[6]  https://xenbits.xen.org/xsa/advisory-221.html
+[7]  https://xenbits.xen.org/xsa/advisory-222.html
+[8]  https://xenbits.xen.org/xsa/advisory-224.html
+[9] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-030-2017.txt#L111-L167
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

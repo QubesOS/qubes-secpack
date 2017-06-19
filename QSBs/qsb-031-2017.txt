@@ -222,7 +222,9 @@ The specific packages that resolve the problem discussed in this
 bulletin are as follows:
 
   For Qubes 3.2:
-  - Xen packages, version TODO
+  - Xen packages, version 4.6.5-28
+  - Kernel packages, version 4.4.67-13 (security-testing)
+  - Kernel packages, version 4.9.31-18 (current-testing)
 
 The packages are to be installed in dom0 via the qubes-dom0-update
 command or via the Qubes VM Manager.
@@ -230,8 +232,8 @@ command or via the Qubes VM Manager.
 A system restart will be required afterwards.
 
 If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18 will change due to the new xen.gz
-binary.
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen and kernel binaries, and because of the regenerated initramfs.
 
 These packages will migrate to the current (stable) repository over the
 coming days after being tested by the community.

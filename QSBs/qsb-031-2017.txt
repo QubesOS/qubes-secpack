@@ -196,11 +196,11 @@ Compromise Recovery
 ====================
 
 Starting with Qubes 3.2 we offer Paranoid Backup Restore Mode, which
-has been designed specifically to aid to help with recovery of a
-(potentially) compromised Qubes system. Thus, if you believe your
-system might have got compromised (perhaps because of the bugs
-discussed in this bulletin), then you should read and follow the
-procedure described here:
+has been designed specifically to aid with recovery of a (potentially)
+compromised Qubes OS system. Thus, if you believe your system might
+have got compromised (perhaps because of the bugs discussed in this
+bulletin), then you should read and follow the procedure described
+here:
 
 https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 
@@ -254,7 +254,7 @@ References
 [6]  https://xenbits.xen.org/xsa/advisory-221.html
 [7]  https://xenbits.xen.org/xsa/advisory-222.html
 [8]  https://xenbits.xen.org/xsa/advisory-224.html
-[9] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-030-2017.txt#L111-L167
+[9]  https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-030-2017.txt#L111-L167
 
 --
 The Qubes Security Team

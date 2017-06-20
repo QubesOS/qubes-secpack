@@ -207,17 +207,6 @@ https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 Patching
 =========
 
-Patched packages will be built and uploaded to the security-testing
-repository shortly after this advisory is published. We have recently
-implemented and published the details of a new, transparent build
-infrastructure. [4] In this new infrastructure, the source code for
-packages is pushed to a public repository, and logs from the build
-process are also publicly published. However, the Xen security policy
-does not permit us to make this data public until after the embargo has
-been lifted. [5] While we have already privately built and tested these
-packages, we must wait until the embargo has been lifted before
-transparently building the public packages using our new infrastructure.
-
 The specific packages that resolve the problem discussed in this
 bulletin are as follows:
 

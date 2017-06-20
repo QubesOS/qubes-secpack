@@ -224,7 +224,7 @@ bulletin are as follows:
   For Qubes 3.2:
   - Xen packages, version 4.6.5-28
   - Kernel packages, version 4.4.67-13 (security-testing)
-  - Kernel packages, version 4.9.31-18 (current-testing)
+  - Kernel packages, version 4.9.33-18 (current-testing)
 
 The packages are to be installed in dom0 via the qubes-dom0-update
 command or via the Qubes VM Manager.

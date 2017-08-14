@@ -5,20 +5,20 @@
                            August 15, 2017
 
 
-   Xen hypervisor and Linux kernel vulnerabilities (XSA 226-230)
+   Xen hypervisor and Linux kernel vulnerabilities (XSA-226 through XSA-230)
 
 Summary
 ========
 
-Today the Xen Security Team has disclosed several Xen Security
-Advisories (XSA 226-230) related to grant tables mechanism, used to
-share memory between domains. Impact ranges from leaks to system
-crashes and privilege escalations. See also our commentary below.
+The Xen Security Team released several Xen Security Advisories today (XSA-226
+through XSA-230) related to the grant tables mechanism used to share memory
+between domains. The impact of these advisories ranges from data leaks to
+system crashes and privilege escalations. See our commentary below for details.
 
 Technical details
 ==================
 
-Xen Security Advisories 226 [1]:
+Xen Security Advisory 226 [1]:
 
 | Code to handle copy operations on transitive grants has built in retry
 | logic, involving a function reinvoking itself with unchanged
@@ -30,7 +30,7 @@ Xen Security Advisories 226 [1]:
 | A malicious or buggy guest may be able to crash Xen.  Privilege
 | escalation and information leaks cannot be ruled out.
 
-Xen Security Advisories 227 [2]:
+Xen Security Advisory 227 [2]:
 
 | When mapping a grant reference, a guest must inform Xen of where it
 | would like the grant mapped.  For PV guests, this is done by nominating
@@ -49,7 +49,7 @@ Xen Security Advisories 227 [2]:
 | 
 | A PV guest can elevate its privilege to that of the host.
 
-Xen Security Advisories 228 [3]:
+Xen Security Advisory 228 [3]:
 
 | The grant table code in Xen has a bespoke semi-lockfree allocator for
 | recording grant mappings ("maptrack" entries).  This allocator has a
@@ -69,7 +69,7 @@ Xen Security Advisories 228 [3]:
 | A malicious guest administrator can crash the host, and can probably
 | escalate their privilege to that of the host.
 
-Xen Security Advisories 229 [4]:
+Xen Security Advisory 229 [4]:
 
 | The block layer in Linux may choose to merge adjacent block IO requests.
 | When Linux is running as a Xen guest, the default merging algorithm is
@@ -84,7 +84,7 @@ Xen Security Advisories 229 [4]:
 | other guests in the system or from Xen itself, or be used to DoS or
 | escalate privilege within the system.
 
-Xen Security Advisories 230 [5]:
+Xen Security Advisory 230 [5]:
 
 | Xen maintains the _GTF_{read,writ}ing bits as appropriate, to inform the
 | guest that a grant is in use.  A guest is expected not to modify the
@@ -102,43 +102,42 @@ Xen Security Advisories 230 [5]:
 Commentary from the Qubes Security Team
 ========================================
 
-It looks like the most severe of the vulnerabilities published today is the XSA
-227, which is another example of a bug in memory management code for
+It looks like the most severe of the vulnerabilities published today is
+XSA-227, which is another example of a bug in memory management code for
 para-virtualized (PV) VMs. As discussed before, in Qubes 4.0 [6], we've decided
-to retire the use of PV virtualization mode in favour of the fully virtualized
-VMs, exactly with the goal of preventing such classes of vulnerabilities to
-affect Qubes OS security. We shall note however, that Qubes 3.2 uses PV for all
-its VMs by default.
+to retire the use of PV virtualization mode in favour of fully virtualized VMs,
+precisely in order to to prevent this class of vulnerabilities from affecting
+the security of Qubes OS. We note however, that Qubes 3.2 uses PV for all VMs
+by default.
 
-Another potentially serious vulnerability seems to be the XSA 228. While this
-does not seem to be limited to PV virtualization only, we should note that it is
-a race condition type of bug. Such types of vulnerabilities are typically
+XSA-228 seems to be another potentially serious vulnerability. While this does
+not seem to be limited only to PV virtualization, we should note that it is a
+race condition type of bug. Such types of vulnerabilities are typically
 significantly more difficult to reliably exploit in practice.
 
-The remaining vulnerabilities (XSA 229 and 230) look even more theoretical. We
-should also note that the XSA 229 is a vulnerability in the Linux kernel's
+The remaining vulnerabilities (XSA-229 and XSA-230) look even more theoretical.
+We should also note that XSA-229 is a vulnerability in the Linux kernel's
 implementation of the Xen PV block (disk) backend, not in the Xen hypervisor.
-Qubes architecture partly alleviates potential successful attack exploiting this
-vulnerability thanks to offloading of some of the storage backends to USB and
+The Qubes architecture partly mitigates potential successful attacks exploiting
+this vulnerability thanks to offloading some of the storage backend to USB and
 (optionally) other VMs. The main system block backend still runs in dom0,
-however, hence the inclusion of the bug in the bulletin.
+however, hence the inclusion of this bug in the bulletin.
 
 Compromise Recovery
 ====================
 
-Starting with Qubes 3.2 we offer Paranoid Backup Restore Mode, which
-has been designed specifically to aid with recovery of a (potentially)
-compromised Qubes OS system. Thus, if you believe your system might
-have got compromised (perhaps because of the bugs discussed in this
-bulletin), then you should read and follow the procedure described
-here:
+Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which was
+designed specifically to aid in the recovery of a (potentially) compromised
+Qubes OS system. Thus, if you believe your system might have been compromised
+(perhaps because of the bugs discussed in this bulletin), then you should read
+and follow the procedure described here:
 
 https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 
 Patching
 =========
 
-The specific packages that resolve the problem discussed in this
+The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 
   For Qubes 3.2:
@@ -149,32 +148,30 @@ bulletin are as follows:
   - Xen packages, version 4.8.1-5
   - Kernel packages, version 4.9.35-20
 
-The packages are to be installed in dom0 via the qubes-dom0-update
-command or via the Qubes VM Manager.
+The packages are to be installed in dom0 via the qubes-dom0-update command or
+via the Qubes VM Manager. A system restart will be required afterwards.
 
-A system restart will be required afterwards.
+If you use Anti Evil Maid, you will need to reseal your secret passphrase to
+new PCR values, as PCR18+19 will change due to the new Xen and kernel binaries,
+and because of the regenerated initramfs.
 
-If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18+19 will change due to the new
-Xen and kernel binaries, and because of the regenerated initramfs.
-
-These packages will migrate to the current (stable) repository over the
-coming days after being tested by the community.
+These packages will migrate to the current (stable) repository over the next
+two weeks after being tested by the community.
 
 Credits
 ========
 
-See original Xen Security Advisories.
+See the original Xen Security Advisories.
 
 References
 ===========
 
-[1]  https://xenbits.xen.org/xsa/advisory-226.html
-[2]  https://xenbits.xen.org/xsa/advisory-227.html
-[3]  https://xenbits.xen.org/xsa/advisory-228.html
-[4]  https://xenbits.xen.org/xsa/advisory-229.html
-[5]  https://xenbits.xen.org/xsa/advisory-230.html
-[6]  https://www.qubes-os.org/news/2017/07/31/qubes-40-rc1/
+[1] https://xenbits.xen.org/xsa/advisory-226.html
+[2] https://xenbits.xen.org/xsa/advisory-227.html
+[3] https://xenbits.xen.org/xsa/advisory-228.html
+[4] https://xenbits.xen.org/xsa/advisory-229.html
+[5] https://xenbits.xen.org/xsa/advisory-230.html
+[6] https://www.qubes-os.org/news/2017/07/31/qubes-40-rc1/
 
 --
 The Qubes Security Team

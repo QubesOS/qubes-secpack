@@ -105,7 +105,7 @@ Commentary from the Qubes Security Team
 It looks like the most severe of the vulnerabilities published today is the XSA
 227, which is another example of a bug in memory management code for
 para-virtualized (PV) VMs. As discussed before, in Qubes 4.0 [6], we've decided
-to retired the use of PV virtualization mode in favour of the fully virtualized
+to retire the use of PV virtualization mode in favour of the fully virtualized
 VMs, exactly with the goal of preventing such classes of vulnerabilities to
 affect Qubes OS security. We shall note however, that Qubes 3.2 uses PV for all
 its VMs by default.
@@ -116,7 +116,7 @@ a race condition type of bug. Such types of vulnerabilities are typically
 significantly more difficult to reliably exploit in practice.
 
 The remaining vulnerabilities (XSA 229 and 230) look even more theoretical. We
-should also note that the XSA 230 is a vulnerability in the Linux kernel's
+should also note that the XSA 229 is a vulnerability in the Linux kernel's
 implementation of the Xen PV block (disk) backend, not in the Xen hypervisor.
 Qubes architecture partly alleviates potential successful attack exploiting this
 vulnerability thanks to offloading of some of the storage backends to USB and
@@ -143,6 +143,10 @@ bulletin are as follows:
 
   For Qubes 3.2:
   - Xen packages, version 4.6.6-29
+  - Kernel packages, version 4.9.35-20
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.1-5
   - Kernel packages, version 4.9.35-20
 
 The packages are to be installed in dom0 via the qubes-dom0-update

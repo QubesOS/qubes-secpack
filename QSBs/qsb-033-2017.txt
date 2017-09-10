@@ -1,0 +1,134 @@
+
+
+             ---===[ Qubes Security Bulletin #33 ]===---
+
+                         September 12, 2017
+
+
+               Xen hypervisor (XSA-231 through XSA-234)
+
+Summary
+========
+
+The Xen Security Team released several Xen Security Advisories today
+(XSA-231 through XSA-234). The impact of these advisories ranges from
+system crashes to privilege escalations. See our commentary below for
+details.
+
+Technical details
+==================
+
+Xen Security Advisory 231 [1]:
+
+| The function `alloc_heap_pages` allows callers to specify the first
+| NUMA node that should be used for allocations through the `memflags`
+| parameter; the node is extracted using the `MEMF_get_node` macro.
+| 
+| While the function checks to see if the special constant
+| `NUMA_NO_NODE` is specified, it otherwise does not handle the case
+| where `node >= MAX_NUMNODES`.  This allows an out-of-bounds access
+| to an internal array.
+| 
+| An attacker using crafted hypercalls can execute arbitrary code within
+| Xen.
+
+Xen Security Advisory 232 [2]:
+
+| The function `__gnttab_cache_flush` handles GNTTABOP_cache_flush grant
+| table operations. It checks to see if the calling domain is the owner
+| of the page that is to be operated on. If it is not, the owner's grant
+| table is checked to see if a grant mapping to the calling domain
+| exists for the page in question.
+| 
+| However, the function does not check to see if the owning domain
+| actually has a grant table or not. Some special domains, such as
+| `DOMID_XEN`, `DOMID_IO` and `DOMID_COW` are created without grant
+| tables. Hence, if __gnttab_cache_flush operates on a page owned by
+| these special domains, it will attempt to dereference a null pointer
+| in the domain struct.
+| 
+| The guest can get Xen to dereference a NULL pointer.
+| 
+| For ARM guests, and x86 HVM guests, and x86 PV guests on systems with
+| SMAP enabled, this will cause a host crash (denial-of-service).
+| 
+| For x86 PV guests on systems without SMAP enabled, an attacker can map
+| a crafted grant structure at virtual address 0.  This can be leveraged
+| to increment an arbitrary virtual address, which can then probably be
+| leveraged into a full privilege escalation.
+
+Xen Security Advisory 234 [4]:
+
+| When removing or replacing a grant mapping, the x86 PV specific path
+| needs to make sure page table entries remain in sync with other
+| accounting done.  Although the identity of the page frame was
+| validated correctly, neither the presence of the mapping nor page
+| writability were taken into account.
+| 
+| A malicious or buggy x86 PV guest could escalate its privileges or
+| crash the hypervisor.
+
+Xen Security Team also released Xen Security Advisory 233 [3], with
+only DoS impact:
+
+| When shutting down a VM with a stubdomain, a race in cxenstored may
+| cause a double-free.
+| 
+| The xenstored daemon may crash, resulting in a DoS of any parts of the
+| system relying on it (including domain creation / destruction,
+| ballooning, device changes, etc).
+
+
+Commentary from the Qubes Security Team
+========================================
+
+TODO
+
+Compromise Recovery
+====================
+
+Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which was
+designed specifically to aid in the recovery of a (potentially) compromised
+Qubes OS system. Thus, if you believe your system might have been compromised
+(perhaps because of the bugs discussed in this bulletin), then you should read
+and follow the procedure described here:
+
+https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-30
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.2-2
+
+The packages are to be installed in dom0 via the qubes-dom0-update command or
+via the Qubes VM Manager. A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret passphrase to
+new PCR values, as PCR18+19 will change due to the new Xen binaries.
+
+These packages will migrate to the current (stable) repository over the next
+two weeks after being tested by the community.
+
+Credits
+========
+
+See the original Xen Security Advisories.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-231.html
+[2] https://xenbits.xen.org/xsa/advisory-232.html
+[3] https://xenbits.xen.org/xsa/advisory-233.html
+[4] https://xenbits.xen.org/xsa/advisory-234.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

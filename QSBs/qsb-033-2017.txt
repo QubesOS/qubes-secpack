@@ -82,7 +82,18 @@ only DoS impact:
 Commentary from the Qubes Security Team
 ========================================
 
-TODO
+This batch of Xen security advisories continues to reassure us that we have made
+a good decision with regards to ditching the PV support for Qubes 4. Indeed only
+one of the above discussed potential privilege-escalation bugs affect non-PV
+virtualization: the XSA 231. This bug itself being an example of a problem in a
+somehow extra code implementing some kind of "additional and exotic"
+functionality (NUMA support). Unfortunately, while Xen has indeed made some
+progress recently in allowing to disable lots of extra features at compile time
+[TODO: link], the code for NUMA support could not be deactivated easily, which
+is a reason for inclusion of this bug in the today's advisory.
+
+That being said, we should stress that the other bugs do affect Qubes 3.2, the
+current stable version.
 
 Compromise Recovery
 ====================

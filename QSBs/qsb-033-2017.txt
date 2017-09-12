@@ -83,21 +83,21 @@ Commentary from the Qubes Security Team
 ========================================
 
 This batch of Xen security advisories reassures us in our decision to
-abandon PV support in Qubes 4.0. Indeed, only one of the potential
-privilege-escalation bugs discussed in this advisory affects non-PV
-virtualization: XSA-231. This bug is a prime example of the common
-problems associated with expanding the codebase in order to implement
-"exotic" functionality (in this case, NUMA support). While the Xen
-Project has made some progress recently in allowing extra features to be
-disabled at compile time [TODO: link], the code for NUMA support could
-not easily be deactivated, which is the reason for the inclusion of this
-bug in today's advisory.
+abandon default para-virtualization (PV) in Qubes 4.0. Indeed, only
+one of the potential privilege-escalation bugs discussed in this
+advisory affects non-PV virtualization: XSA-231. This bug is a prime
+example of the common problems associated with expanding the codebase
+in order to implement "exotic" functionality (in this case, NUMA
+support). While the Xen Project has made some progress recently in
+allowing extra features to be disabled at compile time, the code for
+NUMA support could not easily be deactivated, which is the reason for
+the inclusion of this bug in today's advisory.
 
-While we expect the absence of PV support in Qubes 4.0 to obviate many
-such vulnerabilities in the future, please note that Qubes 3.2 (the
-current, stable version of Qubes) still supports PV. Therefore, all the
-bugs in this bulletin affect Qubes 3.2, and users should patch
-immediately.
+While the departure from para-virtualization (PV) in Qubes 4.0 will
+obviate many such vulnerabilities in the future, please note that
+Qubes 3.2 (the current, stable version of Qubes) still uses PV mode
+for most of the VMs. Therefore, all the bugs in this bulletin affect
+Qubes 3.2, and users should patch immediately.
 
 Compromise Recovery
 ====================

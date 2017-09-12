@@ -68,7 +68,7 @@ Xen Security Advisory 234 [4]:
 | A malicious or buggy x86 PV guest could escalate its privileges or
 | crash the hypervisor.
 
-Xen Security Team also released Xen Security Advisory 233 [3], with
+The Xen Security Team also released Xen Security Advisory 233 [3], with
 only DoS impact:
 
 | When shutting down a VM with a stubdomain, a race in cxenstored may
@@ -82,27 +82,31 @@ only DoS impact:
 Commentary from the Qubes Security Team
 ========================================
 
-This batch of Xen security advisories continues to reassure us that we have made
-a good decision with regards to ditching the PV support for Qubes 4. Indeed only
-one of the above discussed potential privilege-escalation bugs affect non-PV
-virtualization: the XSA 231. This bug itself being an example of a problem in a
-somehow extra code implementing some kind of "additional and exotic"
-functionality (NUMA support). Unfortunately, while Xen has indeed made some
-progress recently in allowing to disable lots of extra features at compile time
-[TODO: link], the code for NUMA support could not be deactivated easily, which
-is a reason for inclusion of this bug in the today's advisory.
+This batch of Xen security advisories reassures us in our decision to
+abandon PV support in Qubes 4.0. Indeed, only one of the potential
+privilege-escalation bugs discussed in this advisory affects non-PV
+virtualization: XSA-231. This bug is a prime example of the common
+problems associated with expanding the codebase in order to implement
+"exotic" functionality (in this case, NUMA support). While the Xen
+Project has made some progress recently in allowing extra features to be
+disabled at compile time [TODO: link], the code for NUMA support could
+not easily be deactivated, which is the reason for the inclusion of this
+bug in today's advisory.
 
-That being said, we should stress that the other bugs do affect Qubes 3.2, the
-current stable version.
+While we expect the absence of PV support in Qubes 4.0 to obviate many
+such vulnerabilities in the future, please note that Qubes 3.2 (the
+current, stable version of Qubes) still supports PV. Therefore, all the
+bugs in this bulletin affect Qubes 3.2, and users should patch
+immediately.
 
 Compromise Recovery
 ====================
 
-Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which was
-designed specifically to aid in the recovery of a (potentially) compromised
-Qubes OS system. Thus, if you believe your system might have been compromised
-(perhaps because of the bugs discussed in this bulletin), then you should read
-and follow the procedure described here:
+Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which
+was designed specifically to aid in the recovery of a (potentially)
+compromised Qubes OS system. Thus, if you believe your system might have
+been compromised (perhaps because of the bugs discussed in this
+bulletin), then you should read and follow the procedure described here:
 
 https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 
@@ -118,14 +122,24 @@ bulletin are as follows:
   For Qubes 4.0:
   - Xen packages, version 4.8.2-2
 
-The packages are to be installed in dom0 via the qubes-dom0-update command or
-via the Qubes VM Manager. A system restart will be required afterwards.
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command, as follows:
 
-If you use Anti Evil Maid, you will need to reseal your secret passphrase to
-new PCR values, as PCR18+19 will change due to the new Xen binaries.
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
 
-These packages will migrate to the current (stable) repository over the next
-two weeks after being tested by the community.
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
 
 Credits
 ========

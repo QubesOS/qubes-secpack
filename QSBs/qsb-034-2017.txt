@@ -10,116 +10,26 @@
 Summary
 ========
 
-Eric Larsson discovered that in some cases, VM may produce a window
-that have no forced colorful borders. VM can not use this
-vulnerability to draw other borders in that place.
+One of our developers, Simon Gaiser (aka HW42), when working on
+improving support for device isolation in Qubes 4.0, has discovered a
+potential security problem with how Xen handles MSI-capable devices.
+This problem has been handled by Xen as an advisory XSA 237, published
+today [1].
 
-At the same time, The Xen Security Team released several Xen Security
-Advisories (XSA-237 through XSA-244). The impact of these advisories
-ranges from system crashes to privilege escalations. See our
+At the same time, The Xen Security Team released several other Xen
+Security Advisories (XSA-238 through XSA-244). The impact of these
+advisories ranges from system crashes to potential privilege
+escalations, which however seem to be mostly theoretical. See our
 commentary below for details.
+
+Finally, Eric Larsson discovered a situation where Qubes GUI
+virtualization might allow a VM to produce a window that has no forced
+colorful borders (which are used on Qubes as front-line indicator of
+trust). The VM can not use this vulnerability to draw other borders in
+that place, however. Again, please see our extensive discussion below.
 
 Technical details
 ==================
-
-GUI daemon issue
-----------------
-
-Qubes OS's GUI virtualization enforce colorful borders around all VM's
-windows. There are two types of windows. First one is normal windows (with a
-border, titlebar etc). In this case, we modify window manager to take
-care of coloring borders. The second category is borderless windows
-(with override_redirect property set to True, in X11 terminology).
-Here, window manager is not involved at all, and our GUI daemon needs
-to draw a border itself. This is done by drawing 2px border whenever
-window content is changed beneath that area. The bug was that if the
-VM application have never send any update for (any part of) the border
-area, the frame was never drawn. Relevant code is in [gui-daemon
-component][gui-daemon], [gui-daemon/xside.c][xside]:
-
-    /* update given fragment of window image
-     * can be requested by VM (MSG_SHMIMAGE) and Xserver (XExposeEvent)
-     * parameters are not sanitized earlier - we must check it carefully
-     * also do not let to cover forced colorful frame (for undecoraded windows)
-     */
-    static void do_shm_update(Ghandles * g, struct windowdata *vm_window,
-               int untrusted_x, int untrusted_y, int untrusted_w,
-               int untrusted_h)
-    {
-
-        /* ... */
-
-        if (!vm_window->image && !(g->screen_window && g->screen_window->image))
-            return;
-        /* force frame to be visible: */
-        /*   * left */
-        delta = border_width - x;
-        if (delta > 0) {
-            w -= delta;
-            x = border_width;
-            do_border = 1;
-        }
-        /*   * right */
-        delta = x + w - (vm_window->width - border_width);
-        if (delta > 0) {
-            w -= delta;
-            do_border = 1;
-        }
-        /*   * top */
-        delta = border_width - y;
-        if (delta > 0) {
-            h -= delta;
-            y = border_width;
-            do_border = 1;
-        }
-        /*   * bottom */
-        delta = y + h - (vm_window->height - border_width);
-        if (delta > 0) {
-            h -= delta;
-            do_border = 1;
-        }
-
-        /* ... */
-
-    }
-
-The above code is responsible for deciding whether colorful border
-needs to be updated. It is done if both:
-a) there is any window image (vm_window->image)
-b) updated area include a border anywhere
-
-If none of those conditions are met, no border is drawn. Note that if
-VM tries to draw anything there (for example fake borders of other
-color), it will be overridden with the right borders, which will stay
-there until window is destroyed.
-
-Eric Larsson discovered that this situation (not updating border area)
-is reachable and even happens with some real world application, when
-it shows a splash screen of a custom shape. Custom window shapes are
-not supported in Qubes OS, but VM side still thinks it is there. And
-do not send updates of content outside of that custom shape.
-
-We fixed the issue by forcefully updating the whole window before
-making it visible:
-
-    static void handle_map(Ghandles * g, struct windowdata *vm_window)
-    {
-
-        /* ... */
-
-        /* added code */
-        if (vm_window->override_redirect) {
-            /* force window update to draw colorful frame, even when VM have not
-             * sent any content yet */
-            do_shm_update(g, vm_window, 0, 0, vm_window->width, vm_window->height);
-        }
-
-        (void) XMapWindow(g->display, vm_window->local_winid);
-    }
-
-This needs some auxiliary changes in do_shm_update function, to draw
-the frame also in case when there is no window content yet
-(vm_window->image is NULL).
 
 Xen issues
 ----------
@@ -267,6 +177,105 @@ Xen Security Advisory 244 [8]:
 | 
 | Avoiding to online CPUs at runtime will avoid this vulnerability.
 
+
+GUI daemon issue
+----------------
+
+Qubes OS's GUI virtualization enforce colorful borders around all VM's
+windows. There are two types of windows. First one is normal windows (with a
+border, titlebar etc). In this case, we modify window manager to take
+care of coloring borders. The second category is borderless windows
+(with override_redirect property set to True, in X11 terminology).
+Here, window manager is not involved at all, and our GUI daemon needs
+to draw a border itself. This is done by drawing 2px border whenever
+window content is changed beneath that area. The bug was that if the
+VM application have never send any update for (any part of) the border
+area, the frame was never drawn. Relevant code is in [gui-daemon
+component][gui-daemon], [gui-daemon/xside.c][xside]:
+
+    /* update given fragment of window image
+     * can be requested by VM (MSG_SHMIMAGE) and Xserver (XExposeEvent)
+     * parameters are not sanitized earlier - we must check it carefully
+     * also do not let to cover forced colorful frame (for undecoraded windows)
+     */
+    static void do_shm_update(Ghandles * g, struct windowdata *vm_window,
+               int untrusted_x, int untrusted_y, int untrusted_w,
+               int untrusted_h)
+    {
+
+        /* ... */
+
+        if (!vm_window->image && !(g->screen_window && g->screen_window->image))
+            return;
+        /* force frame to be visible: */
+        /*   * left */
+        delta = border_width - x;
+        if (delta > 0) {
+            w -= delta;
+            x = border_width;
+            do_border = 1;
+        }
+        /*   * right */
+        delta = x + w - (vm_window->width - border_width);
+        if (delta > 0) {
+            w -= delta;
+            do_border = 1;
+        }
+        /*   * top */
+        delta = border_width - y;
+        if (delta > 0) {
+            h -= delta;
+            y = border_width;
+            do_border = 1;
+        }
+        /*   * bottom */
+        delta = y + h - (vm_window->height - border_width);
+        if (delta > 0) {
+            h -= delta;
+            do_border = 1;
+        }
+
+        /* ... */
+
+    }
+
+The above code is responsible for deciding whether colorful border
+needs to be updated. It is done if both:
+a) there is any window image (vm_window->image)
+b) updated area include a border anywhere
+
+If none of those conditions are met, no border is drawn. Note that if
+VM tries to draw anything there (for example fake borders of other
+color), it will be overridden with the right borders, which will stay
+there until window is destroyed.
+
+Eric Larsson discovered that this situation (not updating border area)
+is reachable and even happens with some real world application, when
+it shows a splash screen of a custom shape. Custom window shapes are
+not supported in Qubes OS, but VM side still thinks it is there. And
+do not send updates of content outside of that custom shape.
+
+We fixed the issue by forcefully updating the whole window before
+making it visible:
+
+    static void handle_map(Ghandles * g, struct windowdata *vm_window)
+    {
+
+        /* ... */
+
+        /* added code */
+        if (vm_window->override_redirect) {
+            /* force window update to draw colorful frame, even when VM have not
+             * sent any content yet */
+            do_shm_update(g, vm_window, 0, 0, vm_window->width, vm_window->height);
+        }
+
+        (void) XMapWindow(g->display, vm_window->local_winid);
+    }
+
+This needs some auxiliary changes in do_shm_update function, to draw
+the frame also in case when there is no window content yet
+(vm_window->image is NULL).
 
 Commentary from the Qubes Security Team
 ========================================

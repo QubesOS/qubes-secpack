@@ -329,7 +329,9 @@ Credits
 
 GUI daemon issue was discovered by Eric Larsson.
 
-See the original Xen Security Advisories.
+PCI MSI issues were discovered by Simon Gaiser (aka HW42).
+
+For other issues see the original Xen Security Advisories.
 
 References
 ===========

@@ -1,0 +1,341 @@
+
+
+             ---===[ Qubes Security Bulletin #34 ]===---
+
+                          October 12, 2017
+
+
+   GUI issue and Xen vulnerabilities (XSA-237 through XSA-244)
+
+Summary
+========
+
+Eric Larsson discovered that in some cases, VM may produce a window
+that have no forced colorful borders. VM can not use this
+vulnerability to draw other borders in that place.
+
+At the same time, The Xen Security Team released several Xen Security
+Advisories (XSA-237 through XSA-244). The impact of these advisories
+ranges from system crashes to privilege escalations. See our
+commentary below for details.
+
+Technical details
+==================
+
+GUI daemon issue
+----------------
+
+Qubes OS's GUI virtualization enforce colorful borders around all VM's
+windows. There are two types of windows. First one is normal windows (with a
+border, titlebar etc). In this case, we modify window manager to take
+care of coloring borders. The second category is borderless windows
+(with override_redirect property set to True, in X11 terminology).
+Here, window manager is not involved at all, and our GUI daemon needs
+to draw a border itself. This is done by drawing 2px border whenever
+window content is changed beneath that area. The bug was that if the
+VM application have never send any update for (any part of) the border
+area, the frame was never drawn. Relevant code is in [gui-daemon
+component][gui-daemon], [gui-daemon/xside.c][xside]:
+
+    /* update given fragment of window image
+     * can be requested by VM (MSG_SHMIMAGE) and Xserver (XExposeEvent)
+     * parameters are not sanitized earlier - we must check it carefully
+     * also do not let to cover forced colorful frame (for undecoraded windows)
+     */
+    static void do_shm_update(Ghandles * g, struct windowdata *vm_window,
+               int untrusted_x, int untrusted_y, int untrusted_w,
+               int untrusted_h)
+    {
+
+        /* ... */
+
+        if (!vm_window->image && !(g->screen_window && g->screen_window->image))
+            return;
+        /* force frame to be visible: */
+        /*   * left */
+        delta = border_width - x;
+        if (delta > 0) {
+            w -= delta;
+            x = border_width;
+            do_border = 1;
+        }
+        /*   * right */
+        delta = x + w - (vm_window->width - border_width);
+        if (delta > 0) {
+            w -= delta;
+            do_border = 1;
+        }
+        /*   * top */
+        delta = border_width - y;
+        if (delta > 0) {
+            h -= delta;
+            y = border_width;
+            do_border = 1;
+        }
+        /*   * bottom */
+        delta = y + h - (vm_window->height - border_width);
+        if (delta > 0) {
+            h -= delta;
+            do_border = 1;
+        }
+
+        /* ... */
+
+    }
+
+The above code is responsible for deciding whether colorful border
+needs to be updated. It is done if both:
+a) there is any window image (vm_window->image)
+b) updated area include a border anywhere
+
+If none of those conditions are met, no border is drawn. Note that if
+VM tries to draw anything there (for example fake borders of other
+color), it will be overridden with the right borders, which will stay
+there until window is destroyed.
+
+Eric Larsson discovered that this situation (not updating border area)
+is reachable and even happens with some real world application, when
+it shows a splash screen of a custom shape. Custom window shapes are
+not supported in Qubes OS, but VM side still thinks it is there. And
+do not send updates of content outside of that custom shape.
+
+We fixed the issue by forcefully updating the whole window before
+making it visible:
+
+    static void handle_map(Ghandles * g, struct windowdata *vm_window)
+    {
+
+        /* ... */
+
+        /* added code */
+        if (vm_window->override_redirect) {
+            /* force window update to draw colorful frame, even when VM have not
+             * sent any content yet */
+            do_shm_update(g, vm_window, 0, 0, vm_window->width, vm_window->height);
+        }
+
+        (void) XMapWindow(g->display, vm_window->local_winid);
+    }
+
+This needs some auxiliary changes in do_shm_update function, to draw
+the frame also in case when there is no window content yet
+(vm_window->image is NULL).
+
+Xen issues
+----------
+
+Xen Security Advisory 237 [1]:
+
+| Multiple issues exist with the setup of PCI MSI interrupts:
+| - unprivileged guests were permitted access to devices not owned by
+|   them, in particular allowing them to disable MSI or MSI-X on any
+|   device
+| - HVM guests can trigger a codepath intended only for PV guests
+| - some failure paths partially tear down previously configured
+|   interrupts, leaving inconsistent state
+| - with XSM enabled, caller and callee of a hook disagreed about the
+|   data structure pointed to by a type-less argument
+| 
+| A malicious or buggy guest may cause the hypervisor to crash, resulting
+| in Denial of Service (DoS) affecting the entire host.  Privilege
+| escalation and information leaks cannot be excluded.
+
+Xen Security Advisory 238 [2]:
+
+| DMOPs (which were a subgroup of HVMOPs in older releases) allow guests
+| to control and drive other guests.  The I/O request server page mapping
+| interface uses range sets to represent I/O resources the emulation of
+| which is provided by a given I/O request server.  The internals of the
+| range set implementation require that ranges have a starting value no
+| lower than the ending one.  Checks for this fact were missing.
+| 
+| Malicious or buggy stub domain kernels or tool stacks otherwise living
+| outside of Domain0 can mount a denial of service attack which, if
+| successful, can affect the whole system.
+| 
+| Only domains controlling HVM guests can exploit this vulnerability.
+| (This includes domains providing hardware emulation services to HVM
+| guests.)
+
+
+Xen Security Advisory 239 [3]:
+
+| Intercepted I/O operations may deal with less than a full machine
+| word's worth of data.  While read paths had been the subject of earlier
+| XSAs (and hence have been fixed), at least one write path was found
+| where the data stored into an internal structure could contain bits
+| from an uninitialized hypervisor stack slot.  A subsequent emulated
+| read would then be able to retrieve these bits.
+| 
+| A malicious unprivileged x86 HVM guest may be able to obtain sensitive
+| information from the host or other guests.
+
+Xen Security Advisory 240 [4]:
+
+| x86 PV guests are permitted to set up certain forms of what is often
+| called "linear page tables", where pagetables contain references to
+| other pagetables at the same level or higher.  Certain restrictions
+| apply in order to fit into Xen's page type handling system.  An
+| important restriction was missed, however: Stacking multiple layers
+| of page tables of the same level on top of one another is not very
+| useful, and the tearing down of such an arrangement involves
+| recursion.  With sufficiently many layers such recursion will result
+| in a stack overflow, commonly resulting in Xen to crash.
+| 
+| A malicious or buggy PV guest may cause the hypervisor to crash,
+| resulting in Denial of Service (DoS) affecting the entire host.
+| Privilege escalation and information leaks cannot be excluded.
+
+Xen Security Advisory 241 [5]:
+
+| x86 PV guests effect TLB flushes by way of a hypercall.  Xen tries to
+| reduce the number of TLB flushes by delaying them as much as possible.
+| When the last type reference of a page is dropped, the need for a TLB
+| flush (before the page is re-used) is recorded.  If a guest TLB flush
+| request involves an Inter Processor Interrupt (IPI) to a CPU in which
+| is the process of dropping the last type reference of some page, and
+| if that IPI arrives at exactly the right instruction boundary, a stale
+| time stamp may be recorded, possibly resulting in the later omission
+| of the necessary TLB flush for that page.
+| 
+| A malicious x86 PV guest may be able to access all of system memory,
+| allowing for all of privilege escalation, host crashes, and
+| information leaks.
+
+Xen Security Advisory 242 [6]:
+
+| The page type system of Xen requires cleanup when the last reference
+| for a given page is being dropped.  In order to exclude simultaneous
+| updates to a given page by multiple parties, pages which are updated
+| are locked beforehand.  This locking includes temporarily increasing
+| the type reference count by one.  When the page is later unlocked, the
+| context precludes cleanup, so the reference that is then dropped must
+| not be the last one.  This was not properly enforced.
+| 
+| A malicious or buggy PV guest may cause a memory leak upon shutdown
+| of the guest, ultimately perhaps resulting in Denial of Service (DoS)
+| affecting the entire host.
+
+Xen Security Advisory 243 [7]:
+
+| The shadow pagetable code uses linear mappings to inspect and modify the
+| shadow pagetables.  A linear mapping which points back to itself is known as
+| self-linear.  For translated guests, the shadow linear mappings (being in a
+| separate address space) are not intended to be self-linear.  For
+| non-translated guests, the shadow linear mappings (being the same
+| address space) are intended to be self-linear.
+| 
+| When constructing a monitor pagetable for Xen to run on a vcpu with, the shadow
+| linear slot is filled with a self-linear mapping, and for translated guests,
+| shortly thereafter replaced with a non-self-linear mapping, when the guest's
+| %cr3 is shadowed.
+| 
+| However when writeable heuristics are used, the shadow mappings are used as
+| part of shadowing %cr3, causing the heuristics to be applied to Xen's
+| pagetables, not the guest shadow pagetables.
+| 
+| While investigating, it was also identified that PV auto-translate mode was
+| insecure.  This mode was removed in Xen 4.7 due to being unused, unmaintained
+| and presumed broken.  We are not aware of any guest implementation of PV
+| auto-translate mode.
+| 
+| A malicious or buggy HVM guest may cause a hypervisor crash, resulting in a
+| Denial of Service (DoS) affecting the entire host, or cause hypervisor memory
+| corruption.  We cannot rule out a guest being able to escalate its privilege.
+
+Xen Security Advisory 244 [8]:
+
+| The x86-64 architecture allows interrupts to be run on distinct stacks.
+| The choice of stack is encoded in a field of the corresponding
+| interrupt descriptor in the Interrupt Descriptor Table (IDT).  That
+| field selects an entry from the active Task State Segment (TSS).
+| 
+| Since, on AMD hardware, Xen switches to an HVM guest's TSS before
+| actually entering the guest, with the Global Interrupt Flag still set,
+| the selectors in the IDT entry are switched when guest context is
+| loaded/unloaded.
+| 
+| When a new CPU is brought online, its IDT is copied from CPU0's IDT,
+| including those selector fields.  If CPU0 happens at that moment to be
+| in HVM context, wrong values for those IDT fields would be installed
+| for the new CPU.  If the first guest vCPU to be run on that CPU
+| belongs to a PV guest, it will then have the ability to escalate its
+| privilege or crash the hypervisor.
+| 
+| A malicious or buggy x86 PV guest could escalate its privileges or
+| crash the hypervisor.
+| 
+| Avoiding to online CPUs at runtime will avoid this vulnerability.
+
+
+Commentary from the Qubes Security Team
+========================================
+
+TODO
+
+Compromise Recovery
+====================
+
+Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which
+was designed specifically to aid in the recovery of a (potentially)
+compromised Qubes OS system. Thus, if you believe your system might have
+been compromised (perhaps because of the bugs discussed in this
+bulletin), then you should read and follow the procedure described here:
+
+https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-32
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.2-6
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command, as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+GUI daemon issue was discovered by Eric Larsson.
+
+See the original Xen Security Advisories.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-237.html
+[2] https://xenbits.xen.org/xsa/advisory-238.html
+[3] https://xenbits.xen.org/xsa/advisory-239.html
+[4] https://xenbits.xen.org/xsa/advisory-240.html
+[5] https://xenbits.xen.org/xsa/advisory-241.html
+[6] https://xenbits.xen.org/xsa/advisory-242.html
+[7] https://xenbits.xen.org/xsa/advisory-243.html
+[8] https://xenbits.xen.org/xsa/advisory-244.html
+[gui-daemon] https://github.com/QubesOS/qubes-gui-daemon/
+[xside] https://github.com/QubesOS/qubes-gui-daemon/blob/master/gui-daemon/xside.c#L1317-L1447
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

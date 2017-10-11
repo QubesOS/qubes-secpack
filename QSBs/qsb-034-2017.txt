@@ -286,7 +286,8 @@ not apply at all. We'll comment briefly on each one:
 
 XSA-237 - The impact is denial of service. In addition, we believe
           proper use of Interrupt Remapping should offer a generic
-          solution to this problem.
+          solution to similar problems, to reduce them to denial of
+          service at worst.
 
 XSA-238 - The impact is denial of service only.
 

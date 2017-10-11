@@ -280,7 +280,39 @@ the frame also in case when there is no window content yet
 Commentary from the Qubes Security Team
 ========================================
 
-TODO
+This batch of Xen Security Advisories affects Qubes OS mostly
+theoretically and in case of Qubes OS 4.0 half of them does not apply
+at all. Lets see in details:
+
+* XSA-237 - the impact is denial of service; additionally we believe
+proper use of Interrupt Remapping should offer a generic solution to
+this problem
+
+* XSA-238 - the impact is denial of service only
+
+* XSA-239 - attacking domain have no control over what information is
+leaked
+
+* XSA-240 - the impact is denial of service 
+
+* XSA-241 - the issue applies only to PV domains, so attack vector is
+largely limited in Qubes OS 4.0, which use HVM domains by default;
+additionally we believe the race condition described here is hard to
+win
+
+* XSA-242 - the impact is denial of service only; additionally the
+issue applies only to PV domains
+
+* XSA-243 - the impact is denial of service; additionally the
+vulnerable code (shadow page tables) is built-time disabled in Qubes
+OS 4.0
+
+* XSA-244 - the issue applies only to PV domains and only to AMD CPUs,
+rarely used on laptop hardware; more importantly the vulnerable
+code path (runtime CPU hotplug) is not used in Qubes OS
+
+The above list reassure us that switching to HVM domains in Qubes OS
+4.0 was a good decision.
 
 Compromise Recovery
 ====================

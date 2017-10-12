@@ -334,9 +334,11 @@ bulletin are as follows:
 
   For Qubes 3.2:
   - Xen packages, version 4.6.6-32
+  - qubes-gui-dom0, version 3.2.12
 
   For Qubes 4.0:
   - Xen packages, version 4.8.2-6
+  - qubes-gui-dom0, version 4.0.5
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:

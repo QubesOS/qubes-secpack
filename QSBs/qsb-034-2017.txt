@@ -284,29 +284,30 @@ For the most part, this batch of Xen Security Advisories affects Qubes
 OS 3.2 only theoretically. In the case of Qubes OS 4.0, half of them do
 not apply at all. We'll comment briefly on each one:
 
-XSA-237 - The impact is denial of service. In addition, we believe
-          proper use of Interrupt Remapping should offer a generic
+XSA-237 - The impact is believed to be denial of service only. In addition,
+          we believe proper use of Interrupt Remapping should offer a generic
           solution to similar problems, to reduce them to denial of
           service at worst.
 
-XSA-238 - The impact is denial of service only.
+XSA-238 - The stated impact is denial of service only.
 
 XSA-239 - The attacking domain has no control over what information
           is leaked.
 
-XSA-240 - The impact is denial of service.
+XSA-240 - The practical impact is believed to be denial of service (and does not
+          affect HVMs).
 
 XSA-241 - The issue applies only to PV domains, so the attack vector
           is largely limited in Qubes OS 4.0, which uses HVM domains
-          by default. In addition, we believe the race condition
-          described here is hard to win.
+          by default. In addition, the Xen Security Team considers this
+          bug to be hard to exploit in practice (see advisory).
 
-XSA-242 - The impact is denial of service only. In addition, the
+XSA-242 - The stated impact is denial of service only. In addition, the
           issue applies only to PV domains.
 
-XSA-243 - The impact is denial of service. In addition, the
-          vulnerable code (shadow page tables) is build-time disabled
-	  in Qubes OS 4.0.
+XSA-243 - The practical impact is believed to be denial of service. In addition,
+          the vulnerable code (shadow page tables) is build-time disabled
+          in Qubes OS 4.0.
 
 XSA-244 - The vulnerable code path (runtime CPU hotplug) is not used
           in Qubes OS.

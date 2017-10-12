@@ -10,31 +10,31 @@
 Summary
 ========
 
-One of our developers, Simon Gaiser (aka HW42), when working on
-improving support for device isolation in Qubes 4.0, has discovered a
-potential security problem with how Xen handles MSI-capable devices.
-This problem has been handled by Xen as an advisory XSA 237, published
-today [1].
+One of our developers, Simon Gaiser (aka HW42), while working on
+improving support for device isolation in Qubes 4.0, discovered a
+potential security problem with the way Xen handles MSI-capable devices.
+The Xen Security Team has classified this problem as XSA-237 [01], which
+was published today.
 
-At the same time, The Xen Security Team released several other Xen
+At the same time, the Xen Security Team released several other Xen
 Security Advisories (XSA-238 through XSA-244). The impact of these
 advisories ranges from system crashes to potential privilege
-escalations, which however seem to be mostly theoretical. See our
+escalations. However, the latter seem to be mostly theoretical. See our
 commentary below for details.
 
-Finally, Eric Larsson discovered a situation where Qubes GUI
-virtualization might allow a VM to produce a window that has no forced
-colorful borders (which are used on Qubes as front-line indicator of
-trust). The VM can not use this vulnerability to draw other borders in
-that place, however. Again, please see our extensive discussion below.
+Finally, Eric Larsson discovered a situation in which Qubes GUI
+virtualization could allow a VM to produce a window that has no colored
+borders (which are used in Qubes as front-line indicators of trust).
+A VM cannot use this vulnerability to draw different borders in place of
+the correct one, however. We discuss this issue extensively below.
 
 Technical details
 ==================
 
 Xen issues
-----------
+-----------
 
-Xen Security Advisory 237 [1]:
+Xen Security Advisory 237 [01]:
 
 | Multiple issues exist with the setup of PCI MSI interrupts:
 | - unprivileged guests were permitted access to devices not owned by
@@ -50,7 +50,7 @@ Xen Security Advisory 237 [1]:
 | in Denial of Service (DoS) affecting the entire host.  Privilege
 | escalation and information leaks cannot be excluded.
 
-Xen Security Advisory 238 [2]:
+Xen Security Advisory 238 [02]:
 
 | DMOPs (which were a subgroup of HVMOPs in older releases) allow guests
 | to control and drive other guests.  The I/O request server page mapping
@@ -67,8 +67,7 @@ Xen Security Advisory 238 [2]:
 | (This includes domains providing hardware emulation services to HVM
 | guests.)
 
-
-Xen Security Advisory 239 [3]:
+Xen Security Advisory 239 [03]:
 
 | Intercepted I/O operations may deal with less than a full machine
 | word's worth of data.  While read paths had been the subject of earlier
@@ -80,7 +79,7 @@ Xen Security Advisory 239 [3]:
 | A malicious unprivileged x86 HVM guest may be able to obtain sensitive
 | information from the host or other guests.
 
-Xen Security Advisory 240 [4]:
+Xen Security Advisory 240 [04]:
 
 | x86 PV guests are permitted to set up certain forms of what is often
 | called "linear page tables", where pagetables contain references to
@@ -96,7 +95,7 @@ Xen Security Advisory 240 [4]:
 | resulting in Denial of Service (DoS) affecting the entire host.
 | Privilege escalation and information leaks cannot be excluded.
 
-Xen Security Advisory 241 [5]:
+Xen Security Advisory 241 [05]:
 
 | x86 PV guests effect TLB flushes by way of a hypercall.  Xen tries to
 | reduce the number of TLB flushes by delaying them as much as possible.
@@ -112,7 +111,7 @@ Xen Security Advisory 241 [5]:
 | allowing for all of privilege escalation, host crashes, and
 | information leaks.
 
-Xen Security Advisory 242 [6]:
+Xen Security Advisory 242 [06]:
 
 | The page type system of Xen requires cleanup when the last reference
 | for a given page is being dropped.  In order to exclude simultaneous
@@ -126,7 +125,7 @@ Xen Security Advisory 242 [6]:
 | of the guest, ultimately perhaps resulting in Denial of Service (DoS)
 | affecting the entire host.
 
-Xen Security Advisory 243 [7]:
+Xen Security Advisory 243 [07]:
 
 | The shadow pagetable code uses linear mappings to inspect and modify the
 | shadow pagetables.  A linear mapping which points back to itself is known as
@@ -153,7 +152,7 @@ Xen Security Advisory 243 [7]:
 | Denial of Service (DoS) affecting the entire host, or cause hypervisor memory
 | corruption.  We cannot rule out a guest being able to escalate its privilege.
 
-Xen Security Advisory 244 [8]:
+Xen Security Advisory 244 [08]:
 
 | The x86-64 architecture allows interrupts to be run on distinct stacks.
 | The choice of stack is encoded in a field of the corresponding
@@ -179,19 +178,19 @@ Xen Security Advisory 244 [8]:
 
 
 GUI daemon issue
-----------------
+-----------------
 
-Qubes OS's GUI virtualization enforce colorful borders around all VM's
-windows. There are two types of windows. First one is normal windows (with a
-border, titlebar etc). In this case, we modify window manager to take
-care of coloring borders. The second category is borderless windows
-(with override_redirect property set to True, in X11 terminology).
-Here, window manager is not involved at all, and our GUI daemon needs
-to draw a border itself. This is done by drawing 2px border whenever
-window content is changed beneath that area. The bug was that if the
-VM application have never send any update for (any part of) the border
-area, the frame was never drawn. Relevant code is in [gui-daemon
-component][gui-daemon], [gui-daemon/xside.c][xside]:
+Qubes OS's GUI virtualization enforces colored borders around all VM
+windows. There are two types of windows. The first type are normal
+windows (with borders, titlebars, etc.). In this case, we modify the
+window manager to take care of coloring the borders. The second type are
+borderless windows (with the override_redirect property set to True in
+X11 terminology). Here, the window manager is not involved at all, and
+our GUI daemon needs to draw a border itself. This is done by drawing a
+2px border whenever window content is changed beneath that area. The bug
+was that if the VM application had never sent any updates for (any part
+of) the border area, the frame was never drawn. The relevant code is in
+the gui-daemon component [09], specifically in gui-daemon/xside.c [10]:
 
     /* update given fragment of window image
      * can be requested by VM (MSG_SHMIMAGE) and Xserver (XExposeEvent)
@@ -239,23 +238,24 @@ component][gui-daemon], [gui-daemon/xside.c][xside]:
 
     }
 
-The above code is responsible for deciding whether colorful border
-needs to be updated. It is done if both:
+The above code is responsible for deciding whether the colored border
+needs to be updated. It is updated if both:
 a) there is any window image (vm_window->image)
-b) updated area include a border anywhere
+b) the updated area includes a border anywhere
 
-If none of those conditions are met, no border is drawn. Note that if
-VM tries to draw anything there (for example fake borders of other
-color), it will be overridden with the right borders, which will stay
-there until window is destroyed.
+If neither of these conditions is met, no border is drawn. Note that if
+the VM tries to draw anything there (for example, a fake border in a
+different color), whatever is drawn will be overridden with the correct
+borders, which will stay there until the window is destroyed.
 
-Eric Larsson discovered that this situation (not updating border area)
-is reachable and even happens with some real world application, when
-it shows a splash screen of a custom shape. Custom window shapes are
-not supported in Qubes OS, but VM side still thinks it is there. And
-do not send updates of content outside of that custom shape.
+Eric Larsson discovered that this situation (not updating the border
+area) is reachable -- and even happens with some real world applications
+-- when the VM shows a splash screen with a custom shape. While custom
+window shapes are not supported in Qubes OS, VMs do not know this. The
+VM still thinks the custom-shaped window is there, so it does not send
+updates of content outside of that custom shape.
 
-We fixed the issue by forcefully updating the whole window before
+We fixed the issue by forcing an update of the whole window before
 making it visible:
 
     static void handle_map(Ghandles * g, struct windowdata *vm_window)
@@ -273,46 +273,45 @@ making it visible:
         (void) XMapWindow(g->display, vm_window->local_winid);
     }
 
-This needs some auxiliary changes in do_shm_update function, to draw
-the frame also in case when there is no window content yet
+This needs some auxiliary changes in the do_shm_update function, to draw
+the frame also in cases when there is no window content yet
 (vm_window->image is NULL).
 
 Commentary from the Qubes Security Team
 ========================================
 
-This batch of Xen Security Advisories affects Qubes OS mostly
-theoretically and in case of Qubes OS 4.0 half of them does not apply
-at all. Lets see in details:
+For the most part, this batch of Xen Security Advisories affects Qubes
+OS 3.2 only theoretically. In the case of Qubes OS 4.0, half of them do
+not apply at all. We'll comment briefly on each one:
 
-* XSA-237 - the impact is denial of service; additionally we believe
-proper use of Interrupt Remapping should offer a generic solution to
-this problem
+XSA-237 - The impact is denial of service. In addition, we believe
+          proper use of Interrupt Remapping should offer a generic
+          solution to this problem.
 
-* XSA-238 - the impact is denial of service only
+XSA-238 - The impact is denial of service only.
 
-* XSA-239 - attacking domain have no control over what information is
-leaked
+XSA-239 - The attacking domain has no control over what information
+          is leaked.
 
-* XSA-240 - the impact is denial of service 
+XSA-240 - The impact is denial of service.
 
-* XSA-241 - the issue applies only to PV domains, so attack vector is
-largely limited in Qubes OS 4.0, which use HVM domains by default;
-additionally we believe the race condition described here is hard to
-win
+XSA-241 - The issue applies only to PV domains, so the attack vector
+          is largely limited in Qubes OS 4.0, which uses HVM domains
+          by default. In addition, we believe the race condition
+          described here is hard to win.
 
-* XSA-242 - the impact is denial of service only; additionally the
-issue applies only to PV domains
+XSA-242 - The impact is denial of service only. In addition, the
+          issue applies only to PV domains.
 
-* XSA-243 - the impact is denial of service; additionally the
-vulnerable code (shadow page tables) is built-time disabled in Qubes
-OS 4.0
+XSA-243 - The impact is denial of service. In addition, the
+          vulnerable code (shadow page tables) is build-time disabled
+	  in Qubes OS 4.0.
 
-* XSA-244 - the issue applies only to PV domains and only to AMD CPUs,
-rarely used on laptop hardware; more importantly the vulnerable
-code path (runtime CPU hotplug) is not used in Qubes OS
+XSA-244 - The vulnerable code path (runtime CPU hotplug) is not used
+          in Qubes OS.
 
-The above list reassure us that switching to HVM domains in Qubes OS
-4.0 was a good decision.
+These results reassure us that switching to HVM domains in Qubes OS 4.0
+was a good decision.
 
 Compromise Recovery
 ====================
@@ -338,7 +337,7 @@ bulletin are as follows:
   - Xen packages, version 4.8.2-6
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
-the qubes-dom0-update command, as follows:
+the qubes-dom0-update command as follows:
 
   For updates from the stable repository (not immediately available):
   $ sudo qubes-dom0-update
@@ -359,25 +358,25 @@ Xen binaries.
 Credits
 ========
 
-GUI daemon issue was discovered by Eric Larsson.
+The GUI daemon issue was discovered by Eric Larsson.
 
-PCI MSI issues were discovered by Simon Gaiser (aka HW42).
+The PCI MSI issues were discovered by Simon Gaiser (aka HW42).
 
-For other issues see the original Xen Security Advisories.
+For other issues, see the original Xen Security Advisories.
 
 References
 ===========
 
-[1] https://xenbits.xen.org/xsa/advisory-237.html
-[2] https://xenbits.xen.org/xsa/advisory-238.html
-[3] https://xenbits.xen.org/xsa/advisory-239.html
-[4] https://xenbits.xen.org/xsa/advisory-240.html
-[5] https://xenbits.xen.org/xsa/advisory-241.html
-[6] https://xenbits.xen.org/xsa/advisory-242.html
-[7] https://xenbits.xen.org/xsa/advisory-243.html
-[8] https://xenbits.xen.org/xsa/advisory-244.html
-[gui-daemon] https://github.com/QubesOS/qubes-gui-daemon/
-[xside] https://github.com/QubesOS/qubes-gui-daemon/blob/master/gui-daemon/xside.c#L1317-L1447
+[01] https://xenbits.xen.org/xsa/advisory-237.html
+[02] https://xenbits.xen.org/xsa/advisory-238.html
+[03] https://xenbits.xen.org/xsa/advisory-239.html
+[04] https://xenbits.xen.org/xsa/advisory-240.html
+[05] https://xenbits.xen.org/xsa/advisory-241.html
+[06] https://xenbits.xen.org/xsa/advisory-242.html
+[07] https://xenbits.xen.org/xsa/advisory-243.html
+[08] https://xenbits.xen.org/xsa/advisory-244.html
+[09] https://github.com/QubesOS/qubes-gui-daemon/
+[10] https://github.com/QubesOS/qubes-gui-daemon/blob/master/gui-daemon/xside.c#L1317-L1447
 
 --
 The Qubes Security Team

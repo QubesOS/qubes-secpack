@@ -10,10 +10,11 @@
 Summary
 ========
 
-The Xen Security Team released Xen Security Advisories XSA-236 related
-to the grant tables mechanism used to share memory between domains.
-The practical impact of this advisory is believed to be denial of
-service.
+The Xen Security Team has published Xen Security Advisory 236, which
+concerns an issue with the grant tables mechanism used to share memory
+between domains. The practical impact of this advisory is believed to
+be denial of service only. However, privilege escalation and information
+leaks are theoretically possible.
 
 Technical details
 ==================
@@ -31,22 +32,21 @@ Xen Security Advisory 236 [1]:
 | Service.  Privilege escalation and information leaks cannot be ruled
 | out.
 
-
 Compromise Recovery
 ====================
 
-Starting with Qubes 3.2, we offer Paranoid Backup Restore Mode, which was
-designed specifically to aid in the recovery of a (potentially) compromised
-Qubes OS system. Thus, if you believe your system might have been compromised
-(perhaps because of the bugs discussed in this bulletin), then you should read
-and follow the procedure described here:
+Beginning with Qubes 3.2, we offer Paranoid Backup Restore Mode, which
+was designed specifically to aid in the recovery of a potentially
+compromised Qubes OS system. If you believe your system may be
+compromised (perhaps because of the issue discussed in this bulletin),
+please read and follow the procedure described here:
 
 https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 
 Patching
 =========
 
-The specific packages that resolve the problems discussed in this
+The specific packages that resolve the problem discussed in this
 bulletin are as follows:
 
   For Qubes 3.2:

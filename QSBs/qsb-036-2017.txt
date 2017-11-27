@@ -1,0 +1,108 @@
+
+
+             ---===[ Qubes Security Bulletin #36 ]===---
+
+                          November 28, 2017
+
+
+      Xen hypervisor issue in populate-on-demand code (XSA-247)
+
+Summary
+========
+
+The Xen Security Team has published Xen Security Advisory 247, which
+concerns an issue with populate-on-demand mechanism used to overbook
+memory. The practical exploitation of this issue for privilege
+escalation is is believed to be very hard.
+
+Technical details
+==================
+
+Xen Security Advisory 247 [1]:
+
+| Certain actions require modification of entries in a guest's P2M
+| (Physical-to-Machine) table.  When large pages are in use for this
+| table, such an operation may incur a memory allocation (to replace a
+| large mapping with individual smaller ones).  If this allocation
+| fails, the p2m_set_entry() function will return an error.
+| 
+| Unfortunately, several places in the populate-on-demand code don't
+| check the return value of p2m_set_entry() to see if it succeeded.
+| 
+| In some cases, the operation was meant to remove an entry from the p2m
+| table.  If this removal fails, a malicious guest may engineer that the
+| page be returned to the Xen free list, making it available to be
+| allocated to another domain, while it retains a writable mapping to
+| the page.
+| 
+| In other cases, the operation was meant to remove special
+| populate-on-demand entries; if this removal fails, the internal
+| accounting becomes inconsistent and may eventually hit a BUG().
+| 
+| The allocation involved comes from a separate pool of memory created
+| when the domain is created; under normal operating conditions it never
+| fails, but a malicious guest may be able to engineer situations where
+| this pool is exhausted.
+| 
+| An unprivileged guest can retain a writable mapping of freed memory.
+| Depending on how this page is used, it could result in either an
+| information leak, or full privilege escalation.
+| 
+| Alternatively, an unprivileged guest can cause Xen to hit a BUG(),
+| causing a clean crash - ie, host-wide denial-of-service (DoS).
+
+Compromise Recovery
+====================
+
+Beginning with Qubes 3.2, we offer Paranoid Backup Restore Mode, which
+was designed specifically to aid in the recovery of a potentially
+compromised Qubes OS system. If you believe your system may be
+compromised (perhaps because of the issue discussed in this bulletin),
+please read and follow the procedure described here:
+
+https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-35
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.2-10
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-247.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

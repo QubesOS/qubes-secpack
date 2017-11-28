@@ -11,9 +11,9 @@ Summary
 ========
 
 The Xen Security Team has published Xen Security Advisory 247, which
-concerns an issue with populate-on-demand mechanism used to overbook
-memory. The practical exploitation of this issue for privilege
-escalation is is believed to be very hard.
+concerns an issue with the populate-on-demand mechanism used to overbook
+memory. We believe it would be very difficult, in practice, to exploit
+this issue for privilege escalation.
 
 Technical details
 ==================

@@ -86,7 +86,7 @@ bulletin are as follows:
   - Xen packages, version 4.6.6-35
 
   For Qubes 4.0:
-  - Xen packages, version 4.8.2-10
+  - Xen packages, version 4.8.2-11
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:

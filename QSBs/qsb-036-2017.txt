@@ -15,6 +15,10 @@ concerns an issue with populate-on-demand mechanism used to overbook
 memory. The practical exploitation of this issue for privilege
 escalation is is believed to be very hard.
 
+Additionally, the Xen Security Team has published Xen Security
+Advisory 246 (x86: infinite loop due to missing PoD error checking),
+with the impact being denial of service only.
+
 Technical details
 ==================
 
@@ -50,6 +54,16 @@ Xen Security Advisory 247 [1]:
 | 
 | Alternatively, an unprivileged guest can cause Xen to hit a BUG(),
 | causing a clean crash - ie, host-wide denial-of-service (DoS).
+
+Xen Security Advisory 246 [2]:
+
+| Failure to recognize errors being returned from low level functions in
+| Populate on Demand (PoD) code may result in higher level code entering
+| an infinite loop.
+| 
+| A malicious HVM guest can cause one pcpu to permanently hang.  This
+| normally cascades into the whole system freezing, resulting in a a
+| host Denial of Service (DoS).
 
 Compromise Recovery
 ====================
@@ -102,6 +116,7 @@ References
 ===========
 
 [1] https://xenbits.xen.org/xsa/advisory-247.html
+[2] https://xenbits.xen.org/xsa/advisory-246.html
 
 --
 The Qubes Security Team

@@ -1,0 +1,288 @@
+
+
+             ---===[ Qubes Security Bulletin #37 ]===---
+
+                          January 9, 2018
+
+
+    Information leaks due to processor speculative execution bugs
+
+Summary
+========
+
+On the night of January 3, two independent groups of researchers
+announced the results of their months-long work into abusing modern
+processors' so-called speculative mode to leak secrets from the system's
+privileged memory [1][2][3][4]. As a response, the Xen Security Team
+published Xen Security Advisory 254 [5]. The Xen Security Team did _not_
+previously share information about these problems via their (non-public)
+security pre-disclosure list, of which the Qubes Security Team is a
+member.
+
+In the limited time we've had to analyze the issue, we've come to the
+following conclusions about the practical impact on Qubes OS users and
+possible remedies. We'll also share a plan to address the issues in a
+more systematic way in the coming weeks.
+
+Practical impact and limiting factors for Qubes users
+======================================================
+
+## Fully virtualized VMs offer significant protection against Meltdown
+
+Meltdown, the most reliable attack of the three discussed, cannot be
+exploited _from_ a fully-virtualized (i.e. HVM or PVH) VM. It does not
+matter whether the _target_ VM (i.e. the one from which the attacker
+wants to steal secrets) is fully-virtualized. In Qubes 3.x, all VMs are
+para-virtualized (PV) by default, though users can choose to create
+fully-virtualized VMs.  PV VMs do not protect against the Meltdown
+attack. In Qubes 4.0, almost all VMs are fully-virtualized by default
+and thus offer protection. However, the fully-virtualized VMs in Qubes
+3.2 and in release candidates 1-3 of Qubes 4.0 still rely on PV-based
+"stub domains", making it possible for an attacker who can chain another
+exploit for qemu to attempt the Meltdown attack.
+
+## Virtualization makes at least one variant of Spectre seem difficult
+
+Of the two Spectre variants, it _seems_ that at least one of them might
+be significantly harder to exploit under Xen than under monolithic
+systems because there are significantly fewer options for the attacker
+to interact with the hypervisor.
+
+## All attacks are read-only
+
+It's important to stress that these attacks allow only _reading_ memory,
+not modifying it. This means that an attacker cannot use Spectre or
+Meltdown to plant any backdoors or otherwise compromise the system in
+any persistent way.  Thanks to the Qubes OS template mechanism, which is
+used by default for all user and system qubes (AppVMs and ServiceVMs),
+simply restarting a VM should bring it back to a good known state for
+most attacks, wiping out the potential attacking code in the
+TemplateBasedVM (unless an attacker found a way to put triggers within
+the user's home directory; please see [8] for more discussion).
+
+## Only running VMs are vulnerable
+
+Since Qubes OS is a memory-hungry system, it seems that an attacker
+would only be able to steal secrets from VMs running concurrently with
+the attacking VM. This is because any pages from shutdown VMs will
+typically very quickly get allocated to other, running VMs and get wiped
+as part of this procedure.
+
+## PGP and other cryptographic keys are at risk
+
+For VMs that happen to be running concurrently with the attacking VM, it
+seems possible that these attacks might allow the attacker to steal
+cryptographic keys, including private PGP keys.
+
+## Disk encryption and screenlocker passwords are at risk
+
+There is one VM that is always running concurrently with other VMs: the
+AdminVM (dom0). This VM contains at least two important user secrets:
+
+ - The disk (LUKS) encryption key (and likely the passphrase)
+ - The screenlocker passphrase
+
+In order to make use of these secrets, however, the attacker would have
+to conduct a physical attack on the user's computer (e.g. steal the
+laptop physically). Users who use the same passphrase to encrypt their
+backups may also be affected.
+
+Additional remedies available to Qubes users
+=============================================
+
+Thanks to the explicit Qubes partitioning model, it should be
+straightforward for users to implement additional hygiene by ensuring
+that, whenever less trusted VMs are running, highly sensitive VMs are
+shut down.
+
+Additionally, for some of the VMs that must run anyway (e.g. networking
+and USB qubes), it is possible to recreate the VM each time the user
+suspects it may have been compromised, e.g. after disconnecting from a
+less trusted Wi-Fi network, or unplugging an untrusted USB device. In
+Qubes 4.0, this is even easier, since Disposable VMs can now be used for
+the networking and USB VMs (see [10]).
+
+The Qubes firewalling and networking systems also make it easy to limit
+the networking resources VMs can reach, including making VMs completely
+offline. While firewalling in Qubes is not intended to be a
+leak-prevention mechanism, it likely has this effect in a broad class
+class of attack scenarios. Moreover, making a VM completely offline
+(i.e. setting its NetVM to "none") is a more robust way to limit the
+ability of an attacker to leak secrets stolen from memory to the outside
+world.  While this mechanism should not be considered bullet-proof -- it
+is still possible to mount a specialized attack that exploits a covert
+channel to leak the data -- it could be considered as an additional
+layer of defense.
+
+Finally, Qubes offers mechanisms to allow for additional protection of
+user secrets, especially cryptographic keys, such as PGP keys used for
+encryption and signing. Qubes Split GPG [6] allows the user to keep
+these keys in an isolated VM. So, for example, the user might be running
+her "development" qube in parallel with a compromised qube, while
+keeping the GPG backend VM (where she keeps the signing key that she
+uses to sign her software releases) shut down most of the time (because
+it's only needed when a release is being made). This way, the software
+signing keys will be protected from the attack.
+
+The user could take this further by using Qubes Split GPG with a backend
+qube running on a physically separate computer, as has been demonstrated
+with the Qubes USB Armory project [7].
+
+(Proper) patching
+==================
+
+Mitigations against the CPU bugs discussed here are in development but
+have not yet been released. The Xen Project is working on a set of
+patches (see XSA 254 [5] for updates). At the same time, we are working
+on similar mitigations where feasible.
+
+## Qubes 4.0
+
+As explained above, almost all the VMs in Qubes 4.0 are
+fully-virtualized by default (specifically, they are HVMs), which
+mitigates the most severe issue, Meltdown. The only PV domains in
+Qubes 4.0 are stub domains, which we plan to eliminate by switching to
+PVH where possible. This will be done in Qubes 4.0-rc4 and also
+released as a normal update for existing Qubes 4.0 installations. The
+only remaining PV stub domains will be those used for VMs with PCI
+devices. (In the default configuration, these are sys-net and
+sys-usb.) The Xen Project has not yet provided any solution for this
+[9].
+
+## Qubes 3.2
+
+For Qubes 3.2, we plan to release an update that will make almost all
+VMs run in a fully-virtualized mode. Specifically, we plan to backport
+PVH support from Qubes 4.0 and enable it for all VMs without PCI
+devices. After this update, all VMs that previously ran in PV mode (and
+that do not have PCI devices) will subsequently run in PVH mode, with
+the exception of stub domains. Any HVMs will continue to run in HVM
+mode.
+
+There are two important points regarding the Qubes 3.2 update. First,
+this update will work only when the hardware supports VT-x or equivalent
+technology. Qubes 3.2 will continue to work on systems without VT-x, but
+there will be no mitigation against Meltdown on such systems. Users on
+systems that do not support VT-x are advised to take this into
+consideration when assessing the trustworthiness of their systems.
+
+Second, the Qubes 3.2 update will also switch any VMs that use a custom
+kernel to PVH mode, which will temporarily prevent them from working.
+This is a deliberate security choice to protect the system as a whole
+(rather than leaving VMs with custom kernels in PV mode, which would
+allow attackers to use them to mount Meltdown attacks). In order to use
+a VM with a custom kernel after the update (whether the custom kernel
+was installed in dom0 or inside the VM), users must either manually
+change the VM back to PV or change the kernel that the VM uses. (Kernel
+>=4.11 is required, and booting an in-VM kernel is not supported in PVH
+mode.)
+
+We'll update this bulletin and issue a separate announcement once
+patches are available.
+
+Suggested actions after patching
+=================================
+
+While the potential attacks discussed in this bulletin are severe,
+recovering from these potential attacks should be easier than in the
+case of an exploit that allows the attacker to perform arbitrary code
+execution, resulting in a full system compromise. Specifically, we don't
+believe it is necessary to use Qubes Paranoid Backup Restore Mode to
+address these vulnerabilities because of the strict read-only character
+of the attacks discussed. Instead, users who believe they are affected
+should consider taking the following actions:
+
+    1. Changing the screenlocker passphrase.
+    
+    2. Changing the disk encryption (LUKS) passphrase.
+    
+    3. Re-encrypting the disk to force a change of the disk encryption
+       _key_. (In practice, this can be done by reinstalling Qubes and
+       restoring from a backup.)
+
+    4. Evaluating the odds that other secrets have been compromised,
+       such as other passwords and cryptographic keys (e.g. private
+       PGP, SSH, or TLS keys), and generate new secrets. It is unclear
+       how easy it might be for attackers to steal such data in a
+       real world Qubes environment.
+
+Technical discussion
+=====================
+
+From a (high-level) architecture point of view, the attacks discussed in
+this bulletin should not concern Qubes OS much. This is because,
+architecture-wise, there should be no secrets or other sensitive data in
+the hypervisor memory. This is in stark contrast to traditional
+monolithic systems, where there is an abundance of sensitive information
+living in the kernel (supervisor).
+
+Unfortunately, for rather accidental reasons, the implementation of the
+particular hypervisor we happen to be using to implement isolation for
+Qubes, i.e. the Xen hypervisor, undermines this clean architecture by
+internally mapping all physical memory pages into its address space. Of
+course, under normal circumstances, this isn't a security problem,
+because no one is able to read the hypervisor memory. However, the bugs
+we're discussing today might allow an attacker to do just that. This is
+a great example of how difficult it can be to analyze the security
+impact of a feature when limiting oneself to only one layer of
+abstraction, especially a high-level one (also known as the "PowerPoint
+level").
+
+At the same time, we should point out that the use of full
+virtualization prevents at least one of the attacks, and incidentally
+the most powerful one, i.e. the Meltdown attack.
+
+However, we should also point out that, in Qubes 3.2, even HVMs still
+rely on PV stub domains to provide I/O emulation (qemu). In the case of
+an additional vulnerability within qemu, an attacker might compromise
+the PV stub domain and attempt to perform the Meltdown attack from
+there.
+
+This limitation also applies to HVMs in release candidates 1-3 of Qubes
+4.0.  Qubes 4.0-rc4, which we plan to release next week, should be using
+PVH instead of HVM for almost all VMs without PCI devices by default,
+thus eliminating this avenue of attack. As discussed in the Patching
+section, VMs with PCI devices will be the exception, which means that
+the Meltdown attack could in theory still be conducted if the attacker
+compromises a VM with PCI devices and afterward compromises the
+corresponding stub domain via a hypothetical qemu exploit.
+Unfortunately, there is not much we can do about this without
+cooperation from the Xen project [9][11].
+
+Here is an overview of the VM modes that correspond to each Qubes OS
+version:
+
+VM type \ Qubes OS version         | 3.2 | 3.2+ | 4.0-rc1-3 | 4.0-rc4 |
+---------------------------------- | --- | ---- | --------- | ------- |
+Default VMs without PCI devices    | PV  | PVH  |    HVM    |   PVH   |
+Default VMs with PCI devices       | PV  | PV   |    HVM    |   HVM   |
+Stub domains - VMs w/o PCI devices | PV  | N/A  |    PV     |   N/A   |
+Stub domains - VMs w/ PCI devices  | PV  | PV   |    PV     |   PV    |
+
+("3.2+" denotes Qubes 3.2 after applying the update discussed above,
+which will result in most VMs running in PVH mode. "N/A" means "not
+applicable," since HVMs do not require stub domains.)
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html
+[2] https://meltdownattack.com/
+[3] https://meltdownattack.com/meltdown.pdf
+[4] https://spectreattack.com/spectre.pdf
+[5] https://xenbits.xen.org/xsa/advisory-254.html
+[6] https://www.qubes-os.org/doc/split-gpg/
+[7] https://github.com/inversepath/qubes-qrexec-to-tcp
+[8] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+[9] https://lists.xenproject.org/archives/html/xen-devel/2018-01/msg00403.html
+[10] https://www.qubes-os.org/news/2017/10/03/core3/
+[11] https://blog.xenproject.org/2018/01/04/xen-project-spectremeltdown-faq/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

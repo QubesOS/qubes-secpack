@@ -30,14 +30,16 @@ Practical impact and limiting factors for Qubes users
 ## Fully virtualized VMs offer signifiant protection
 
 The most reliable attack (Meltdown) of the three discussed cannot be
-exploited from a fully-virtualized VMs. In Qubes 3.x, however, all the
-VMs are para-virtualized (PV) by default, and thus do not protect
-against this attack. In Qubes 4.0, all the VMs are fully-virtualized
-and thus offer protection. However, even the fully virtualized VMs in
-Qubes 3.2, as well in the release candidates 1-3 for Qubes 4.0, still
-rely on PV-based so called "stub domain", making it possible for the
-attacker who can chain another exploit for qemu to still attempt the
-Meltdown attack.
+exploited _from_ a fully-virtualized VMs. In Qubes 3.x, however, by
+_default_ all the VMs are para-virtualized (PV), and thus do not
+protect against this attack. In Qubes 4.0, all the VMs are
+fully-virtualized and thus offer protection. However, even the fully
+virtualized VMs in Qubes 3.2, as well in the release candidates 1-3
+for Qubes 4.0, still rely on PV-based so called "stub domain", making
+it possible for the attacker who can chain another exploit for qemu to
+still attempt the Meltdown attack. It does not matter whether the
+target VM (i.e. the one from which the attacker wants to steal
+secrets) is fully-virtualized.
 
 ## Spectre attacks seems hard
 
@@ -62,7 +64,9 @@ the user's home directory -- please see [8] for more discussion).
 
 Furthermore, due to Qubes OS being a memory-hungry system, it seems
 the attacker would be able to only steal secrets from the VMs running
-concurrently with the attacker VM.
+concurrently with the attacker VM. This is because any pages from the
+shutdown VMs will typically very quickly get allocated to other,
+running VMs, and get wiped as part of this procedure.
 
 ## GPG and other crypto keys are at risk
 
@@ -80,7 +84,9 @@ this is the AdminVM (dom0). This VM contains two important user secrets:
 
 In order to make use of these secrets, however, the attacker would
 need to conduct a physical attack on the user's computer (e.g. steal
-the laptop physically).
+the laptop physically). Users should be mindful, however, in case they
+re-use the same disk encryption passphrase to also encrypt their
+backups.
 
 Additional remedies available to Qubes users
 =============================================
@@ -88,17 +94,24 @@ Additional remedies available to Qubes users
 Thanks to the Qubes explicit partitioning model it should be
 straightforward for users to implement an additional hygiene and
 ensure that whenever less trusted VMs are running, then the highly
-sensitive VMs are shutdown. Additionally, for some of the VMs that
-must run anyway (e.g. network and USB qubes), it is trivial to bring
-their root filesystem back to the good known state by mere rebooting
-them, thanks to the Qubes template mechanism. This could be done
-often, e.g. after disconnecting from the less trusted WiFi networks,
-or unplugging of untrusted USB devices.
+sensitive VMs are shutdown.
 
-The Qubes firewalling makes it also easy to limit what networking
-resources specific VMs might reach. This might be used to limit
-ability of the attack to leak secrets stolen from the memory (e.g.
-using the Meltdown attack) to the outside world.
+Additionally, for some of the VMs that must run anyway (e.g. network
+and USB qubes), it is possible to simply-recreate the VM each time the
+user suspects a situation which might have compromised it took place,
+e.g. after disconnecting from the less trusted WiFi networks, or
+unplugging of untrusted USB devices. On Qubes 4.0, this can be further
+simplified by using the new features of Disposable VMs, which can now
+be used as e.g. network or USB VMs (see [10]).
+
+The Qubes firewalling and networking makes it also easy to limit what
+networking resources specific VMs might reach (including making the
+VMs offline). This might be used to limit ability of the attack to
+leak secrets stolen from the memory (e.g.  using the Meltdown attack)
+to the outside world. While this mechanism should not be considered
+bullet-proof -- it is still possible to mount specific attack which
+exploits some additional network-based covert channel to leak the data
+-- it could be considered as an additional layer of defense.
 
 Finally, Qubes offers mechanisms to allow for additional protection of
 users secrets, especially keys, such as GPG keys used for encryption
@@ -144,7 +157,14 @@ appropriate patches will be ready.
 Suggested actions after patching
 =================================
 
-After patching we suggest users to:
+Even though the attacks discussed in this bulletin should be treated
+with all seriousness, still the recovery from a potential useful
+attack should be easier than in case of a full system compromise with
+a code execution exploit. Specifically, we don't believe it is needed
+to use Qubes Paranoid Backup Restore Mode to address these
+vulnerabilities, because of the strict read-only character of the
+attacks discussed. Instead, those users who believe they were affected
+in practice might consider "only" the following actions:
 
     1. Change their screenlocker password
     
@@ -154,13 +174,10 @@ After patching we suggest users to:
     encryption _key_ (in practice: reinstall Qubes and restore the VMs
     from a backup).
 
-In addition, every user should evaluate chances of various other
-secrets being compromised, such as other passwords and GPG/SSH/TLS
-private keys, and generate new secrets.
-
-We don't believe it is needed to use Qubes Paranoid Backup Restore
-Mode to address these vulnerabilities, because of the strict read-only
-character of the attacks discussed.
+    4. Evaluate chances of various other secrets being compromised,
+    such as other passwords and GPG/SSH/TLS private keys, and generate
+    new secrets. It is unclear how easy it might be for attackers to
+    steal such data in a _practical_ Qubes environment.
 
 Technical discussion
 =====================
@@ -197,8 +214,13 @@ from there.
 The above limitation also applies to the release candidates 1-3 for
 Qubes 4.0. The next release candidate we plan to release next week,
 should be using PVH instead of HVM for all the AppVMs by default, thus
-eliminating this avenue of attack (but, as discussed in the Patching
-section, not for driver domains).
+eliminating this avenue of attack. However, as discussed in the
+Patching section, not for driver domains, meaning the Meltdown attacks
+could in theory still be conducted when the attacker compromised the
+driver domain AND afterwords compromised the corresponding stub domain
+via a hypothetical qemu exploit. Sadly there is not much we can do
+about this last part, without cooperation from the Xen project on that
+matter [TODO: link].
 
 Credits
 ========
@@ -217,6 +239,7 @@ References
 [7] https://github.com/inversepath/qubes-qrexec-to-tcp
 [8] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 [9] https://lists.xenproject.org/archives/html/xen-devel/2018-01/msg00403.html
+[10] https://www.qubes-os.org/news/2017/10/03/core3/
 
 --
 The Qubes Security Team

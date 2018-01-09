@@ -117,17 +117,29 @@ USB Armory project [7].
 (Proper) patching
 ==================
 
-TODO: Marek :)
+Mitigations against CPU bugs discussed here are not yet fully
+developed. Xen Project team is working on appropriate patches (see XSA
+254 [5] for updates), but at the same time we are working on similar
+mitigations were feasible.
 
- - patches not ready yet, see XSA
- - our plan for 3.2:
-  - use HVMs for AppVMs?
-  - link to patches by Simon?
- - our plan for 4.0
-  - HVM is there already -> difficult to Meltdown
-  - Spectre probably hard anyway
-  - But: stub doms are PV -> move to PVH in rc4
-  - But: no solution for driver domains (link to Xen discussion why not)
+For Qubes 4.0, default configuration already use HVMs, which already
+mitigates the most severe issue - Meltdown. The only PV domains there
+are stubdomains, which we plan to eliminate by switching to PVH where
+possible. This will be done in Qubes 4.0 rc4, and also released as
+normal updates for already installed systems.
+The only remaining PV stubdomains will be for PCI devices handling VMs
+(sys-net, sys-usb in default configuration). Xen Project does not
+provide (yet) any solution for this[9].
+
+For Qubes 3.2, we plan to backport PVH support from Qubes 4.0 and
+enable it for VMs without PCI devices. This will work only when the
+hardware support VT-x or equivalent technology. Qubes 3.2 will remain
+to work even without VT-x, but there is no mitigation against Meltdown
+CPU bug for such systems. Users are advised to take this into
+consideration when assessing trustworthiness of their systems.
+
+We'll update this bulletin and issue separate announcement when
+appropriate patches will be ready.
 
 Suggested actions after patching
 =================================
@@ -204,6 +216,7 @@ References
 [6] https://www.qubes-os.org/doc/split-gpg/
 [7] https://github.com/inversepath/qubes-qrexec-to-tcp
 [8] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
+[9] https://lists.xenproject.org/archives/html/xen-devel/2018-01/msg00403.html
 
 --
 The Qubes Security Team

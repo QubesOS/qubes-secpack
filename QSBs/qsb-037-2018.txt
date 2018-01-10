@@ -98,7 +98,7 @@ shut down.
 Additionally, for some of the VMs that must run anyway (e.g. networking
 and USB qubes), it is possible to recreate the VM each time the user
 suspects it may have been compromised, e.g. after disconnecting from a
-less trusted Wi-Fi networ, or unplugging an untrusted USB device. In
+less trusted Wi-Fi network, or unplugging an untrusted USB device. In
 Qubes 4.0, this is even easier, since Disposable VMs can now be used for
 the networking and USB VMs (see [10]).
 
@@ -245,8 +245,7 @@ driver domains will be the exception, which means that the Meltdown
 attack could in theory still be conducted if the attacker compromises
 the driver domain and afterward compromises the corresponding stub
 domain via a hypothetical qemu exploit. Unfortunately, there is not much
-we can do about this without cooperation from the Xen project
-[TODO: link].
+we can do about this without cooperation from the Xen project[9][11].
 
 Credits
 ========
@@ -266,6 +265,7 @@ References
 [8] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 [9] https://lists.xenproject.org/archives/html/xen-devel/2018-01/msg00403.html
 [10] https://www.qubes-os.org/news/2017/10/03/core3/
+[11] https://blog.xenproject.org/2018/01/04/xen-project-spectremeltdown-faq/
 
 --
 The Qubes Security Team

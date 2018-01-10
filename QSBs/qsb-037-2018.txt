@@ -141,12 +141,12 @@ on similar mitigations where feasible.
 As explained above, almost all the VMs in Qubes 4.0 are
 fully-virtualized by default (specifically, they are HVMs), which
 mitigates the most severe issue, Meltdown. The only PV domains in Qubes
-4.0 are stubdomains, which we plan to eliminate by switching to PVH
+4.0 are stub domains, which we plan to eliminate by switching to PVH
 where possible. This will be done in Qubes 4.0-rc4 and also released as
-normal updates for existing Qubes 4.0 installations.  The only remaining
-PV stubdomains will be for VMs with PCI devices.  (In the default
+a normal update for existing Qubes 4.0 installations. The only remaining
+PV stub domains will be for VMs with PCI devices. (In the default
 configuration, these are sys-net and sys-usb.) The Xen Project has not
-yet provided any solution for this[9].
+yet provided any solution for this [9].
 
 ## Qubes 3.2
 
@@ -154,8 +154,9 @@ For Qubes 3.2, we plan to release an update that will make almost all
 VMs run in a fully-virtualized mode. Specifically, we plan to backport
 PVH support from Qubes 4.0 and enable it for all VMs without PCI
 devices. After this update, all VMs that previously ran in PV mode (and
-that do not have PCI devices) will subsequently run in PVH mode. Any
-HVMs will continue to run in HVM mode.
+that do not have PCI devices) will subsequently run in PVH mode, with
+the exception of stub domains. Any HVMs will continue to run in HVM
+mode.
 
 There are two important points regarding the Qubes 3.2 update. First,
 this update will work only when the hardware supports VT-x or equivalent
@@ -231,21 +232,20 @@ virtualization prevents at least one of the attacks, and incidentally
 the most powerful one, i.e. the Meltdown attack.
 
 However, we should also point out that, in Qubes 3.2, even
-fully-virtualized VMs (i.e. HVMs) still rely on para-virtualized (PV)
-stub domains to provide I/O emulation (qemu). In the case of an
-additional vulnerability within qemu, an attacker might compromise the
-PV-based stub domain and attempt to perform the Meltdown attack from
-there.
+fully-virtualized VMs still rely on PV stub domains to provide I/O
+emulation (qemu). In the case of an additional vulnerability within
+qemu, an attacker might compromise the PV-based stub domain and attempt
+to perform the Meltdown attack from there.
 
 This limitation also applies to release candidates 1-3 of Qubes 4.0.
 Qubes 4.0-rc4, which we plan to release next week, should be using PVH
 instead of HVM for almost all VMs without PCI devices by default, thus
 eliminating this avenue of attack. As discussed in the Patching section,
-driver domains will be the exception, which means that the Meltdown
-attack could in theory still be conducted if the attacker compromises
-the driver domain and afterward compromises the corresponding stub
-domain via a hypothetical qemu exploit. Unfortunately, there is not much
-we can do about this without cooperation from the Xen project[9][11].
+stub domains will be the exception, which means that the Meltdown attack
+could in theory still be conducted if the attacker compromises the stub
+domain and afterward compromises the corresponding VM via a hypothetical
+qemu exploit. Unfortunately, there is not much we can do about this
+without cooperation from the Xen project [9][11].
 
 Credits
 ========

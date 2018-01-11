@@ -261,7 +261,7 @@ Stub domains - VMs w/ PCI devices  | PV  | PV   |    PV     |   PV    |
 
 ("3.2+" denotes Qubes 3.2 after applying the update discussed above,
 which will result in most VMs running in PVH mode. "N/A" means "not
-applicable," since HVMs do not require stub domains.)
+applicable," since PVH VMs do not require stub domains.)
 
 Credits
 ========

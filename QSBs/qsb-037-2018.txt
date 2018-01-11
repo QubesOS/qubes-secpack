@@ -231,21 +231,36 @@ At the same time, we should point out that the use of full
 virtualization prevents at least one of the attacks, and incidentally
 the most powerful one, i.e. the Meltdown attack.
 
-However, we should also point out that, in Qubes 3.2, even
-fully-virtualized VMs still rely on PV stub domains to provide I/O
-emulation (qemu). In the case of an additional vulnerability within
-qemu, an attacker might compromise the PV-based stub domain and attempt
-to perform the Meltdown attack from there.
+However, we should also point out that, in Qubes 3.2, even HVMs still
+rely on PV stub domains to provide I/O emulation (qemu). In the case of
+an additional vulnerability within qemu, an attacker might compromise
+the PV stub domain and attempt to perform the Meltdown attack from
+there.
 
-This limitation also applies to release candidates 1-3 of Qubes 4.0.
-Qubes 4.0-rc4, which we plan to release next week, should be using PVH
-instead of HVM for almost all VMs without PCI devices by default, thus
-eliminating this avenue of attack. As discussed in the Patching section,
-stub domains will be the exception, which means that the Meltdown attack
-could in theory still be conducted if the attacker compromises the stub
-domain and afterward compromises the corresponding VM via a hypothetical
-qemu exploit. Unfortunately, there is not much we can do about this
-without cooperation from the Xen project [9][11].
+This limitation also applies to HVMs in release candidates 1-3 of Qubes
+4.0.  Qubes 4.0-rc4, which we plan to release next week, should be using
+PVH instead of HVM for almost all VMs without PCI devices by default,
+thus eliminating this avenue of attack. As discussed in the Patching
+section, VMs with PCI devices will be the exception, which means that
+the Meltdown attack could in theory still be conducted if the attacker
+compromises a VM with PCI devices and afterward compromises the
+corresponding stub domain via a hypothetical qemu exploit.
+Unfortunately, there is not much we can do about this without
+cooperation from the Xen project [9][11].
+
+Here is an overview of the VM modes that correspond to each Qubes OS
+version:
+
+VM type \ Qubes OS version         | 3.2 | 3.2+ | 4.0-rc1-3 | 4.0-rc4 |
+---------------------------------- | --- | ---- | --------- | ------- |
+Default VMs without PCI devices    | PV  | PVH  |    HVM    |   PVH   |
+Default VMs with PCI devices       | PV  | PV   |    HVM    |   HVM   |
+Stub domains - VMs w/o PCI devices | PV  | N/A  |    PV     |   N/A   |
+Stub domains - VMs w/ PCI devices  | PV  | PV   |    PV     |   PV    |
+
+("3.2+" denotes Qubes 3.2 after applying the update discussed above,
+which will result in most VMs running in PVH mode. "N/A" means "not
+applicable," since HVMs do not require stub domains.)
 
 Credits
 ========

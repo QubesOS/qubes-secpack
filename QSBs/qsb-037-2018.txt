@@ -14,10 +14,9 @@ On the night of January 3, two independent groups of researchers
 announced the results of their months-long work into abusing modern
 processors' so-called speculative mode to leak secrets from the system's
 privileged memory [1][2][3][4]. As a response, the Xen Security Team
-published Xen Security Advisory 254 [5]. The Xen Security Team did _not_
-previously share information about these problems via their (non-public)
-security pre-disclosure list, of which the Qubes Security Team is a
-member.
+published Xen Security Advisory 254 (XSA-254) [5]. The Qubes Security
+Team did _not_ receive notice of these vulnerabilities via the Xen
+security pre-disclosure list before XSA-254 was publicly released.
 
 In the limited time we've had to analyze the issue, we've come to the
 following conclusions about the practical impact on Qubes OS users and
@@ -133,7 +132,7 @@ with the Qubes USB Armory project [7].
 
 Mitigations against the CPU bugs discussed here are in development but
 have not yet been released. The Xen Project is working on a set of
-patches (see XSA 254 [5] for updates). At the same time, we are working
+patches (see XSA-254 [5] for updates). At the same time, we are working
 on similar mitigations where feasible.
 
 ## Qubes 4.0
@@ -256,12 +255,13 @@ VM type \ Qubes OS version         | 3.2 | 3.2+ | 4.0-rc1-3 | 4.0-rc4 |
 ---------------------------------- | --- | ---- | --------- | ------- |
 Default VMs without PCI devices    | PV  | PVH  |    HVM    |   PVH   |
 Default VMs with PCI devices       | PV  | PV   |    HVM    |   HVM   |
-Stub domains - VMs w/o PCI devices | PV  | N/A  |    PV     |   N/A   |
-Stub domains - VMs w/ PCI devices  | PV  | PV   |    PV     |   PV    |
+Stub domains - Default VMs w/o PCI | N/A | N/A  |    PV     |   N/A   |
+Stub domains - Default VMs w/ PCI  | PV  | PV   |    PV     |   PV    |
+Stub domains - HVMs                | PV  | PV   |    PV     |   PV    |
 
 ("3.2+" denotes Qubes 3.2 after applying the update discussed above,
 which will result in most VMs running in PVH mode. "N/A" means "not
-applicable," since HVMs do not require stub domains.)
+applicable," since PVH VMs do not require stub domains.)
 
 Credits
 ========

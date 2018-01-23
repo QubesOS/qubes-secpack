@@ -140,21 +140,22 @@ where possible. This will be done in Qubes 4.0-rc4 and also released as
 a normal update for existing Qubes 4.0 installations. The only remaining
 PV stub domains will be those used for VMs with PCI devices. (In the
 default configuration, these are sys-net and sys-usb.) To protect those
-domains, we will provide a page table isolation patch for Xen (aka
-XPTI), as described in the following section on Qubes 3.2.
+domains, we will provide the Xen page-table isolation (XPTI) patch, as
+described in the following section on Qubes 3.2.
 
 ## Qubes 3.2
 
 Previously, we had planned to release an update for Qubes 3.2 that would
 have made almost all VMs run in PVH mode by backporting support for this
 mode from Qubes 4.0. However, a much less drastic option has become
-available sooner than we and the Xen Security Team anticipated: a page
-table isolation patch for Xen (aka XPTI). This mitigation will make the
-most sensitive memory regions (including all of physical memory mapped
-into Xen address space) immune to the Meltdown attack. In addition, this
-mitigation will work on systems that lack VT-x support. (By contrast,
-our original plan to backport PVH would have worked only when the
-hardware supported VT-x or equivalent technology.)
+available sooner than we and the Xen Security Team anticipated: what the
+Xen Security Team refers to as a "stage 1" implementation of the Xen
+page-table isolation (XPTI) mitigation strategy [5]. This mitigation
+will make the most sensitive memory regions (including all of physical
+memory mapped into Xen address space) immune to the Meltdown attack. In
+addition, this mitigation will work on systems that lack VT-x support.
+(By contrast, our original plan to backport PVH would have worked only
+when the hardware supported VT-x or equivalent technology.)
 
 Please note that this mitigation is expected to have a noticeable
 performance impact. While there will be an option to disable the

@@ -7,6 +7,12 @@
 
     Information leaks due to processor speculative execution bugs
 
+Changelog
+==========
+
+2018-01-11: Original QSB published
+2018-01-23: Updated mitigation plan to XPTI; added Xen package versions
+
 Summary
 ========
 

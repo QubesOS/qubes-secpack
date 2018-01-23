@@ -130,11 +130,6 @@ with the Qubes USB Armory project [7].
 (Proper) patching
 ==================
 
-Mitigations against the CPU bugs discussed here are in development but
-have not yet been released. The Xen Project is working on a set of
-patches (see XSA-254 [5] for updates). At the same time, we are working
-on similar mitigations where feasible.
-
 ## Qubes 4.0
 
 As explained above, almost all the VMs in Qubes 4.0 are
@@ -145,39 +140,21 @@ PVH where possible. This will be done in Qubes 4.0-rc4 and also
 released as a normal update for existing Qubes 4.0 installations. The
 only remaining PV stub domains will be those used for VMs with PCI
 devices. (In the default configuration, these are sys-net and
-sys-usb.) The Xen Project has not yet provided any solution for this
-[9].
+sys-usb.) For those domains we provide Xen patched with "stage 1"
+mitigation, similar to Qubes 3.2 (see below).
 
 ## Qubes 3.2
 
-For Qubes 3.2, we plan to release an update that will make almost all
-VMs run in a fully-virtualized mode. Specifically, we plan to backport
-PVH support from Qubes 4.0 and enable it for all VMs without PCI
-devices. After this update, all VMs that previously ran in PV mode (and
-that do not have PCI devices) will subsequently run in PVH mode, with
-the exception of stub domains. Any HVMs will continue to run in HVM
-mode.
+For Qubes 3.2, we provide patched Xen with "stage 1" mitigation
+prepared by Xen Security Team. This mitigation makes the most
+sensitive memory regions (including whole physical memory mapped into
+Xen address space) immune to Meltdown attack. Additionally, this
+mitigation works on the system lacking VT-x support (in contrast to
+our original, PVH-based plan).
+This mitigation may affect system performance.
 
-There are two important points regarding the Qubes 3.2 update. First,
-this update will work only when the hardware supports VT-x or equivalent
-technology. Qubes 3.2 will continue to work on systems without VT-x, but
-there will be no mitigation against Meltdown on such systems. Users on
-systems that do not support VT-x are advised to take this into
-consideration when assessing the trustworthiness of their systems.
-
-Second, the Qubes 3.2 update will also switch any VMs that use a custom
-kernel to PVH mode, which will temporarily prevent them from working.
-This is a deliberate security choice to protect the system as a whole
-(rather than leaving VMs with custom kernels in PV mode, which would
-allow attackers to use them to mount Meltdown attacks). In order to use
-a VM with a custom kernel after the update (whether the custom kernel
-was installed in dom0 or inside the VM), users must either manually
-change the VM back to PV or change the kernel that the VM uses. (Kernel
->=4.11 is required, and booting an in-VM kernel is not supported in PVH
-mode.)
-
-We'll update this bulletin and issue a separate announcement once
-patches are available.
+The specific packages discussed above:
+ - Xen packages, version 4.6.6-36
 
 Suggested actions after patching
 =================================
@@ -251,17 +228,13 @@ cooperation from the Xen project [9][11].
 Here is an overview of the VM modes that correspond to each Qubes OS
 version:
 
-VM type \ Qubes OS version         | 3.2 | 3.2+ | 4.0-rc1-3 | 4.0-rc4 |
----------------------------------- | --- | ---- | --------- | ------- |
-Default VMs without PCI devices    | PV  | PVH  |    HVM    |   PVH   |
-Default VMs with PCI devices       | PV  | PV   |    HVM    |   HVM   |
-Stub domains - Default VMs w/o PCI | N/A | N/A  |    PV     |   N/A   |
-Stub domains - Default VMs w/ PCI  | N/A | N/A  |    PV     |   PV    |
-Stub domains - HVMs                | PV  | PV   |    PV     |   PV    |
-
-("3.2+" denotes Qubes 3.2 after applying the update discussed above,
-which will result in most VMs running in PVH mode. "N/A" means "not
-applicable," since PV and PVH VMs do not require stub domains.)
+VM type \ Qubes OS version         | 3.2 | 4.0-rc1-3 | 4.0-rc4 |
+---------------------------------- | --- | --------- | ------- |
+Default VMs without PCI devices    | PV  |    HVM    |   PVH   |
+Default VMs with PCI devices       | PV  |    HVM    |   HVM   |
+Stub domains - Default VMs w/o PCI | N/A |    PV     |   N/A   |
+Stub domains - Default VMs w/ PCI  | N/A |    PV     |   PV    |
+Stub domains - HVMs                | PV  |    PV     |   PV    |
 
 Credits
 ========

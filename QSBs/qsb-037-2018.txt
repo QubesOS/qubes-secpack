@@ -168,9 +168,29 @@ performance impact. While there will be an option to disable the
 mitigation (and thereby avoid the performance impact), doing so will
 return the system to a vulnerable state.
 
-The following packages contain the patches described above:
+The specific packages that contain the XPTI patches for Qubes 3.2 are
+as follows:
 
- - Xen packages, version 4.6.6-36
+  - Xen packages, version 4.6.6-36
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
 
 Suggested actions after patching
 =================================

@@ -21,27 +21,24 @@ evaluating the qrexec policy but before invoking the RPC handler executable.
 Impact
 =======
 
-1. Policy bypass. The qrexec argument value that is delivered to the handler
-   executable can be different from the value that is present in the RPC policy
-   at the time the policy is evaluated. This is especially problematic when the
-   policy is defined as a blacklist of arguments rather than a whitelist, e.g.
-   "permit any arguments to example.Call but PROHIBITED". If an attacker were
-   to call 'example.Call+PROHIBITED$invalid', the argument would not match the
-   blacklisted variable at the time of policy evaluation, so it would be
-   admitted.  However, performing shell parameter expansion on the argument
-   results in the prohibited value, which is what the actual handler receives.
+1. Potential policy bypass. The qrexec argument value that is delivered to the
+   handler executable can be different from the value that is present in the
+   RPC policy at the time the policy is evaluated. This is especially
+   problematic when the policy is defined as a blacklist of arguments rather
+   than a whitelist, e.g.  "permit any arguments to example.Call but
+   PROHIBITED". If an attacker were to call 'example.Call+PROHIBITED$invalid',
+   the argument would not match the blacklisted variable at the time of policy
+   evaluation, so it would be admitted.  However, performing shell parameter
+   expansion on the argument results in the prohibited value, which is what the
+   actual handler receives.
 
-2. Information leak. If the qrexec handler acts upon the argument, the attacker
-   could read or deduce the contents of those variables.
+2. Potential information leak. If the qrexec handler acts upon the argument,
+   the attacker could read or deduce the contents of those variables.
 
-3. Other vulnerabilities. Some of the variables present in the environment, like
-   $HOME and $PATH, also contain characters that are not permissible in qrexec
-   names or arguments that could theoretically lead to other classes of
-   vulnerabilities, such as directory traversal.
-
-4. Information denial. If the destination of the original call was specified
-   using a token starting with the '$' character, the value of
-   QREXEC_REQUESTED_TARGET variable is malformed.
+3. Other potential vulnerabilities. Some of the variables present in the
+   environment, like $HOME and $PATH, also contain characters that are not
+   permissible in qrexec names or arguments that could theoretically lead to
+   other classes of vulnerabilities, such as directory traversal.
 
 Technical details
 ==================

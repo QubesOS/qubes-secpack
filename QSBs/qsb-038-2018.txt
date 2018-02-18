@@ -1,0 +1,335 @@
+
+
+             ---===[ Qubes Security Bulletin #38 ]===---
+
+                          February 20, 2018
+
+
+          Qrexec policy bypass and possible information leak
+
+Summary
+========
+
+One of our developers, Wojtek Porczyk, discovered a vulnerability in the way
+qube names are handled, which can result in qrexec policies being bypassed, a
+theoretical information leak, and possibly other vulnerabilities. The '$'
+character (U+0024 DOLLAR SIGN), when part of a qrexec RPC name and/or
+destination specification (like '$adminvm', '$default', or one of the variants
+of '$dispvm') is expanded according to shell parameter expansion [1] after
+evaluating the qrexec policy but before invoking the RPC handler executable. 
+
+Impact
+=======
+
+1. Policy bypass. The qrexec argument value that is delivered to the handler
+   executable can be different from the value that is present in the RPC policy
+   at the time the policy is evaluated. This is especially problematic when the
+   policy is defined as a blacklist of arguments rather than a whitelist, e.g.
+   "permit any arguments to example.Call but PROHIBITED". If an attacker were
+   to call 'example.Call+PROHIBITED$invalid', the argument would not match the
+   blacklisted variable at the time of policy evaluation, so it would be
+   admitted.  However, performing shell parameter expansion on the argument
+   results in the prohibited value, which is what the actual handler receives.
+
+2. Information leak. If the qrexec handler acts upon the argument, the attacker
+   could read or deduce the contents of those variables.
+
+3. Other vulnerabilities. Some of the variables present in the environment, like
+   $HOME and $PATH, also contain characters that are not permissible in qrexec
+   names or arguments that could theoretically lead to other classes of
+   vulnerabilities, such as directory traversal.
+
+4. Information denial. If the destination of the original call was specified
+   using a token starting with the '$' character, the value of
+   QREXEC_REQUESTED_TARGET variable is malformed.
+
+Technical details
+==================
+
+The '$' character is used in several places in qrexec and is therefore an
+allowed character in parameters to Qubes RPC calls. It is also allowed as part
+of the RPC name. The validation code is as follows [2]:
+
+    static void sanitize_name(char * untrusted_s_signed, char *extra_allowed_chars)
+    {
+        unsigned char * untrusted_s;
+        for (untrusted_s=(unsigned char*)untrusted_s_signed; *untrusted_s; untrusted_s++) {
+            if (*untrusted_s >= 'a' && *untrusted_s <= 'z')
+                continue;
+            if (*untrusted_s >= 'A' && *untrusted_s <= 'Z')
+                continue;
+            if (*untrusted_s >= '0' && *untrusted_s <= '9')
+                continue;
+            if (*untrusted_s == '$' ||
+                   *untrusted_s == '_' ||
+                   *untrusted_s == '-' ||
+                   *untrusted_s == '.')
+                continue;
+            if (extra_allowed_chars && strchr(extra_allowed_chars, *untrusted_s))
+                continue;
+            *untrusted_s = '_';
+        }
+    }
+
+and is invoked as [3]:
+
+    sanitize_name(untrusted_params.service_name, "+");
+    sanitize_name(untrusted_params.target_domain, ":");
+
+Those arguments are part of the basis of policy evaluation. If policy
+evaluation was successful, the parameters are then forwarded to the destination
+domain over qrexec, and the call is executed using the qubes-rpc-multiplexer
+executable, which is invoked by a POSIX shell. The exact mechanism differs
+between dom0 and other qubes [4]:
+
+    if self.target == 'dom0':
+        cmd = '{multiplexer} {service} {source} {original_target}'.format(
+            multiplexer=QUBES_RPC_MULTIPLEXER_PATH,
+            service=self.service,
+            source=self.source,
+            original_target=self.original_target)
+    else:
+        cmd = '{user}:QUBESRPC {service} {source}'.format(
+            user=(self.rule.override_user or 'DEFAULT'),
+            service=self.service,
+            source=self.source)
+
+    # ...
+
+    try:
+        subprocess.call([QREXEC_CLIENT] + qrexec_opts + [cmd])
+
+For the dom0 case, these are the relevant parts from the executable referenced
+as QREXEC_CLIENT above [5]:
+
+    /* called from do_fork_exec */
+    void do_exec(const char *prog)
+    {
+        execl("/bin/bash", "bash", "-c", prog, NULL);
+    }
+
+    /* ... */
+
+    static void prepare_local_fds(char *cmdline)
+    {
+        /* ... */
+        do_fork_exec(cmdline, &local_pid, &local_stdin_fd, &local_stdout_fd,
+                NULL);
+    }
+
+    /* ... */
+
+    int main(int argc, char **argv)
+    {
+        /* ... */
+
+        if (strcmp(domname, "dom0") == 0) {
+            /* ... */
+
+            prepare_local_fds(remote_cmdline);
+
+For qubes other than dom0, the command line is reconstructed from the command
+passed through qrexec [6]:
+
+    void do_exec(const char *cmd)
+    {
+        char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - RPC_REQUEST_COMMAND_LEN + 1];
+        char *realcmd = index(cmd, ':'), *user;
+
+        /* ... */
+
+        /* replace magic RPC cmd with RPC multiplexer path */
+        if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", RPC_REQUEST_COMMAND_LEN+1)==0) {
+            strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
+            strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
+            realcmd = buf;
+        }
+
+        /* ... */
+
+    #ifdef HAVE_PAM
+        /* ... */
+        shell_basename = basename (pw->pw_shell);
+        /* this process is going to die shortly, so don't care about freeing */
+        arg0 = malloc (strlen (shell_basename) + 2);
+
+        /* ... */
+
+        /* FORK HERE */
+        child = fork ();
+
+        switch (child) {
+            case -1:
+                goto error;
+            case 0:
+                /* child */
+
+                if (setgid (pw->pw_gid))
+                    exit(126);
+                if (setuid (pw->pw_uid))
+                    exit(126);
+                setsid();
+                /* This is a copy but don't care to free as we exec later anyways.  */
+                env = pam_getenvlist (pamh);
+
+                execle(pw->pw_shell, arg0, "-c", realcmd, (char*)NULL, env);
+
+    /* ... */
+
+    #else
+        execl("/bin/su", "su", "-", user, "-c", realcmd, NULL);
+        perror("execl");
+        exit(1);
+    #endif
+
+Notice that the '$' character is unescaped in all cases when it is passed to
+the shell and is interpreted according to the rules of parameter expansion [1].
+
+Mitigating factors
+===================
+
+Only the '$' shell special character character was allowed, so only the
+corresponding simple form of parameter expansion is permitted [1]. The '{}'
+characters are prohibited, so other forms of parameter expansion are not
+possible. Had other characters like '()', been permitted, which is not the
+case, this vulnerability would amount to code execution.
+
+The qrexec calls that are present in a default Qubes OS installation and that
+have, by default, a policy that would actually allow them to be called:
+
+  - do not contain the '$' character; and
+  - do not act upon differences in their arguments.
+
+Therefore, this vulnerability is limited to custom RPCs and/or custom policies.
+
+The attacker is constrained to preexisting environment variables and shell
+special variables, which do not appear to contain very valuable information.
+
+Since writing policies in the blacklist paradigm is a poor security practice in
+general, it is perhaps less common among the security-conscious Qubes userbase.
+All users who write custom RPCs or policies are henceforth advised to adopt the
+whitelist paradigm.
+
+Resolution
+===========
+
+We've decided to deprecate the '$' character from qrexec-related usage.
+Instead, to denote special tokens, we will use the '@' (U+0040 COMMERCIAL AT)
+character, which we believe is less likely to be interpreted in a special way
+by the relevant software.
+
+This is a forward-incompatible change for existing systems, specifically in
+policy syntax, remote domain parameters to the qrexec-client and
+qrexec-client-vm tools, and the API exposed to the qrexec handler script. In
+order to maintain backward compatibility, these tools will accept older
+keywords while parsing policy and command line parameters, then translate them
+to the new keywords before evaluating the policy or invoking the actual call,
+respectively.
+
+It will no longer be possible to define calls and receive arguments containing
+the '$' character. However, we believe that no such calls exist. Had they
+existed, this bug would have been disclosed earlier.
+
+In addition, the shell will not be used to call qubes-rpc-multiplexer.
+
+The environment variable specifying the original target qube will also be
+specified differently for cases that, in the past, would have contained the '$'
+character. However, this wasn't working as specified anyway, so we believe the
+impact of this change to be minimal. The new variables will be as follows:
+
+- QREXEC_REQUESTED_TARGET_TYPE
+    with value of either 'name' or 'keyword'
+- QREXEC_REQUESTED_TARGET
+    set only when QREXEC_REQUESTED_TARGET_TYPE set to 'name'
+- QREXEC_REQUESTED_TARGET_KEYWORD
+    set only when QREXEC_REQUESTED_TARGET_TYPE set to 'keyword'
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this bulletin are
+as follows:
+
+  For Qubes 3.2, dom0:
+  - qubes-utils 3.2.7
+  - qubes-core-dom0 3.2.17
+  - qubes-core-dom0-linux 3.2.17
+
+  For Qubes 3.2, domUs:
+  - qubes-utils 3.2.7
+  - qubes-core-vm (Fedora) / qubes-core-agent (Debian) 3.2.24
+
+  For Qubes 4.0, dom0:
+  - qubes-utils 4.0.16
+  - qubes-core-dom0 4.0.23
+  - qubes-core-dom0-linux 4.0.11
+
+  For Qubes 4.0, domUs:
+  - qubes-utils 4.0.16
+  - qubes-core-agent 4.0.22
+
+The packages for dom0 are to be installed in dom0 via the Qubes VM Manager or
+via the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+The packages for domUs are to be installed in TemplateVMs and StandaloneVMs via
+the Qubes VM Manager or via the respective package manager:
+
+  For updates to Fedora from the stable repository (not immediately available):
+  $ sudo dnf update
+
+  For updates to Fedora from the security-testing repository:
+  $ sudo dnf update --enablerepo=qubes-vm-*-security-testing
+
+  For updates to Debian from the stable repository (not immediately available):
+  $ sudo apt update && sudo apt dist-upgrade
+
+  For updates to Debian from the security-testing repository:
+  First, uncomment the line below "Qubes security updates testing repository" in
+    /etc/apt/sources.list.d/qubes-r*.list
+  Then:
+  $ sudo apt update && sudo apt dist-upgrade
+
+A restart is required for these changes to take effect. In the case of dom0,
+this entails a full system restart. In the case of TemplateVMs, this entails
+shutting down the TemplateVM before restarting all the TemplateBasedVMs based
+on that TemplateVM.
+
+These packages will migrate from the security-testing repository to the current
+(stable) repository over the next two weeks after being tested by the
+community.
+
+Timeline
+=========
+
+2011-07-22  Commit c23cc48 permits '$' character [7].
+2016-03-27  Commit 0607d90 introduces qrexec arguments [8][9].
+2018-02-14  The vulnerability is discovered and reported internally.
+2018-02-20  The vulnerability is patched, and this bulletin is released.
+
+Credits
+========
+
+The issue was discovered by Wojtek Porczyk.
+
+References
+===========
+
+[1] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02
+[2] https://github.com/QubesOS/qubes-core-admin-linux/blob/v4.0.10/qrexec/qrexec-daemon.c#L643-L662
+[3] https://github.com/QubesOS/qubes-core-admin-linux/blob/v4.0.10/qrexec/qrexec-daemon.c#L685-L686
+[4] https://github.com/QubesOS/qubes-core-admin/blob/v4.0.22/qubespolicy/__init__.py#L452
+[5] https://github.com/QubesOS/qubes-core-admin-linux/blob/v4.0.10/qrexec/qrexec-daemon.c
+[6] https://github.com/QubesOS/qubes-core-agent-linux/blob/v4.0.21/qrexec/qrexec-agent.c#L136
+[7] https://github.com/QubesOS/qubes-core-admin/commit/c23cc48#diff-3aa52ac2dd3e25700efd40e77b02b2d0
+[8] https://github.com/QubesOS/qubes-core-admin-linux/commit/0607d90
+[9] https://github.com/QubesOS/qubes-issues/issues/1876
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

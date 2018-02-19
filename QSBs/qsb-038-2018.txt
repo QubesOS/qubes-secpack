@@ -13,10 +13,11 @@ Summary
 One of our developers, Wojtek Porczyk, discovered a vulnerability in the way
 qube names are handled, which can result in qrexec policies being bypassed, a
 theoretical information leak, and possibly other vulnerabilities. The '$'
-character (U+0024 DOLLAR SIGN), when part of a qrexec RPC name and/or
-destination specification (like '$adminvm', '$default', or one of the variants
-of '$dispvm') is expanded according to shell parameter expansion [1] after
-evaluating the qrexec policy but before invoking the RPC handler executable. 
+character, when part of a qrexec RPC name and/or destination
+specification (like '$adminvm', '$default', or one of the variants of
+'$dispvm') is expanded according to shell parameter expansion [1]
+after evaluating the qrexec policy but before invoking the RPC handler
+executable. 
 
 Impact
 =======
@@ -211,8 +212,8 @@ Resolution
 ===========
 
 We've decided to deprecate the '$' character from qrexec-related usage.
-Instead, to denote special tokens, we will use the '@' (U+0040 COMMERCIAL AT)
-character, which we believe is less likely to be interpreted in a special way
+Instead, to denote special tokens, we will use the '@' character,
+which we believe is less likely to be interpreted in a special way
 by the relevant software.
 
 This is a forward-incompatible change for existing systems, specifically in

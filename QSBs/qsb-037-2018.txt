@@ -12,6 +12,7 @@ Changelog
 
 2018-01-11: Original QSB published
 2018-01-23: Updated mitigation plan to XPTI; added Xen package versions
+2018-03-14: Updated package versions with Spectre SP2 mitigations
 
 Summary
 ========
@@ -149,6 +150,37 @@ default configuration, these are sys-net and sys-usb.) To protect those
 domains, we will provide the Xen page-table isolation (XPTI) patch, as
 described in the following section on Qubes 3.2.
 
+Additionally, Xen provided patches to mitigate Spectre variant 2. While
+we don't believe this variant is reliably exploitable to obtain
+sensitive information from other domains, it is possible to use it
+for help with other attacks inside a domain (like escaping a sandbox
+of web browser). This mitigation to be fully effective require
+updated microcode - refer to your BIOS vendor for updates.
+
+The specific packages that contain the XPTI and Spectre variant 2
+patches for Qubes 4.0 are as follows:
+
+  - Xen packages, version 4.8.3-3
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
 ## Qubes 3.2
 
 Previously, we had planned to release an update for Qubes 3.2 that would
@@ -168,10 +200,17 @@ performance impact. While there will be an option to disable the
 mitigation (and thereby avoid the performance impact), doing so will
 return the system to a vulnerable state.
 
-The specific packages that contain the XPTI patches for Qubes 3.2 are
-as follows:
+Additionally, Xen provided patches to mitigate Spectre variant 2. While
+we don't believe this variant is reliably exploitable to obtain
+sensitive information from other domains, it is possible to use it
+for help with other attacks inside a domain (like escaping a sandbox
+of web browser). This mitigation to be fully effective require updated
+microcode - refer to your BIOS vendor for updates.
 
-  - Xen packages, version 4.6.6-36
+The specific packages that contain the XPTI and Spectre variant 2
+patches for Qubes 3.2 are as follows:
+
+  - Xen packages, version 4.6.6-37
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:

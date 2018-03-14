@@ -1,0 +1,107 @@
+
+
+                    ---===[ Qubes Canary #15 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is March 14, 2018.
+
+2. There have been 38 Qubes Security Bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
+backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+two weeks of June 2018. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
+
+Special announcements
+----------------------
+
+None.
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other
+means, like blackmail or compromising the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feeds quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Wed, 14 Mar 2018 13:38:04 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+Refugee Bedtime Stories: 'A Long, Long Time Ago, Syria Was Beautiful, My Son'
+Creative Destruction: Macron Eyes Expanding His Movement Across Europe
+'The Sale of Our Identity': C&A Family Member Discusses Firm's Uncertain Future
+The Trade Warrior: Donald Trump's Attack on German Prosperity
+Reporter Podcast: Understanding the Riddles of Greenland
+
+$ feedstail -1 -n5 -f '{title}' -u https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+Why Moscow Will Never Apologize for Attack on Ex-Spy
+The Biggest Refugee Camp Braces for Rain: ‘This Is Going to Be a Catastrophe’
+Tillerson’s Firing Had Been Expected, but It Still Stunned Observers
+Now Two Former Presidents of South Korea Are Under Investigation
+New Zealand Diplomat Censured for Vulgar Tweet About U.S. Democrats
+
+$ feedstail -1 -n5 -f '{title}' -u https://feeds.bbci.co.uk/news/world/rss.xml
+Stephen Hawking: Visionary physicist dies aged 76
+Democrat Conor Lamb claims victory in Pennsylvania election
+Rex Tillerson: Secretary of state fired by Trump in Russia warning
+Italy bomb: World War Two device forces mass evacuation in Fano
+Caribbean volcano Kick 'em Jenny: Ships warned off area
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
+Britain expels 23 Russian diplomats over chemical attack on ex-spy
+Stephen Hawking, who unlocked the secrets of space and time, dies at 76
+Turkey's Erdogan says hopes Syria's Afrin town to be captured by Wednesday evening
+Civilians needing medical aid leave Syria's Ghouta for second day
+Tokyo bids farewell to 'trustworthy' Tillerson, Seoul awaits seasoned Pompeo
+
+$ curl -s 'https://blockchain.info/blocks/?format=json'
+
+$ python3 -c 'import sys, json; print(json.load(sys.stdin)['\''blocks'\''][10]['\''hash'\''])'
+00000000000000000020436a19f4772283e739a4dbd171be51214f5fe73c6804
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

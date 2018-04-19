@@ -1,0 +1,76 @@
+
+
+             ---===[ Qubes Security Bulletin #39 ]===---
+
+                           April 20, 2018
+
+
+         GUI issue allowing a window to have white borders
+
+Summary
+========
+
+Christoffer Jerkeby discovered a situation in which Qubes GUI
+virtualization could allow a VM to produce a window that has no colored
+borders (which are used in Qubes as front-line indicators of trust).
+A VM cannot use this vulnerability to draw different borders in place of
+the correct one, however. We discuss this issue extensively below.
+Very similar issue was already fixed as part of QSB#34[1], but the fix
+missed one case.
+
+Technical details
+==================
+
+GUI daemon issue
+-----------------
+
+The patch for QSB#34 properly handled the case when VM's window has
+different shape and border area is not updated at any time, but failed
+to fix the case when no window image was sent at all, before mapping
+the window. In the latter case, argument sanitization section of
+do_shm_update function was skipped, resulting in arguments being
+ignored. This later results in colorful border _not_ being redrawn.
+
+See QSB#34[1] for detailed description.
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - qubes-gui-dom0, version 3.2.13
+
+  For Qubes 4.0:
+  - qubes-gui-dom0, version 4.0.8
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A restart of all GUI daemons will be required afterwards, which can be
+achieved by logging out and in.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+Credits
+========
+
+The issue was discovered by Christoffer Jerkeby.
+
+References
+===========
+
+[1] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-034-2017.txt
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

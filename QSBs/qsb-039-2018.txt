@@ -10,7 +10,7 @@
 Summary
 ========
 
-Christoffer Jerkeby discovered a situation in which Qubes GUI
+Christoffer Kugg Jerkeby discovered a situation in which Qubes GUI
 virtualization could allow a VM to produce a window with borders that
 are white instead of the color of the VM's label. (In Qubes, border
 colors are used as front-line indicators of trust.) However, a VM cannot
@@ -74,7 +74,7 @@ by the community.
 Credits
 ========
 
-The issue was discovered by Christoffer Jerkeby.
+The issue was discovered by Christoffer Kugg Jerkeby.
 
 References
 ===========

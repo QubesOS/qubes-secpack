@@ -11,27 +11,37 @@ Summary
 ========
 
 Christoffer Jerkeby discovered a situation in which Qubes GUI
-virtualization could allow a VM to produce a window that has no colored
-borders (which are used in Qubes as front-line indicators of trust).
-A VM cannot use this vulnerability to draw different borders in place of
-the correct one, however. We discuss this issue extensively below.
-Very similar issue was already fixed as part of QSB#34[1], but the fix
-missed one case.
+virtualization could allow a VM to produce a window with borders that
+are white instead of the color of the VM's label. (In Qubes, border
+colors are used as front-line indicators of trust.) However, a VM cannot
+use this vulnerability to draw borders with a non-white color other than
+the correct one.  A very similar bug was fixed as part of QSB #34 [1],
+but the fix missed this one case, as described below.
 
 Technical details
 ==================
 
-GUI daemon issue
------------------
+In QSB #34, we reported a similar bug involving the Qubes GUI daemon.
+Whenever a VM displays a borderless window in Qubes, the Qubes GUI
+daemon is responsible for drawing a colored border around it. In
+particular, whenever a window content update is sent for the border area
+of a bordless window, the GUI daemon draws a 2px border in that
+location. The bug reported in QSB #34 occurred when a VM showed a
+borderless splash screen window with a custom shape. While custom window
+shapes are not supported in Qubes OS, VMs do not know this.  The VM
+still thought the custom-shaped window was there, so it never sent
+window content updates outside of the custom shape. Hence, it never sent
+window content updates for the border areas of custom-shaped windows.
+Since there were no window content updates for the border areas, nothing
+triggered the GUI daemon to draw borders in those locations. As a
+result, custom-shaped splash screen windows had no borders at all.
 
-The patch for QSB#34 properly handled the case when VM's window has
-different shape and border area is not updated at any time, but failed
-to fix the case when no window image was sent at all, before mapping
-the window. In the latter case, argument sanitization section of
-do_shm_update function was skipped, resulting in arguments being
-ignored. This later results in colorful border _not_ being redrawn.
-
-See QSB#34[1] for detailed description.
+While the patch for QSB #34 fixed the case just described, it failed to
+fix the case in which no window image is sent at all before mapping the
+window. In this latter case, the argument sanitization section of the
+do_shm_update function is skipped, resulting in arguments being ignored.
+This, in turn, results in the window having borders that are white
+instead of the color of the VM's label.
 
 Patching
 =========

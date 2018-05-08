@@ -2,24 +2,62 @@
 
              ---===[ Qubes Security Bulletin #39 ]===---
 
-                           April 20, 2018
+                            May  8, 2018
 
 
-         GUI issue allowing a window to have white borders
+          Xen vulnerability (XSA-260) and GUI daemon issue
 
 Summary
 ========
 
-Christoffer Kugg Jerkeby discovered a situation in which Qubes GUI
-virtualization could allow a VM to produce a window with borders that
-are white instead of the color of the VM's label. (In Qubes, border
-colors are used as front-line indicators of trust.) However, a VM cannot
-use this vulnerability to draw borders with a non-white color other than
-the correct one.  A very similar bug was fixed as part of QSB #34 [1],
-but the fix missed this one case, as described below.
+Today the Xen Security Team released Xen
+Security Advisories 260 through 262. The bug described in XSA-260
+allows the attacker controlling a PV domain to break out to dom0.
+This is a critical bug for Qubes 3.2, but for Qubes 4.0 is much less
+severe as domains running untrusted code are PVH and HVM by default.
+
+Additionally, Christoffer Kugg Jerkeby discovered a situation in which
+Qubes GUI virtualization could allow a VM to produce a window with
+borders that are white instead of the color of the VM's label. (In
+Qubes, border colors are used as front-line indicators of trust.)
+However, a VM cannot use this vulnerability to draw borders with a
+non-white color other than the correct one. A very similar bug was
+fixed as part of QSB #34 [1], but the fix missed this one case, as
+described below.
 
 Technical details
 ==================
+
+Xen issues
+-----------
+
+Xen Security Advisory 260 [2]:
+
+| When switching stacks, it is critical to have a matching stack segment
+| and stack pointer.  To allow an atomic update from what would otherwise
+| be two adjacent instructions, an update which changes the stack segment
+| (either a mov or pop instruction with %ss encoded as the destination
+| register) sets the movss shadow for one instruction.
+| 
+| The exact behaviour of the movss shadow is poorly understood.
+| 
+| In practice, a movss shadow delays some debug exceptions (e.g. from a
+| hardware breakpoint) until the subsequent instruction has completed.  If
+| the subsequent instruction normally transitions to supervisor mode
+| (e.g. a system call), then the debug exception will be taken after the
+| transition to ring0 is completed.
+| 
+| For most transitions to supervisor mode, this only confuses Xen into
+| printing a lot of debugging information.  For the syscall instruction
+| however, the exception gets taken before the syscall handler can move
+| off the guest stack.
+| 
+| A malicious PV guest can escalate their privilege to that of the
+| hypervisor.
+
+
+GUI daemon issue
+----------------
 
 In QSB #34, we reported a similar bug involving the Qubes GUI daemon.
 Whenever a VM displays a borderless window in Qubes, the GUI daemon is
@@ -57,9 +95,11 @@ The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 
   For Qubes 3.2:
+  - Xen packages, version 4.6.6-40
   - qubes-gui-dom0, version 3.2.13
 
   For Qubes 4.0:
+  - Xen packages, version 4.8.2-7
   - qubes-gui-dom0, version 4.0.8
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
@@ -71,22 +111,27 @@ the qubes-dom0-update command as follows:
   For updates from the security-testing repository:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
 
-A restart of all GUI daemons will be required afterwards, which can be
-achieved by logging out and in.
+A system restart will be required afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community.
 
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
 Credits
 ========
 
-The issue was discovered by Christoffer Kugg Jerkeby.
+The GUI issue was discovered by Christoffer Kugg Jerkeby.
+For other issues, see the original Xen Security Advisories.
 
 References
 ===========
 
 [1] https://www.qubes-os.org/news/2017/10/12/qsb-34/
+[2] https://xenbits.xen.org/xsa/advisory-260.html
 
 --
 The Qubes Security Team

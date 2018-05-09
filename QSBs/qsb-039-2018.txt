@@ -10,11 +10,12 @@
 Summary
 ========
 
-Today the Xen Security Team released Xen
-Security Advisories 260 through 262. The bug described in XSA-260
-allows the attacker controlling a PV domain to break out to dom0.
-This is a critical bug for Qubes 3.2, but for Qubes 4.0 is much less
-severe as domains running untrusted code are PVH and HVM by default.
+Today, the Xen Security Team released Xen Security Advisories 260
+through 262. Among these, only XSA-260 affects the security of Qubes
+OS. The bug described in XSA-260 allows an attacker controlling a PV
+domain to break out to dom0. This is a critical bug for Qubes 3.2, but
+for Qubes 4.0 is much less severe, since all the domains that run
+untrusted code in Qubes 4.0 are either PVH or HVM by default.
 
 Additionally, Christoffer Kugg Jerkeby discovered a situation in which
 Qubes GUI virtualization could allow a VM to produce a window with

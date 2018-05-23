@@ -78,6 +78,18 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
+In addition, Intel Corporation has announced that microcode updates
+will be available soon [3]:
+
+| Variant 3a is mitigated in the same processor microcode updates as
+| Variant 4, and Intel has released these updates in beta form to OEM
+| system manufacturers and system software vendors. They are being
+| readied for production release, and will be delivered to consumers
+| and IT Professionals in the coming weeks.
+
+This bulletin will be updated once the Intel microcode updates are
+available. No microcode update is necessary for AMD processors.
+
 Credits
 ========
 
@@ -88,6 +100,7 @@ References
 
 [1] https://xenbits.xen.org/xsa/advisory-263.html
 [2] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-037-2018.txt
+[3] https://www.intel.com/content/www/us/en/architecture-and-technology/facts-about-side-channel-analysis-and-intel-products.html
 
 --
 The Qubes Security Team

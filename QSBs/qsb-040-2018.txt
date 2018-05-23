@@ -1,0 +1,94 @@
+
+
+             ---===[ Qubes Security Bulletin #40 ]===---
+
+                             2018-05-23
+
+
+      Information leaks due to processor speculative store bypass
+
+Summary
+========
+
+On 2018-05-21, the Xen Security Team published Xen Security Advisory
+263 (CVE-2018-3639 / XSA-263) [1] with the following description:
+
+| Contemporary high performance processors may use a technique commonly
+| known as Memory Disambiguation, whereby speculative execution may
+| proceed past unresolved stores.  This opens a speculative sidechannel
+| in which loads from an address which have had a recent store can
+| observe and operate on the older, stale, value.
+
+Please note that this issue was neither predisclosed nor embargoed.
+Consequently, the Qubes Security Team has not had time to analyze it in
+advance of issuing this bulletin.
+
+Impact
+=======
+
+According to XSA-263, the impact of this issue is as follows:
+
+| An attacker who can locate or create a suitable code gadget in a
+| different privilege context may be able to infer the content of
+| arbitrary memory accessible to that other privilege context.
+| 
+| At the time of writing, there are no known vulnerable gadgets in the
+| compiled hypervisor code.  Xen has no interfaces which allow JIT code
+| to be provided.  Therefore we believe that the hypervisor itself is
+| not vulnerable.  Additionally, we do not think there is a viable
+| information leak by one Xen guest against another non-cooperating
+| guest.
+| 
+| However, in most configurations, within-guest information leak is
+| possible.  Mitigation for this generally depends on guest changes
+| (for which you must consult your OS vendor) *and* on hypervisor
+| support, provided in this advisory.
+
+In light of this, XSA-263 appears to be less severe than the related
+Spectre and Meltdown vulnerabilities we discussed in QSB #37 [2].
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version TODO
+
+  For Qubes 4.0:
+  - Xen packages, version TODO
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-263.html
+[2] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-037-2018.txt
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

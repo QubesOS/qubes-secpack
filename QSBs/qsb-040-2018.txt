@@ -54,10 +54,10 @@ The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 
   For Qubes 3.2:
-  - Xen packages, version TODO
+  - Xen packages, version 4.6.6-41
 
   For Qubes 4.0:
-  - Xen packages, version TODO
+  - Xen packages, version 4.8.3-8
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:

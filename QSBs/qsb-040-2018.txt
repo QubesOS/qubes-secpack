@@ -5,7 +5,7 @@
                              2018-05-23
 
 
-      Information leaks due to processor speculative store bypass
+  Information leaks due to processor speculative store bypass (XSA-263)
 
 Summary
 ========

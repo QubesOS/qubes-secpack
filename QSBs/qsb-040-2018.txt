@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #40 ]===---
 
-                             2018-05-23
+                             2018-05-24
 
 
   Information leaks due to processor speculative store bypass (XSA-263)

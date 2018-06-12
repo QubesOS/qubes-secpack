@@ -78,8 +78,8 @@ There are several important things to note about SSBD:
 
 1. On both Intel and AMD processors, SSBD is globally disabled by
    default. If the user wishes to enable SSBD globally, the user must do
-   so manually with a special Xen boot option. However, doing so carries
-   a performance penalty.
+   so manually with the Xen boot option `spec-ctrl=ssbd=true`. However,
+   enabling this option carries a performance penalty.
 
 2. We concur with the analysis in XSA-263 that this vulnerability
    presents minimal risk to Xen itself and minimal risk of inter-guest

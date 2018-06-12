@@ -7,6 +7,12 @@
 
   Information leaks due to processor speculative store bypass (XSA-263)
 
+Changelog
+==========
+
+2018-05-24: Original QSB published
+2018-06-11: Updated and clarified Patching section
+
 Summary
 ========
 
@@ -50,8 +56,49 @@ Spectre and Meltdown vulnerabilities we discussed in QSB #37 [2].
 Patching
 =========
 
-The specific packages that resolve the problems discussed in this
-bulletin are as follows:
+The mitigation for this issue is called called "Speculative Store Bypass
+Disable" (SSBD). For Intel processors, SSBD requires both a software
+update and a CPU microcode update. For AMD processors, a software update
+alone is sufficient; no microcode update is necessary. The packages
+described below provide the necessary software updates for SSBD. On
+2018-05-23, Intel Corporation announced that microcode updates would be
+available soon [3]:
+
+| Variant 3a is mitigated in the same processor microcode updates as
+| Variant 4, and Intel has released these updates in beta form to OEM
+| system manufacturers and system software vendors. They are being
+| readied for production release, and will be delivered to consumers
+| and IT Professionals in the coming weeks.
+
+However, as of 2018-06-11, we are not aware of any available microcode
+updates that address this issue for Intel processors. This bulletin will
+be updated once the Intel microcode updates are available.
+
+There are several important things to note about SSBD:
+
+1. On both Intel and AMD processors, SSBD is globally disabled by
+   default. If the user wishes to enable SSBD globally, the user must do
+   so manually with a special Xen boot option. However, doing so carries
+   a performance penalty.
+
+2. We concur with the analysis in XSA-263 that this vulnerability
+   presents minimal risk to Xen itself and minimal risk of inter-guest
+   attacks. Therefore, we believe that proper compartmentalization is
+   sufficient for Qubes users to mitigate this issue without having to
+   enable SSBD globally.
+
+3. For Intel (but not AMD) processors, SSBD can be enabled locally by
+   Xen guests without the user having to manually enable it globally.
+
+4. For AMD (but not Intel) processors, SSBD cannot be enabled locally by
+   Xen guests. The user must manually enable it globally for it to have
+   any effect at all.
+
+5. The guest kernel determines whether SSBD is automatically enabled for
+   guests on systems with Intel processors.  As of 2018-06-11, the
+   kernels we currently offer in our repositories do not enable SSBD.
+
+The specific packages relevant to this issue are as follows:
 
   For Qubes 3.2:
   - Xen packages, version 4.6.6-41
@@ -77,18 +124,6 @@ by the community.
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
-
-In addition, Intel Corporation has announced that microcode updates
-will be available soon [3]:
-
-| Variant 3a is mitigated in the same processor microcode updates as
-| Variant 4, and Intel has released these updates in beta form to OEM
-| system manufacturers and system software vendors. They are being
-| readied for production release, and will be delivered to consumers
-| and IT Professionals in the coming weeks.
-
-This bulletin will be updated once the Intel microcode updates are
-available. No microcode update is necessary for AMD processors.
 
 Credits
 ========

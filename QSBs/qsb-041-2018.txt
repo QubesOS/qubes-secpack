@@ -1,0 +1,82 @@
+
+
+             ---===[ Qubes Security Bulletin #41 ]===---
+
+                             2018-06-13
+
+
+  Speculative register leakage from lazy FPU context switching (XSA-267)
+
+Summary
+========
+
+On 2018-06-13, the Xen Security Team published Xen Security Advisory
+267 (CVE-2018-3665 / XSA-267) [1] with the following description:
+
+| x86 has a hardware mechanism for lazy FPU context switching.  On a task
+| switch, %cr0.ts (Task Switched) gets set, and the next instruction to
+| touch floating point state raises an #NM (No Math, later known as Device
+| Not Available) exception.
+| 
+| Traditionally, FPU state has been large in comparison to available
+| bandwidth (and therefore slow to switch) and not used as frequently as
+| cpu tasks tend to switch.  This mechanism allows the OS to only switch
+| FPU when necessary, which in turn increases performance.
+| 
+| Some CPUs however speculate past an #NM exception, allowing register
+| content to be leaked by a side-channel.
+| 
+| An attacker can read x87/MMX/SSE/AVX/AVX-512 register state belonging to
+| another vCPU previously scheduled on the same processor.  This can be
+| state belonging a different guest, or state belonging to a different
+| thread inside the same guest.
+
+This is yet another CPU hardware bug related to speculative execution.
+
+Patching
+=========
+
+To resolve this issue, Xen Project provided patches disabling lazy FPU
+context switching on affected systems.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-42
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.3-9
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-267.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

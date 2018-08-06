@@ -1,0 +1,91 @@
+
+
+             ---===[ Qubes Security Bulletin #42 ]===---
+
+                             2018-08-14
+
+
+      Linux netback driver OOB access in hash handling (XSA-270)
+
+Summary
+========
+
+On 2018-08-14, the Xen Security Team published Xen Security Advisory
+270 (XSA-270) [1] with the following description:
+
+| Linux's netback driver allows frontends to control mapping of requests
+| to request queues.  When processing a request to set or change this
+| mapping, some input validation was missing or flawed.
+| 
+| A malicious or buggy frontend may cause the (usually privileged)
+| backend to make out of bounds memory accesses, potentially resulting
+| in one or more of privilege escalation, Denial of Service (DoS), or
+| information leaks.
+
+Impact for Qubes
+=================
+
+The bug affects only network backend driver, meaning that a qube
+connected to a network can attack a qube providing that network. This
+includes:
+ - in default configuration, any network-connected AppVM can attack
+ sys-firewall, from where it can attack sys-net
+ - a qube connected to a VPN Gateway[2] can attack it and potentially
+ steal VPN credentials
+ - a Whonix Workstation can attack Whonix Gateway, breaking anonymity
+
+Dom0 and network-disconnected qubes are not affected.
+
+Patching
+=========
+
+To resolve this issue, Xen Project provided patches fixing the issue.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - kernel packages, version 4.14.57-2
+  - kernel-latest packages, version 4.17.9-2
+
+  For Qubes 4.0:
+  - kernel packages, version 4.14.57-2
+  - kernel-latest packages, version 4.17.9-2
+
+kernel-latest packages are not installed by default - it is not
+necessary to install them. But if one have them installed, it is
+recommended to update to the fixed version.
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A restart of network-providing qubes will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Linux binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-267.html
+[2] https://www.qubes-os.org/doc/vpn/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -83,7 +83,7 @@ See the original Xen Security Advisory.
 References
 ===========
 
-[1] https://xenbits.xen.org/xsa/advisory-267.html
+[1] https://xenbits.xen.org/xsa/advisory-270.html
 [2] https://www.qubes-os.org/doc/vpn/
 
 --

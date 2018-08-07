@@ -25,21 +25,26 @@ On 2018-08-14, the Xen Security Team published Xen Security Advisory
 Impact for Qubes
 =================
 
-The bug affects only network backend driver, meaning that a qube
-connected to a network can attack a qube providing that network. This
-includes:
- - in default configuration, any network-connected AppVM can attack
- sys-firewall, from where it can attack sys-net
- - a qube connected to a VPN Gateway[2] can attack it and potentially
- steal VPN credentials
- - a Whonix Workstation can attack Whonix Gateway, breaking anonymity
+The bug affects only the network backend driver, which means that any
+qube with access to a network can attack the qube that provides it with
+access to that network. For example:
 
-Dom0 and network-disconnected qubes are not affected.
+ - In a default configuration, any network-connected AppVM can attack
+   sys-firewall, which can in turn attack sys-net.
+
+ - Any qube connected to a VPN Gateway [2] can attack the VPN Gateway
+   and potentially steal VPN credentials.
+
+ - Any Whonix Workstation can attack the Whonix Gateway to which it is
+   connected, potentially compromising anonymity.
+
+It is important to note, however, that dom0 and network-disconnected
+qubes are not affected.
 
 Patching
 =========
 
-To resolve this issue, Xen Project provided patches fixing the issue.
+The Xen Project has provided patches to fix this issue.
 
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:
@@ -52,9 +57,11 @@ bulletin are as follows:
   - kernel packages, version 4.14.57-2
   - kernel-latest packages, version 4.17.9-2
 
-kernel-latest packages are not installed by default - it is not
-necessary to install them. But if one have them installed, it is
-recommended to update to the fixed version.
+The kernel-latest packages are not installed by default. If you do not
+already have them installed, then it is not necessary to install them in
+order to fix this issue. However, if you already have them installed,
+then we recommend that you update them to the version containing the fix
+for this issue.
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:
@@ -65,7 +72,7 @@ the qubes-dom0-update command as follows:
   For updates from the security-testing repository:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
 
-A restart of network-providing qubes will be required afterwards.
+A restart of all network-providing qubes will be required afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -74,6 +81,12 @@ by the community.
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Linux binaries.
+
+Users who are using in-VM kernels [3] for any of their VMs should note
+that installing the packages listed above will not update their in-VM
+kernels. We recommend that these users install updates for their in-VM
+kernels when the appropriate distributions provide kernel updates that
+fix this issue.
 
 Credits
 ========
@@ -85,6 +98,7 @@ References
 
 [1] https://xenbits.xen.org/xsa/advisory-270.html
 [2] https://www.qubes-os.org/doc/vpn/
+[3] https://www.qubes-os.org/doc/managing-vm-kernel/#using-kernel-installed-in-the-vm-r40
 
 --
 The Qubes Security Team

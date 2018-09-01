@@ -1,0 +1,145 @@
+
+
+             ---===[ Qubes Security Bulletin #43 ]===---
+
+                             2018-09-01
+
+
+         L1 Terminal Fault speculative side channel (XSA-273)
+
+Summary
+========
+
+On 2018-08-14, the Xen Security Team published Xen Security Advisory
+273 (CVE-2018-3620,CVE-2018-3646 / XSA-273) [1] with the following
+description:
+
+| In x86 nomenclature, a Terminal Fault is a pagetable walk which aborts
+| due to the page being not present (e.g. paged out to disk), or because
+| of reserved bits being set.
+| 
+| Architecturally, such a memory access will result in a page fault
+| exception, but some processors will speculatively compute the physical
+| address and issue an L1D lookup.  If data resides in the L1D cache, it
+| may be forwarded to dependent instructions, and may be leaked via a side
+| channel.
+| 
+| Furthermore:
+|   * SGX protections are not applied
+|   * EPT guest to host translations are not applied
+|   * SMM protections are not applied
+| 
+| This issue is split into multiple CVEs depending on circumstance.  The
+| CVEs which apply to Xen are:
+|   * CVE-2018-3620 - Operating Systems and SMM
+|   * CVE-2018-3646 - Hypervisors
+| 
+| For more details, see:
+|   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00161.html
+| 
+| An attacker can potentially read arbitrary host RAM.  This includes data
+| belonging to Xen, data belonging to other guests, and data belonging to
+| different security contexts within the same guest.
+| 
+| An attacker could be a guest kernel (which can manipulate the pagetables
+| directly), or could be guest userspace either directly (e.g. with
+| mprotect() or similar system call) or indirectly (by gaming the guest
+| kernel's paging subsystem).
+
+This is yet another CPU hardware bug related to speculative execution.
+
+Only Intel processors are affected.
+
+Impact of mitigations on Qubes OS
+==================================
+
+Qubes OS 3.2
+-------------
+
+Part of the mitigation is disabling hyper-threading. This results in
+the system seeing only half of the CPU cores compared to
+hyper-threading enabled, thus reducing system performance.
+This mitigation is needed only when running HVM qubes (or PVH, but
+those are unavailable in Qubes OS 3.2). If user do not use HVM
+qubes, it is safe to re-enable hyper-threading. To do that, change
+`smt=off` to `smt=on` Xen parameter, depending on boot mode:
+
+a) EFI - in `/boot/efi/EFI/qubes/xen.cfg` in dom0.
+
+b) legacy - in `/etc/default/grub`, then run `sudo grub2-mkconfig -o
+/boot/grub2/grub.cfg` in dom0.
+
+Qubes OS 4.0
+-------------
+
+Part of the mitigation is disabling hyper-threading. This results in
+the system seeing only half of the CPU cores compared to
+hyper-threading enabled, thus reducing system performance.
+Since Qubes OS 4.0 use PVH and HVM qubes, it is _not_ safe to
+re-enable hyper-threading.
+If user modified number of virtual CPUs assigned to any qube
+("vcpus" property), it may be necessary to adjust this value (to
+account for reduced system resources).
+
+Additionally, if user use any PV qube (discouraged), it is necessary
+to update its kernel to a version containing L1TF mitigations.
+Otherwise it may be crashed when using swap (part of the mitigation
+and intentional[2] lack of shadow paging support in Qubes OS 4.0). If
+the kernel is provided by dom0 ("kernel" property), we provide updated
+kernel packages - see "Patching" section below. If the kernel is used
+from within the VM (using pvgrub), use appropriate VM's distribution
+update channel. Alternatively, to avoid the crash, one can disable
+swap in such VM.
+
+Patching
+=========
+
+To resolve this issue, Xen Project provided patches adding necessary
+mitigations. To make use of them, CPU microcode update is needed.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-44
+  - microcode_ctl package, version 2.1-26.qubes1
+  - kernel-qubes-vm package, version 4.14.67-1
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.4-2
+  - microcode_ctl 2.1-26.qubes1
+  - kernel-qubes-vm package, version 4.14.67-1 (optional)
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-273.html
+[2] https://www.qubes-os.org/news/2016/07/21/new-hw-certification-for-q4/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

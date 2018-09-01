@@ -56,46 +56,52 @@ Impact of mitigations on Qubes OS
 Qubes OS 3.2
 -------------
 
-Part of the mitigation is disabling hyper-threading. This results in
-the system seeing only half of the CPU cores compared to
-hyper-threading enabled, thus reducing system performance.
-This mitigation is needed only when running HVM qubes (or PVH, but
-those are unavailable in Qubes OS 3.2). If user do not use HVM
-qubes, it is safe to re-enable hyper-threading. To do that, change
-`smt=off` to `smt=on` Xen parameter, depending on boot mode:
+Part of the mitigation is to disable hyper-threading. This halves the
+number of CPU cores that the system sees compared to having
+hyper-threading enabled, thus reducing system performance.  This
+mitigation is needed only when running HVM qubes (or PVH, but PVH is not
+available in Qubes OS 3.2 anyway). If you do _not_ use any HVM qubes, it
+is safe to re-enable hyper-threading by following the instructions
+below. The instructions differ depending on whether you use EFI or
+legacy boot.
 
-a) EFI - in `/boot/efi/EFI/qubes/xen.cfg` in dom0.
+How to re-enable hyper-threading with EFI boot:
+1. Change `smt=off` to `smt=on` in `/boot/efi/EFI/qubes/xen.cfg` in dom0.
+2. Save your change to the file.
+3. Reboot dom0.
 
-b) legacy - in `/etc/default/grub`, then run `sudo grub2-mkconfig -o
-/boot/grub2/grub.cfg` in dom0.
+How to re-enable hyper-threading with legacy boot:
+1. Change `smt=off` to `smt=on` in `/etc/default/grub` in dom0.
+2. Save your change to the file.
+3. Run `sudo grub2-mkconfig -o /boot/grub2/grub.cfg` in dom0.
+4. Reboot dom0.
 
 Qubes OS 4.0
 -------------
 
-Part of the mitigation is disabling hyper-threading. This results in
-the system seeing only half of the CPU cores compared to
-hyper-threading enabled, thus reducing system performance.
-Since Qubes OS 4.0 use PVH and HVM qubes, it is _not_ safe to
-re-enable hyper-threading.
-If user modified number of virtual CPUs assigned to any qube
-("vcpus" property), it may be necessary to adjust this value (to
-account for reduced system resources).
+Part of the mitigation is to disable hyper-threading. This halves the
+number of CPU cores that the system sees compared to having
+hyper-threading enabled, thus reducing system performance.  Since Qubes
+OS 4.0 uses both PVH and HVM qubes, it is _not_ safe to re-enable
+hyper-threading.  If you have previously modified the number of virtual
+CPUs assigned to any qube (the "vcpus" property), it may be necessary to
+adjust this value in order to account for reduced system performance.
 
-Additionally, if user use any PV qube (discouraged), it is necessary
-to update its kernel to a version containing L1TF mitigations.
-Otherwise it may be crashed when using swap (part of the mitigation
-and intentional[2] lack of shadow paging support in Qubes OS 4.0). If
-the kernel is provided by dom0 ("kernel" property), we provide updated
-kernel packages - see "Patching" section below. If the kernel is used
-from within the VM (using pvgrub), use appropriate VM's distribution
-update channel. Alternatively, to avoid the crash, one can disable
-swap in such VM.
+In addition, if you use any PV qubes (which is discouraged for security
+reasons), it is necessary to update their kernels to a version that
+contains L1TF mitigations.  Otherwise, they may crash when using swap
+(which is part of the mitigation and part of the intentional [2] lack of
+shadow paging support in Qubes OS 4.0). If the kernel is provided by
+dom0 (the "kernel" property), we provide updated kernel packages (see
+the "Patching" section below). If the kernel is used from within the VM
+(using pvgrub), use the VM's appropriate distribution update channel.
+Alternatively, to avoid crashing, you can disable swap in such VMs.
 
 Patching
 =========
 
-To resolve this issue, Xen Project provided patches adding necessary
-mitigations. To make use of them, CPU microcode update is needed.
+The Xen Project has provided patches that mitigate this issue. A CPU
+microcode update is required to take advantage of them.
 
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:

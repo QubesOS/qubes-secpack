@@ -1,0 +1,107 @@
+
+
+                    ---===[ Qubes Canary #17 ]===---
+
+
+Statements
+-----------
+
+The Qubes core developers who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is October 15, 2018.
+
+2. There have been 43 Qubes Security Bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+Project (e.g. to hand out the private signing keys or to introduce
+backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+two weeks of January 2019. Special note should be taken if no new canary
+is published by that time or if the list of statements changes without
+plausible explanation.
+
+Special announcements
+----------------------
+
+None.
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently
+compromised.  This means that we assume NO trust in any of the servers
+or services which host or provide any Qubes-related data, in
+particular, software updates, source code repositories, and Qubes ISO
+downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other
+means, like blackmail or compromising the signers' laptops, to coerce
+us to produce false declarations.
+
+The news feeds quoted below (Proof of freshness) serves to demonstrate
+that this canary could not have been created prior to the date stated.
+It shows that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to
+anybody. None of the signers should be ever held legally responsible
+for any of the statements made here.
+
+Proof of freshness
+-------------------
+
+$ date -R -u
+Mon, 15 Oct 2018 12:56:41 +0000
+
+$ feedstail -1 -n5 -f '{title}' -u https://www.spiegel.de/international/index.rss
+Merkel's Bavaria Headache: Berlin Coalition Emerges Even Weaker
+A European IMF: The New Face of the Eurozone Bailout Fund
+Social Design Award: Vote For Your Favorite Neighborhood Project
+Rape Allegations: Ronaldo's Defense Team Develops a Strategy
+Operation Mekong: China Solidifies Its Influence in Southeast Asia
+
+$ feedstail -1 -n5 -f '{title}' -u https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+‘Our Hands Can Reach You’: Khashoggi Case Shakes Saudi Dissidents Abroad
+Brazil Edges Toward Bolsonaro as a ‘Last Resort’ Leader
+How to Attract a Killer Tigress? Try a Man’s Cologne
+Kim Jong-un Invites Pope Francis to North Korea
+Bulgarian Journalist, Host of Anticorruption TV Show, Is Raped and Killed
+
+$ feedstail -1 -n5 -f '{title}' -u https://feeds.bbci.co.uk/news/world/rss.xml
+Jamal Khashoggi: Turkey to search Saudi consulate in Istanbul
+France weather: Red alert as flash floods kill 13 in south-west
+Buckethead the bear cub's head freed from jar after three days
+Hostage held at Cologne main train station
+China star detained for 'anthem insult'
+
+$ feedstail -1 -n5 -f '{title}' -u http://feeds.reuters.com/reuters/worldnews
+Jordan and Syria reopen Nassib border crossing
+U.S. still aiming to cut Iran oil sales to zero, market well-supplied: U.S. envoy for Iran
+Saudi king orders probe in Khashoggi case, Turkey to search consulate
+Bavaria election shakes Merkel's coalition, far-right rejoices
+Merkel vows to regain trust after conservative losses in Bavaria
+
+
+$ python3 -c 'import sys, json; print(json.load(sys.stdin)['\''blocks'\''][10]['\''hash'\''])'
+$ curl -s 'https://blockchain.info/blocks/?format=json'
+000000000000000000201919eaab0aa9d10b9f1458d84f60434533d7cb915192
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this
+canary in the qubes-secpack.git repo, and (2) via digital signatures
+on the corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures!

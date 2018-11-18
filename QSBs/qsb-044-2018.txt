@@ -10,9 +10,9 @@ Summary
 ========
 
 On 2018-11-20, the Xen Security Team published multiple Xen Security
-Advisories:
+Advisories (XSAs):
 
-XSA-275[1] "insufficient TLB flushing / improper large page mappings
+XSA-275 [1] "insufficient TLB flushing / improper large page mappings
 with AMD IOMMUs":
 | In order to be certain that no undue access to memory is possible
 | anymore after IOMMU mappings of this memory have been removed,
@@ -28,7 +28,10 @@ with AMD IOMMUs":
 | cause a Denial of Service (DoS) affecting the entire host, or may be
 | able to access data it is not supposed to access (information leak).
 
-XSA-280[2] "Fix for XSA-240 conflicts with shadow paging":
+XSA-275 affects only AMD CPUs using IOMMU on both Qubes OS 3.2 and Qubes
+OS 4.0. XSA-275 does not affect Intel CPUs on any Qubes OS version.
+
+XSA-280 [2] "Fix for XSA-240 conflicts with shadow paging":
 | The fix for XSA-240 introduced a new field into the control structure
 | associated with each page of RAM.  This field was added to a union,
 | another member of which is used when Xen uses shadow paging for the
@@ -39,9 +42,8 @@ XSA-280[2] "Fix for XSA-240 conflicts with shadow paging":
 | a DoS (Denial of Service) affecting the entire host.  Privilege
 | escalation as well as information leaks cannot be ruled out.
 
-The first issue affect both Qubes OS 3.2 and Qubes OS 4.0 on AMD
-hardware. The second one affect only Qubes OS 3.2, as in Qubes OS 4.0
-we have disabled shadow paging feature at build time.
+XSA-280 affects only Qubes OS 3.2. XSA-280 does not affect Qubes OS 4.0,
+since the shadow paging feature is disabled at build time for 4.0.
 
 Patching
 =========
@@ -49,10 +51,10 @@ Patching
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 
-  For Qubes 3.2:
+  For Qubes OS 3.2:
   - Xen packages, version 4.6.6-45
 
-  For Qubes 4.0:
+  For Qubes OS 4.0:
   - Xen packages, version 4.8.4-7
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via

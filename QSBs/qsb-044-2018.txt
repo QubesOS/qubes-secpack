@@ -1,0 +1,90 @@
+
+
+             ---===[ Qubes Security Bulletin #44 ]===---
+
+                             2018-11-20
+
+           Multiple Xen vulnerabilities (XSA-275, XSA-280)
+
+Summary
+========
+
+On 2018-11-20, the Xen Security Team published multiple Xen Security
+Advisories:
+
+XSA-275[1] "insufficient TLB flushing / improper large page mappings
+with AMD IOMMUs":
+| In order to be certain that no undue access to memory is possible
+| anymore after IOMMU mappings of this memory have been removed,
+| Translation Lookaside Buffers (TLBs) need to be flushed after most
+| changes to such mappings.  Xen bypassed certain IOMMU flushes on AMD
+| x86 hardware.
+| 
+| Furthermore logic exists Xen to re-combine small page mappings
+| into larger ones.  Such re-combination could have occured in cases
+| when it was not really safe/correct to do so.
+| 
+| A malicious or buggy guest may be able to escalate its privileges, may
+| cause a Denial of Service (DoS) affecting the entire host, or may be
+| able to access data it is not supposed to access (information leak).
+
+XSA-280[2] "Fix for XSA-240 conflicts with shadow paging":
+| The fix for XSA-240 introduced a new field into the control structure
+| associated with each page of RAM.  This field was added to a union,
+| another member of which is used when Xen uses shadow paging for the
+| guest.  During migration, or with the L1TF (XSA-273) mitigation for
+| PV guests in effect, the two uses conflict.
+| 
+| A malicious or buggy x86 PV guest may cause Xen to crash, resulting in
+| a DoS (Denial of Service) affecting the entire host.  Privilege
+| escalation as well as information leaks cannot be ruled out.
+
+The first issue affect both Qubes OS 3.2 and Qubes OS 4.0 on AMD
+hardware. The second one affect only Qubes OS 3.2, as in Qubes OS 4.0
+we have disabled shadow paging feature at build time.
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 3.2:
+  - Xen packages, version 4.6.6-45
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.4-7
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-275.html
+[2] https://xenbits.xen.org/xsa/advisory-280.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

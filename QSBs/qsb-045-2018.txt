@@ -1,0 +1,97 @@
+
+
+             ---===[ Qubes Security Bulletin #45 ]===---
+
+                             TODO
+
+            Insecure default configuration of Salt stack
+
+Summary
+========
+
+Salt stack in Qubes OS, among other things, can be used to configure software
+installed in qubes (including TemplateVMs and AppVMs)[1]. To isolate dom0 from
+potentially compromised qubes, a Disposable VM is used between dom0 and target
+qube to contain all the complex processing there[2]. Each target qube gets
+separate Disposable VM, which is given power to execute arbitrary command
+(through qubes.VMShell qrexec service) in that target qube.
+
+In default configuration, this Disposable VM is based on the same DVM template
+that is set for all the other actions (including default Disposable: Firefox
+menu entry). This DVM template have red label and have networking enabled,
+which may suggest it isn't security critical element.  If that default DVM
+template is compromised (for example by a web browser plugin user installs
+there[3]), the next time user use Salt stack, it could also compromise target
+qubes.
+
+Additionally, the option to use alternative DVM template was not exposed in
+user interface - neither command line nor graphical.
+
+Vulnerable systems
+==================
+
+To exploit this vulnerability, several condition needs to be met:
+
+1. User needs to use Salt stack to configure software inside qubes (it isn't by
+   default). Only qubes configured by Salt would be affected.
+
+2. User needs to customize default DVM template - this is where potential
+   compromise could happen.
+
+The issue applies only to Qubes 4.0.
+
+Resolution
+==========
+
+To fix this problem, we've made two changes:
+
+1. Added "management_dispvm" qube property to specify which DVM template should
+be used to manage the qube in question. The property is inherited from
+TemplateVMs to TemplateBasedVMs and if none of them are set explicitly, the
+default is taken from a global "management_dispvm" property. The per-qube one
+is available with `qvm-prefs` utility, the global one - with `qubes-prefs`.
+
+2. Created `default-mgmt-dvm` DVM template, which is hidden from the menu (to
+   avoid accidental usage), have networking disabled and have black label
+   (same as templates). This qube is set as global "management_dispvm".
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes OS 4.0:
+  - qubes-core-dom0 version 4.0.36
+  - qubes-mgmt-salt-dom0-virtual-machines version 4.0.15
+  - qubes-mgmt-salt-admin-tools version 4.0.12
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+
+Credits
+========
+
+The issue was reported by Demi M. Obenour <demiobenour@gmail.com>
+
+References
+===========
+
+[1] https://www.qubes-os.org/doc/salt/#configuring-a-vms-system-from-dom0
+[2] https://github.com/QubesOS/qubes-issues/issues/1541#issuecomment-187482786
+[3] https://www.qubes-os.org/doc/dispvm-customization/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

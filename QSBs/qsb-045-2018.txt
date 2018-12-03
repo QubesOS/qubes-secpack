@@ -11,34 +11,35 @@ Summary
 
 Salt stack in Qubes OS, among other things, can be used to configure software
 installed in qubes (including TemplateVMs and AppVMs)[1]. To isolate dom0 from
-potentially compromised qubes, a Disposable VM is used between dom0 and target
-qube to contain all the complex processing there[2]. Each target qube gets
-separate Disposable VM, which is given power to execute arbitrary command
-(through qubes.VMShell qrexec service) in that target qube.
+potentially compromised qubes, a Disposable VM is used between dom0 and a
+target qube to contain all the complex processing there[2]. Each target qube
+gets a separate Disposable VM, which is given power to execute arbitrary
+commands (through qubes.VMShell qrexec service) in that target qube.
 
 In default configuration, this Disposable VM is based on the same DVM template
 that is set for all the other actions (including default Disposable: Firefox
-menu entry). This DVM template have red label and have networking enabled,
-which may suggest it isn't security critical element.  If that default DVM
+menu entry). This DVM template has a red label and has networking enabled,
+which may suggest it isn't a security critical element.  If that default DVM
 template is compromised (for example by a web browser plugin user installs
-there[3]), the next time user use Salt stack, it could also compromise target
-qubes.
+there[3]), the next time the user uses Salt stack, it could also compromise
+all target qubes.
 
-Additionally, the option to use alternative DVM template was not exposed in
-user interface - neither command line nor graphical.
+Additionally, the option to use an alternative DVM template for Salt was not
+exposed in user interface - neither command line nor graphical.
 
 Vulnerable systems
 ==================
 
 To exploit this vulnerability, several condition needs to be met:
 
-1. User needs to use Salt stack to configure software inside qubes (it isn't by
-   default). Only qubes configured by Salt would be affected.
+1. The user needs to use Salt stack to configure software inside qubes (it
+   isn't by default). Only qubes configured by Salt would be affected.
 
-2. User needs to customize default DVM template - this is where potential
-   compromise could happen.
+2. The user needs to customize the default DVM template without realizing the
+   security implications - this is where potential compromise could happen.
 
-The issue applies only to Qubes 4.0.
+The issue applies only to Qubes 4.0. In Qubes 3.2 a temporarily created AppVM
+based on the default Template is used.
 
 Resolution
 ==========
@@ -46,14 +47,15 @@ Resolution
 To fix this problem, we've made two changes:
 
 1. Added "management_dispvm" qube property to specify which DVM template should
-be used to manage the qube in question. The property is inherited from
-TemplateVMs to TemplateBasedVMs and if none of them are set explicitly, the
-default is taken from a global "management_dispvm" property. The per-qube one
-is available with `qvm-prefs` utility, the global one - with `qubes-prefs`.
+   be used to manage the qube in question. The property is inherited from
+   TemplateVMs to TemplateBasedVMs and if none of them are set explicitly, the
+   default is taken from the global "management_dispvm" property. The per-qube
+   one is available through `qvm-prefs` utility, the global one - through
+   `qubes-prefs`.
 
 2. Created `default-mgmt-dvm` DVM template, which is hidden from the menu (to
-   avoid accidental usage), have networking disabled and have black label
-   (same as templates). This qube is set as global "management_dispvm".
+   avoid accidental usage), has networking disabled and has a black label (same
+   as templates). This qube is set as global "management_dispvm".
 
 Patching
 =========

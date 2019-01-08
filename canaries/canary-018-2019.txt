@@ -29,7 +29,7 @@ plausible explanation.
 Special announcements
 ----------------------
 
-Simon Gaiser joined Qubes Security Team. More details:
+Simon Gaiser (aka HW42) joined the Qubes Security Team. More details:
 https://www.qubes-os.org/news/2018/11/05/qubes-security-team-update/
 
 Disclaimers and notes

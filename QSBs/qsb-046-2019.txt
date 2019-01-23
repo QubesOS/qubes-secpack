@@ -31,10 +31,10 @@ Max Justicz discovered a vulnerability in APT, the high level package
 manager.  The code handling HTTP redirects in the HTTP transport method
 doesn't properly sanitize fields transmitted over the wire. This
 vulnerability could be used by an attacker located as a
-man-in-the-middle between APT and a mirror to inject malicous [sic]
-content in the HTTP connection. This content could then be recognized as
-a valid package by APT and used later for code execution with root
-privileges on the target machine.
+man-in-the-middle between APT and a mirror to inject malicious content
+in the HTTP connection. This content could then be recognized as a valid
+package by APT and used later for code execution with root privileges on
+the target machine.
 
 
 Impact
@@ -69,7 +69,7 @@ bugs and that humankind will never be able to patch all of them promptly
 fact, the very reason we designed Qubes OS as an implementation of the
 security-by-compartmentalization approach.
 
-The Debian update bug discussed today is, however, somewhat special.
+The APT update bug discussed today is, however, somewhat special.
 While it is indeed a bug that only affects VMs internally, it could
 allow an attacker to compromise TemplateVMs, which are used as a basis
 for creating other VMs, such as AppVMs and ServiceVMs. If a TemplateVM

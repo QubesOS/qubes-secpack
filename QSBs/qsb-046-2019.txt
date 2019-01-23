@@ -45,13 +45,6 @@ Fedora VMs are not affected.  Although we do not provide any other
 official or community APT-based templates, any other APT-based VMs that
 users have installed on their own should also be assumed to be affected.
 
-In theory, this bug allows an attacker to take over any APT-based
-template and, consequently, all VMs based on that template. However, for
-the reasons explained above, the configuration used in Qubes OS happens
-to makes this bug hard to exploit. Nevertheless, one should never
-underestimate the creativity of exploit authors, and thus, one should
-assume that the bug is exploitable.
-
 
 Discussion
 ===========
@@ -145,6 +138,16 @@ TemplateVM:
    template:
 
    $ sudo qubes-dom0-update --enablerepo=qubes-templates-community \
+   qubes-template-whonix-gw-14-TODO
+
+   Fixed templates during will be first uploaded to appropriate
+   "testing" repository and moved to stable one after about two weeks.
+   To install template during that time, you need to enable relevant
+   testing repository. For example, to install the whonix-gw-14-TODO
+   template during first two weeks after this announcement:
+
+   $ sudo qubes-dom0-update \
+   --enablerepo=qubes-templates-community-testing \
    qubes-template-whonix-gw-14-TODO
 
 5. If you temporarily changed all VMs based on the target TemplateVM to

@@ -189,10 +189,10 @@ Alternative patching for non-critical TemplateVMs
 
 Users who do not rely on APT-based VMs for any critical tasks may
 instead opt just to install fixed APT packages. This is _not_ secure if
-the template has already been compromised. If the user is not willing to
-take the risk that the template may already be compromised, the user
-should instead follow the instructions in the previous section to
-completely remove the template, then install a fresh one.
+the template has already been compromised. If you are not willing to
+take the risk that the template may already be compromised, you should
+instead follow the instructions in the previous section to completely
+remove the template, then install a fresh one.
 
 As the bug is present in the update mechanism itself, special care
 should be taken while performing the update, as described in [1]. We
@@ -226,8 +226,8 @@ the qubes-dom0-update command as follows:
 Credits
 ========
 
-This bug was found by Max Justicz and reported to the Debian Security
-Team.
+This vulnerability was discovered by Max Justicz and reported to the
+Debian Security Team.
 
 
 References

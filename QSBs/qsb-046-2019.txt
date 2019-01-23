@@ -143,7 +143,7 @@ TemplateVM:
    Then verify the right version was installed:
 
    $ rpm -q qubes-template-whonix-gw-14
-   qubes-template-whonix-gw-14-4.0.1-201901231238
+   qubes-template-whonix-gw-14-4.0.1-201901231238.noarch
 
    In accordance with our standard policy, new (fixed) template packages
    will first reside in the testing repositories for approximately two

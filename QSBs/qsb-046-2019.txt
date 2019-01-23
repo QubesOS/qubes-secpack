@@ -45,13 +45,6 @@ Fedora VMs are not affected.  Although we do not provide any other
 official or community APT-based templates, any other APT-based VMs that
 users have installed on their own should also be assumed to be affected.
 
-In theory, this bug allows an attacker to take over any APT-based
-template and, consequently, all VMs based on that template. However, for
-the reasons explained above, the configuration used in Qubes OS happens
-to makes this bug hard to exploit. Nevertheless, one should never
-underestimate the creativity of exploit authors, and thus, one should
-assume that the bug is exploitable.
-
 
 Discussion
 ===========

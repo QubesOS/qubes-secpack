@@ -135,9 +135,14 @@ TemplateVM:
    This requires specifying the template package name (not the
    TemplateVM's name). A list of new (fixed) template package names is
    provided below.  For example, to install the whonix-gw-14
-   template version 4.0.1-201901231238:
+   template:
 
    $ sudo qubes-dom0-update --enablerepo=qubes-templates-community \
+   qubes-template-whonix-gw-14
+
+   Then verify the right version was installed:
+
+   $ rpm -q qubes-template-whonix-gw-14
    qubes-template-whonix-gw-14-4.0.1-201901231238
 
    In accordance with our standard policy, new (fixed) template packages
@@ -145,11 +150,11 @@ TemplateVM:
    weeks before migrating to the stable repositories. In order to
    install a templates package from its testing repository, you must
    enable that repository. For example, to install the whonix-gw-14
-   template version 4.0.1-201901231238 from its testing repository:
+   template from its testing repository:
 
    $ sudo qubes-dom0-update \
    --enablerepo=qubes-templates-community-testing \
-   qubes-template-whonix-gw-14-4.0.1-201901231238
+   qubes-template-whonix-gw-14
 
 5. If you temporarily changed all VMs based on the target TemplateVM to
    a different template in step 2, change them back to the fresh

@@ -134,22 +134,22 @@ TemplateVM:
 
    This requires specifying the template package name (not the
    TemplateVM's name). A list of new (fixed) template package names is
-   provided below.  For example, to install the whonix-gw-14-TODO
-   template:
+   provided below.  For example, to install the whonix-gw-14
+   template version 4.0.1-201901231238:
 
    $ sudo qubes-dom0-update --enablerepo=qubes-templates-community \
-   qubes-template-whonix-gw-14-TODO
+   qubes-template-whonix-gw-14-4.0.1-201901231238
 
    In accordance with our standard policy, new (fixed) template packages
    will first reside in the testing repositories for approximately two
    weeks before migrating to the stable repositories. In order to
    install a templates package from its testing repository, you must
-   enable that repository. For example, to install the whonix-gw-14-TODO
-   template from its testing repository:
+   enable that repository. For example, to install the whonix-gw-14
+   template version 4.0.1-201901231238 from its testing repository:
 
    $ sudo qubes-dom0-update \
    --enablerepo=qubes-templates-community-testing \
-   qubes-template-whonix-gw-14-TODO
+   qubes-template-whonix-gw-14-4.0.1-201901231238
 
 5. If you temporarily changed all VMs based on the target TemplateVM to
    a different template in step 2, change them back to the fresh
@@ -164,24 +164,24 @@ Old (vulnerable) and new (fixed) Qubes TemplateVM packages are listed
 for each supported Qubes OS version in the tables below:
 
 Qubes 4.0:
-+----------------------------------------------------------------+
-|     Old (Vulnerable)        |          New (Fixed)             |
-| --------------------------- | -------------------------------- |
-| qubes-template-debian-8     | qubes-template-debian-8-TODO     |
-| qubes-template-debian-9     | qubes-template-debian-9-TODO     |
-| qubes-template-whonix-gw-14 | qubes-template-whonix-gw-14-TODO |
-| qubes-template-whonix-ws-14 | qubes-template-whonix-ws-14-TODO |
-+----------------------------------------------------------------+
++------------------------------------------------------------------------------+
+|     Old (Vulnerable)        |                  New (Fixed)                   |
+| --------------------------- | ---------------------------------------------- |
+| qubes-template-debian-8     | qubes-template-debian-8-4.0.1-201901231241     |
+| qubes-template-debian-9     | qubes-template-debian-9-4.0.1-201901230644     |
+| qubes-template-whonix-gw-14 | qubes-template-whonix-gw-14-4.0.1-201901231238 |
+| qubes-template-whonix-ws-14 | qubes-template-whonix-ws-14-4.0.1-201901231238 |
++------------------------------------------------------------------------------+
 
 Qubes 3.2:
-+----------------------------------------------------------------+
-|     Old (Vulnerable)        |          New (Fixed)             |
-| --------------------------- | -------------------------------- |
-| qubes-template-debian-8     | qubes-template-debian-8-TODO     |
-| qubes-template-debian-9     | qubes-template-debian-9-TODO     |
-| qubes-template-whonix-gw-14 | qubes-template-whonix-gw-14-TODO |
-| qubes-template-whonix-ws-14 | qubes-template-whonix-ws-14-TODO |
-+----------------------------------------------------------------+
++--------------------------------------------------------------------------+
+|     Old (Vulnerable)        |                  New (Fixed)               |
+| --------------------------- | ------------------------------------------ |
+| qubes-template-debian-8     | qubes-template-debian-8-4.0.1-201901230645 |
+| qubes-template-debian-9     | qubes-template-debian-9-4.0.1-201901230645 |
+| qubes-template-whonix-gw-14 | not supported                              |
+| qubes-template-whonix-ws-14 | not supported                              |
++--------------------------------------------------------------------------+
 
 
 Alternative patching for non-critical TemplateVMs

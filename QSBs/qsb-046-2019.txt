@@ -1,0 +1,180 @@
+
+
+             ---===[ Qubes Security Bulletin #46 ]===---
+
+                             2019-01-23
+
+                Debian update mechanism vulnerability
+
+Summary
+========
+
+The Debian Security Team has announced a security bug (DSA-4371-1) in
+the HTTP redirects handling when downloading packages, which could lead to
+privilege escalation [1] within a Debian-based VM. This bug does _not_
+allow escape from any VM or enable any attacks on other parts of the
+Qubes system. In particular, this bug does _not_ affect dom0, the Xen
+hypervisor, and non-Debian-based VMs. Nevertheless, we have decided to
+release this bulletin, because if a TemplateVM is affected, then every
+VM based on that template is affected.
+
+Description of the bug
+=======================
+
+As described in [1]:
+
+| Max Justicz discovered a vulnerability in APT, the high level package manager.
+| The code handling HTTP redirects in the HTTP transport method doesn't properly
+| sanitize fields transmitted over the wire. This vulnerability could be used by
+| an attacker located as a man-in-the-middle between APT and a mirror to inject
+| malicous content in the HTTP connection. This content could then be recognized
+| as a valid package by APT and used later for code execution with root
+| privileges on the target machine.
+
+
+Impact
+=======
+
+In theory, this bug allows an attacker to take over any Debian 8 or
+Debian 9 template (which includes Whonix templates [3]) and,
+consequently, any VMs based on those templates. However, for the
+reasons explained above, the configuration used in Qubes OS happens to
+makes this bug hard to exploit. Nevertheless, one should never
+underestimate the creativity of exploit authors, and thus one should
+assume that the bug is exploitable and patch immediately, just to stay
+on the safe side.
+
+Additional discussion
+======================
+
+Normally, we do not release Qubes Security Bulletins (QSBs) to address
+vulnerabilities that only affect VMs internally without affecting
+the rest of the Qubes system, i.e. vulnerabilities that do not
+undermine the Qubes security model.
+
+For example, we do not release QSBs to address bugs in Firefox or
+Linux kernel USB stacks, because Qubes OS has been designed under the
+primary assumption that in a typical desktop OS there will be countless
+such bugs and that humankind will never be able to patch all of them
+promptly (before developers introduce new bugs). This is, in fact, the
+very reason we designed Qubes OS as an implementation of the Security
+by Compartmentalization approach.
+
+The Debian updater bug discussed today is, however, somewhat special.
+While it is indeed a bug that only affects VMs internally, it could
+allow an attacker to compromise TemplateVMs, which are used as a
+basis for creating other VMs, such as AppVMs and ServiceVMs. If a
+TemplateVM is compromised, then all the VMs based on that TemplateVM
+will be compromised. Since AppVMs operate directly on user data, and
+since ServiceVMs can be critical to user privacy (especially in the
+case of Whonix and VPN ProxyVMs), this is a serious matter.
+
+In Qubes OS, we take special precautions to make TemplateVMs difficult
+to compromise. For example, we block all network connections to and
+from templates, with one exception: We allow templates to connect to
+the so-called "Update Proxy" (which runs in the NetVM). This allows
+the TemplateVM to retrieve updates while protecting users from
+accidentally using TemplateVMs to perform risky activities, such as
+browsing the web.
+
+Since the bug under discussion has the potential to subvert this very
+protection mechanism, we've decided to issue this QSB.
+
+We would like to point out, however, that Qubes OS does a good job of
+mitigating this kind of a vulnerability. Instead of having to reinstall
+the whole operating system from scratch, Qubes users may need only to
+reinstall the affected template(s).
+
+If users are concerned that potential attackers may have compromised
+not only the root filesystem of the template, but also attempted to
+infect user files in AppVM filesystems (e.g. ~/.bashrc or a Web browser
+profile directory), Qubes allows for mounting each of the suspected
+AppVM private images into a different, trusted VM, based on a trusted
+template, for "offline" analysis and cleanup, allowing users to
+preserve their data.
+
+Patching
+=========
+
+The specific packages that resolve the problem discussed in this
+bulletin have been released by the Debian Security Team to the
+appropriate repository. See the upstream advisory [1] for more details.
+
+As the bug affects Debian-based templates themselves, just applying
+updates may not be enough, if those VMs are already compromised. Users,
+especially those using Debian-based VMs for sensitive tasks, should
+remove all affected templates and install fresh ones. This also applies
+to any customized Debian-based templates. Users with customized Debian-
+based templates should first note their customizations, remove the
+potentially compromised templates, install fresh templates, clone
+them, and reapply their customizations to the cloned templates.
+
+The procedure for removing affected templates and installing fresh ones
+is documented as the "Manual Reinstallation Method" in the Qubes
+documentation on reinstalling TemplateVMs [2]. (Please note that the
+simplified template reinstallation method described in the
+documentation, which uses `--action=reinstall`, is not sufficient,
+since it will download the old, vulnerable template.)
+
+Fixed APT packages are included in templates listed below:
+
+For Qubes 4.0:
+* qubes-template-debian-8-TODO
+* qubes-template-debian-9-TODO
+* qubes-template-whonix-gw-14-TODO
+* qubes-template-whonix-ws-14-TODO
+
+For Qubes 3.2:
+* qubes-template-debian-9-TODO
+* qubes-template-debian-8-TODO
+
+
+Alternative patching, for non-critical TemplateVMs
+===================================================
+
+Users who do not rely on Debian-based VMs for any critical tasks may
+instead opt just to install fixed APT packages. As the bug is present
+in the update mechanism itself, special care should be taken while
+performing the update, as described in [1]. We include those steps in
+GUI tools used to update, so updating the GUI tools and performing the
+template update with either of them will also apply the fix in a safe
+way.
+
+Packages that include safe update for Debian templates:
+
+Qubes 4.0:
+ - qubes-desktop-linux-manager 4.0.14 (updates widget)
+ - qubes-manager 4.0.27 (Qube Manager)
+
+Qubes 3.2:
+ - qubes-manager 3.2.14 (Qubes VM Manager)
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+After installing those updates, launch update for all the Debian-based
+templates using either of them.
+
+
+Credits
+========
+
+This bug was found by Max Justicz and reported to the Debian Security
+Team.
+
+
+References
+===========
+
+[1] https://www.debian.org/security/2019/dsa-4371
+[2] https://www.qubes-os.org/doc/reinstall-template/#manual-reinstallation-method-r31
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

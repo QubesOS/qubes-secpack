@@ -27,14 +27,14 @@ Description
 
 As described in [1]:
 
-Max Justicz discovered a vulnerability in APT, the high level package
-manager.  The code handling HTTP redirects in the HTTP transport method
-doesn't properly sanitize fields transmitted over the wire. This
-vulnerability could be used by an attacker located as a
-man-in-the-middle between APT and a mirror to inject malicious content
-in the HTTP connection. This content could then be recognized as a valid
-package by APT and used later for code execution with root privileges on
-the target machine.
+| Max Justicz discovered a vulnerability in APT, the high level package
+| manager.  The code handling HTTP redirects in the HTTP transport
+| method doesn't properly sanitize fields transmitted over the wire.
+| This vulnerability could be used by an attacker located as a
+| man-in-the-middle between APT and a mirror to inject malicious content
+| in the HTTP connection. This content could then be recognized as a
+| valid package by APT and used later for code execution with root
+| privileges on the target machine.
 
 
 Impact

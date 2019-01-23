@@ -201,8 +201,10 @@ tools and performing the template update with either of them will also
 apply the fix in a safe way, as long as the TemplateVM is not already
 compromised.
 
-The following packages versions (or higher) will perform APT updates
-safely:
+Important: Listed below are the minimum package versions that will
+perform APT updates safely. However, after installing these packages,
+you must also update all APT-based TemplateVMs normally. Installing the
+packages listed below is not enough.
 
 Qubes 4.0:
  - qubes-desktop-linux-manager 4.0.14 (updates widget)
@@ -219,9 +221,6 @@ the qubes-dom0-update command as follows:
 
   For updates from the security-testing repository:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
-
-After installing these packages, update all APT-based TemplateVMs
-normally.
 
 
 Credits

@@ -156,13 +156,18 @@ TemplateVM:
    --enablerepo=qubes-templates-community-testing \
    qubes-template-whonix-gw-14
 
-5. If you temporarily changed all VMs based on the target TemplateVM to
+5. If you removed the "sys-whonix" and "anon-whonix" VMs in step 2 and
+   wish to re-create them:
+
+   $ sudo qubesctl state.sls qvm.anon-whonix
+
+6. If you temporarily changed all VMs based on the target TemplateVM to
    a different template in step 2, change them back to the fresh
    TemplateVM now. If you instead removed all VMs based on the old
    TemplateVM, you can recreate your desired VMs from the fresh
    TemplateVM now.
 
-6. If you noted any template customizations in step 1, clone the target
+7. If you noted any template customizations in step 1, clone the target
    TemplateVM, then reapply your customizations to the clone.
 
 Old (vulnerable) and new (fixed) Qubes TemplateVM packages are listed

@@ -152,8 +152,7 @@ TemplateVM:
    enable that repository. For example, to install the whonix-gw-14
    template from its testing repository:
 
-   $ sudo qubes-dom0-update \
-   --enablerepo=qubes-templates-community-testing \
+   $ sudo qubes-dom0-update --enablerepo=qubes-templates*testing \
    qubes-template-whonix-gw-14
 
 5. If you removed the "sys-whonix" and "anon-whonix" VMs in step 2 and

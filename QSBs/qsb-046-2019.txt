@@ -7,6 +7,13 @@
                 APT update mechanism vulnerability
 
 
+Changelog
+==========
+
+2019-01-23: Original QSB published
+2019-01-25: Updated patching instructions
+
+
 Summary
 ========
 

@@ -4,112 +4,116 @@
 
                              2019-02-19
 
-               Confusing network isolation settings
+        Insecure default DisposableVM networking configuration
 
 Summary
 ========
 
-In Qubes OS, one use limit network access of a qube by either
-disconnecting it from any netvm completely, or setting firewall rules.
-Malicious qube may try to circumvent those limits by launching
-Disposable qube, which in default configuration would get unrestricted
-network access.
+In Qubes OS, one can attempt to limit the network access of a qube by
+either completely disconnecting it from any NetVM or setting firewall
+rules to disallow access. A malicious qube can circumvent these limits
+by launching a DisposableVM [1], which, in the default configuration,
+would have unrestricted network access.
 
-Additionally, even when given non-default Disposable qube have no
-network access (or limited access), Disposable qubes started from it
-will have full network access (unless explicitly configured
-otherwise).
+Moreover, even when a non-default DisposableVM is configured to have no
+network access (or limited access), other DisposableVMs started from
+_that_ DisposableVM can have full network access (unless explicitly
+configured otherwise).
 
-While limiting network access should not be treated as effective
-leak-prevention mechanism[1], we still consider high probability of
-creating ineffective network isolation settings a problem.
+While limiting network access in this manner should not be considered to
+be an effective leak-prevention mechanism [1], we still consider this
+type of potentially ineffective network isolation to be a problem.
 
 Details
 ========
 
-In Qubes 4.0, Disposable qubes are based on TemplateBased qubes with
-"template_for_dispvm" property set to true (also known as DVM
-templates[3]). All settings of such Disposable qube are copied from the
-DVM template, including "netvm" property and firewall rules. Network
-(or any other) settings of the calling qube are not considered.
-This design is intentional, as it allows much more flexibility over
-previous model. For example one could create different DVM templates
-for different purposes, like opening links, viewing documents,
-printing etc. Each of those DVM templates could have appropriate
-network settings, matching its purpose.
+In Qubes 4.0, each DisposableVM is based on a DVM Template [2] with the
+`template_for_dispvm` property set to true. The DisposableVM inherits
+all of its settings from the DVM Template, including the `netvm`
+property and firewall rules. Neither the network settings nor any other
+settings of the calling qube are considered.  This design is
+intentional, as it allows much more flexibility over the previous model.
+For example, one could create different DVM Templates for different
+purposes, such as opening links (internet access), viewing documents
+(offline), printing (drivers installed), etc. Each DVM Template has
+appropriate network settings for its purpose.
 
-The important part of this design is a "default_dispvm" qube property,
-which holds DVM template which should be used for a new Disposable qubes
-started from that qube. In default configuration Qubes have one
-default DVM template, which have unlimited network access. The default
-DVM template is set with global `default_dispvm` property (accessible
-through "Global settings" or `qubes-prefs` tool). This global property
-serve as default value for `default_dispvm` qube's property.
-Additionally, even if someone create a different DVM template, with
-limited network access, but do not adjust "default_dispvm" value, new
-Disposable qubes based on such DVM template, will use default DVM
-template, instead of that custom one.
+The important part of this design is the `default_dispvm` qube property.
+The value of this property is the DVM Template that will be used when
+starting new DisposableVMs from that qube. In the default configuration,
+Qubes OS has one default DVM Template, which has unrestricted network
+access. The default DVM Template is, by default, the value of the global
+`default_dispvm` property, which is accessible via "Global settings" in
+Qubes Manager or via the `qubes-prefs` tool. This global property serves
+as the default value for the `default_dispvm` property for every qube.
+If the user creates a non-default DVM Template with limited network
+access, the user must also set the `default_dispvm` value (either
+globally or on a per-qube basis) in order for any new DisposableVM to be
+based on this non-default DVM Template.
 
-In Whonix configuration shipped with Qubes, this issue is avoided by
-creating separate DVM template connected to Whonix Gateway
-(`sys-whonix`) and with its own `default_dispvm` property set to
-itself. Then, each Whonix Workstation get `default_dispvm` property
-set to that DVM template automatically.
+In the Whonix configuration shipped with Qubes, this issue is avoided by
+creating a separate DVM Template that uses the Whonix Gateway
+(`sys-whonix`) as its NetVM. The `default_dispvm` property of this DVM
+Template points to itself. This DVM Template is the value of the
+`default_dispvm` property for every Whonix Workstation.
 
-Additionally, this problem is partially mitigated when importing
-backup from Qubes 3.2. For network-disconnected qubes (more
-specifically - those with `dispvm_netvm` property set to none),
-separate DVM template named `disp-no-netvm` is created, without direct
-network access. But this DVM template itself has unchanged
-`default_dispvm` property, so Disposable qubes started from there
-would have full network access.
+This problem is partially mitigated when restoring a backup from Qubes
+3.2. For each qube that has the `dispvm_netvm` property set to "none", a
+separate DVM Template named `disp-no-netvm` is created. This DVM
+Template has no direct network access. However, this DVM Template itself
+has the default value for its own `default_dispvm` property, so
+DisposableVMs started from it or from DisposableVMs based on it would
+have full network access.
 
 Vulnerable systems
 ==================
 
-This issue apply to Qubes 4.0 only. In Qubes 3.2, network settings of
-Disposable qube are inherited from a calling qube settings (more
-specifically - from its `dispvm_netvm` property, which defaults to
-`netvm` property value).
+This issue affects only Qubes 4.0. In Qubes 3.2, the network settings of
+DisposableVM are inherited from the calling qube's settings (more
+specifically, from its `dispvm_netvm` property, which defaults to the
+`netvm` property's value).
 
-Whonix configuration shipped with Qubes 4.0 is not affected by this
-issue. If you have installed Whonix using different than recommended
-method (qubesctl command), you should review its settings.
-Specifically:
- - whonix-ws-14-dvm should have netvm set to sys-whonix
- - whonix-ws-14-dvm should have default_dispvm set to whonix-ws-14-dvm
- - anon-whonix and other Whonix Workstations (if you created them),
-   should have default_dispvm set to whonix-ws-14-dvm
-See Whonix documentation[4] for details.
+The Whonix configuration shipped with Qubes 4.0 is not affected by this
+issue. If you have installed Whonix using a method other than the
+recommended `qubesctl` command [4], you should review the settings of
+your Whonix qubes.  Specifically:
 
-Systems with default DVM template disconnected from the network (by
-settings its `netvm` property to none) are not affected by this issue.
+ - whonix-ws-14-dvm should have `netvm` set to sys-whonix
+ - whonix-ws-14-dvm should have `default_dispvm` set to whonix-ws-14-dvm
+ - anon-whonix and any other Whonix Workstations should have
+   `default_dispvm` set to whonix-ws-14-dvm
+
+See the Whonix documentation [4] for details.
+
+Systems in which the default DVM Template is disconnected from the
+network (by settings its `netvm` property to "none") are not affected by
+this issue.
 
 Resolution
 ==========
 
 To mitigate this problem, we are implementing two changes:
 
-1. Change default value for `default_dispvm` of a Disposable qube to
-   the DVM template on which this very Disposable qube is based. This
-   means Disposable qubes started from another Disposable qubes will
-   use the same DVM template, so the network settings.
-   This change will not affect DVM templates for which user have
-   modified `default_dispvm` property manually.
+1. When a DisposableVM is started, automatically set its
+   `default_dispvm` to the DVM Template on which it is based. This means
+   that, when a DisposableVM is started from another DisposableVM, they
+   will both be based on the same DVM Template. Hence, they will have
+   all the same settings, including the same network settings.  This
+   change will not affect DVM Templates for which user has manually
+   modified the `default_dispvm` property.
 
-2. Add a warning message in Qube settings when netvm is set to a
-   different value than netvm of default DVM template set in
-   advanced tab.
+2. Add a warning message in the Qube Settings GUI when the NetVM of a
+   qube in the "Basic" tab is set to a different value than the NetVM of
+   the default DVM Template set in the "Advanced" tab.
 
-Note the above takes care only about different netvm setting, but not
-about different firewall settings. If you want your Disposable
-qubes having the same firewall settings as the calling qube, you need
-to adjust firewall settings of relevant DVM template yourself.
+Note that these changes concern only NetVM settings, not firewall
+settings. If you want your DisposableVMs to have the same firewall
+settings as the calling qube, you must adjust the firewall settings of
+appropriate DVM Template yourself.
 
-Additionally, in the next Qubes version we will ship two DVM
-templates by default: one with network access and one without. This
-was already discussed in the past in [2].
-
+In the next version of Qubes, we will ship two DVM Templates by default:
+one with network access and one without. This was already previously
+discussed in issue #1121 [5].
 
 Patching
 =========
@@ -134,7 +138,6 @@ These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community.
 
-
 Credits
 ========
 
@@ -143,10 +146,11 @@ The issue was reported by Vít 'v6ak' Šesták.
 References
 ===========
 
-[1] https://www.qubes-os.org/doc/data-leaks/
-[2] https://github.com/QubesOS/qubes-issues/issues/1121
+[1] https://www.qubes-os.org/doc/disposablevm/
+[2] https://www.qubes-os.org/doc/data-leaks/
 [3] https://www.qubes-os.org/doc/glossary/#dvm-template
 [4] https://www.whonix.org/wiki/Qubes/Install
+[5] https://github.com/QubesOS/qubes-issues/issues/1121
 
 --
 The Qubes Security Team

@@ -10,10 +10,10 @@ Summary
 ========
 
 In Qubes OS, one can attempt to limit the network access of a qube by
-either completely disconnecting it from any NetVM or setting firewall
-rules to disallow access. A malicious qube can circumvent these limits
-by launching a DisposableVM [1], which, in the default configuration,
-would have unrestricted network access.
+either completely disconnecting it from any NetVM or by setting its
+firewall rules to disallow access. A malicious qube can circumvent these
+limits by launching a DisposableVM [1], which, in the default
+configuration, would have unrestricted network access.
 
 Moreover, even when a non-default DisposableVM is configured to have no
 network access (or limited access), other DisposableVMs started from
@@ -28,33 +28,33 @@ Details
 ========
 
 In Qubes 4.0, each DisposableVM is based on a DVM Template [2] with the
-`template_for_dispvm` property set to true. The DisposableVM inherits
+`template_for_dispvm` property set to "True". The DisposableVM inherits
 all of its settings from the DVM Template, including the `netvm`
 property and firewall rules. Neither the network settings nor any other
-settings of the calling qube are considered.  This design is
-intentional, as it allows much more flexibility over the previous model.
-For example, one could create different DVM Templates for different
-purposes, such as opening links (internet access), viewing documents
-(offline), printing (drivers installed), etc. Each DVM Template has
-appropriate network settings for its purpose.
+settings of the calling qube are considered. This design is intentional,
+as it allows much more flexibility over the previous model. For example,
+one could create different DVM Templates for different purposes, such as
+opening links (internet access), viewing documents (offline), printing
+(drivers installed), etc. Each DVM Template has appropriate network
+settings for its purpose.
 
 The important part of this design is the `default_dispvm` qube property.
 The value of this property is the DVM Template that will be used when
 starting new DisposableVMs from that qube. In the default configuration,
 Qubes OS has one default DVM Template, which has unrestricted network
-access. The default DVM Template is, by default, the value of the global
+access. The default DVM Template is the default value of the global
 `default_dispvm` property, which is accessible via "Global settings" in
-Qubes Manager or via the `qubes-prefs` tool. This global property serves
-as the default value for the `default_dispvm` property for every qube.
-If the user creates a non-default DVM Template with limited network
-access, the user must also set the `default_dispvm` value (either
-globally or on a per-qube basis) in order for any new DisposableVM to be
-based on this non-default DVM Template.
+the Qube Manager or via the `qubes-prefs` tool. This global property
+serves as the default value for the `default_dispvm` property for every
+qube. If the user creates a non-default DVM Template with limited
+network access, the user must also set the `default_dispvm` value
+(either globally or on a per-qube basis) in order for any new
+DisposableVM to be based on this non-default DVM Template.
 
 In the Whonix configuration shipped with Qubes, this issue is avoided by
 creating a separate DVM Template that uses the Whonix Gateway
 (`sys-whonix`) as its NetVM. The `default_dispvm` property of this DVM
-Template points to itself. This DVM Template is the value of the
+Template is set to itself. This DVM Template is the value of the
 `default_dispvm` property for every Whonix Workstation.
 
 This problem is partially mitigated when restoring a backup from Qubes
@@ -76,7 +76,7 @@ specifically, from its `dispvm_netvm` property, which defaults to the
 The Whonix configuration shipped with Qubes 4.0 is not affected by this
 issue. If you have installed Whonix using a method other than the
 recommended `qubesctl` command [4], you should review the settings of
-your Whonix qubes.  Specifically:
+your Whonix qubes. Specifically:
 
  - whonix-ws-14-dvm should have `netvm` set to sys-whonix
  - whonix-ws-14-dvm should have `default_dispvm` set to whonix-ws-14-dvm
@@ -98,7 +98,7 @@ To mitigate this problem, we are implementing two changes:
    `default_dispvm` to the DVM Template on which it is based. This means
    that, when a DisposableVM is started from another DisposableVM, they
    will both be based on the same DVM Template. Hence, they will have
-   all the same settings, including the same network settings.  This
+   all the same settings, including the same network settings. This
    change will not affect DVM Templates for which user has manually
    modified the `default_dispvm` property.
 

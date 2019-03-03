@@ -1,0 +1,162 @@
+
+
+             ---===[ Qubes Security Bulletin #48 ]===---
+
+                             2019-03-05
+
+                   Multiple Xen vulnerabilities
+
+Summary
+========
+
+On 2019-03-05, the Xen Security Team published multiple Xen Security
+Advisories (XSAs):
+
+XSA-285 [1] "race with pass-through device hotplug":
+| When adding a passed-through PCI device to a domain after it was already
+| started, IOMMU page tables may need constructing on the fly.  For PV
+| guests the decision whether a page ought to have a mapping is based on
+| whether the page is writable, to prevent IOMMU access to things like
+| page tables.  Writablility of a page may, however, change at any time.
+| Failure of the relevant code to respect this possible race may lead
+| to IOMMU mappings of, in particular, page tables, allowing the guest
+| to alter such page tables without Xen auditing the changes.
+| 
+| Malicious PV guests can escalate their privilege to that of the
+| hypervisor.
+
+XSA-287 [2] "x86: steal_page violates page_struct access discipline":
+| Xen's reference counting rules were designed to allow pages to change
+| owner and state without requiring a global lock.  Each page has a page
+| structure, and a very specific set of access disciplines must be
+| observed to ensure that pages are freed properly, and that no writable
+| mappings exist for PV pagetable pages.
+| 
+| Unfortunately, when the XENMEM_exchange hypercall was introduced,
+| these access disciplines were violated, opening up several potential
+| race conditions.
+| 
+| A single PV guest can leak arbitrary amounts of memory, leading to a
+| denial of service.
+| 
+| A cooperating pair of PV and HVM/PVH guests can get a writable
+| pagetable entry, leading to information disclosure or privilege
+| escalation.
+| 
+| Privilege escalation attacks using only a single PV guest or a pair of
+| PV guests have not been ruled out.
+| 
+| Note that both of these attacks require very precise timing, which may
+| be difficult to exploit in practice.
+
+XSA-288 [3] "x86: Inconsistent PV IOMMU discipline":
+| In order for a PV domain to set up DMA from a passed-through device to
+| one of its pages, the page must be mapped in the IOMMU.  On the other
+| hand, before a PV page may be used as a "special" page type (such as a
+| pagetable or descriptor table), it _must not_ be writable in the IOMMU
+| (otherwise a malicious guest could DMA arbitrary page tables into the
+| memory, bypassing Xen's safety checks); and Xen's current rule is to
+| have such pages not in the IOMMU at all.
+| 
+| Until now, in order to accomplish this, the code has borrowed HVM
+| domain's "physmap" concept: When a page is assigned to a guest,
+| guess_physmap_add_entry() is called, which for PV guests, will create
+| a writable IOMMU mapping; and when a page is removed,
+| guest_physmap_remove_entry() is called, which will remove the mapping.
+| 
+| Additionally, when a page gains the PGT_writable page type, the page
+| will be added into the IOMMU; and when the page changes away from a
+| PGT_writable type, the page will be removed from the IOMMU.
+| 
+| Unfortunately, borrowing the "physmap" concept from HVM domains is
+| problematic.  HVM domains have a lock on their p2m tables, ensuring
+| synchronization between modifications to the p2m; and all hypercall
+| parameters must first be translated through the p2m before being used.
+| Trying to mix this locked-and-gated approach with PV's lock-free
+| approach leads to several races and inconsistencies.
+| 
+| An untrusted PV domain with access to a physical device can DMA into
+| its own pagetables, leading to privilege escalation.
+
+XSA-292 [4] "x86: insufficient TLB flushing when using PCID"
+| Use of Process Context Identifiers (PCID) was introduced into Xen in
+| order to improve performance after XSA-254 (and in particular its
+| Meltdown sub-issue).  This enablement implied changes to the TLB
+| flushing logic.  The particular case of context switch to a vCPU of a
+| PCID-enabled guest left open a time window between the full TLB flush,
+| and the actual address space switch, during which additional TLB
+| entries (from the address space about to be switched away from) can be
+| accumulated, which will not subsequently be purged.
+| 
+| Malicious PV guests may be able to cause a host crash (Denial of
+| Service) or to gain access to data pertaining to other guests.
+| Privilege escalation opportunities cannot be ruled out.
+| 
+| Additionally, vulnerable configurations are likely to be unstable even
+| in the absence of an attack.
+
+
+Impact on Qubes OS
+===================
+
+XSA-285 and XSA-288 does not affect Qubes OS 4.0 in default
+configuration, because require PV domain with a PCI device.
+Additionally to take advantage of XSA-285, user would need to assign
+PCI device to a PV domanin while it is running. Such operation is
+disabled in GUI tools and discouraged in documentation[5].
+
+XSA-287 and XSA-292 affects only PV domains, which in default Qubes OS
+4.0 configuration are used only for stubdomains. This means an
+attacker would need first to compromise a stubdomain to attack Xen
+using those vulnerabilities.
+Nevertheless, it is possible to create other PV domains in Qubes OS
+4.0, so we do treat those advisories as affecting Qubes OS 4.0 too.
+
+All 4 announced XSAs affect Qubes OS 3.2.
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes OS 4.0:
+  - Xen packages version 4.8.5-3
+
+  For Qubes OS 3.2:
+  - Xen packages version 4.6.6-46
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-285.html
+[2] https://xenbits.xen.org/xsa/advisory-287.html
+[3] https://xenbits.xen.org/xsa/advisory-288.html
+[4] https://xenbits.xen.org/xsa/advisory-292.html
+[5] https://www.qubes-os.org/doc/assigning-devices/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

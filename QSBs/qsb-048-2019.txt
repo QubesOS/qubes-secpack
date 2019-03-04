@@ -4,23 +4,24 @@
 
                              2019-03-05
 
-                   Multiple Xen vulnerabilities
+                     Multiple Xen vulnerabilities
 
 Summary
 ========
 
-On 2019-03-05, the Xen Security Team published multiple Xen Security
-Advisories (XSAs):
+On 2019-03-05, the Xen Security Team published the following Xen
+Security Advisories (XSAs):
 
 XSA-285 [1] "race with pass-through device hotplug":
-| When adding a passed-through PCI device to a domain after it was already
-| started, IOMMU page tables may need constructing on the fly.  For PV
-| guests the decision whether a page ought to have a mapping is based on
-| whether the page is writable, to prevent IOMMU access to things like
-| page tables.  Writablility of a page may, however, change at any time.
-| Failure of the relevant code to respect this possible race may lead
-| to IOMMU mappings of, in particular, page tables, allowing the guest
-| to alter such page tables without Xen auditing the changes.
+| When adding a passed-through PCI device to a domain after it was
+| already started, IOMMU page tables may need constructing on the fly.
+| For PV guests the decision whether a page ought to have a mapping is
+| based on whether the page is writable, to prevent IOMMU access to
+| things like page tables.  Writablility of a page may, however, change
+| at any time. Failure of the relevant code to respect this possible
+| race may lead to IOMMU mappings of, in particular, page tables,
+| allowing the guest to alter such page tables without Xen auditing the
+| changes.
 | 
 | Malicious PV guests can escalate their privilege to that of the
 | hypervisor.
@@ -99,20 +100,21 @@ XSA-292 [4] "x86: insufficient TLB flushing when using PCID"
 Impact on Qubes OS
 ===================
 
-XSA-285 and XSA-288 does not affect Qubes OS 4.0 in default
-configuration, because require PV domain with a PCI device.
-Additionally to take advantage of XSA-285, user would need to assign
-PCI device to a PV domanin while it is running. Such operation is
-disabled in GUI tools and discouraged in documentation[5].
+XSA-285 and XSA-288 do not affect Qubes OS 4.0 in its default
+configuration, since they require a PV domain with a PCI device.
+Moreover, in order to take advantage of XSA-285, the user would have to
+assign a PCI device to a PV domain while it was running. Such an
+operation is disabled in the Qubes GUI tools and discouraged in the
+Qubes documentation. [5]
 
-XSA-287 and XSA-292 affects only PV domains, which in default Qubes OS
-4.0 configuration are used only for stubdomains. This means an
-attacker would need first to compromise a stubdomain to attack Xen
-using those vulnerabilities.
-Nevertheless, it is possible to create other PV domains in Qubes OS
-4.0, so we do treat those advisories as affecting Qubes OS 4.0 too.
+XSA-287 and XSA-292 affect only PV domains, which are used only for
+stubdomains in the default Qubes OS 4.0 configuration. This means that
+an attacker would first have to compromise a stubdomain in order to
+attack Xen by exploiting these vulnerabilities. Nevertheless, since it
+is possible to manually create PV domains in Qubes OS 4.0, we consider
+XSA-287 and XSA-292 to affect Qubes OS 4.0.
 
-All 4 announced XSAs affect Qubes OS 3.2.
+All four of these XSAs affect Qubes OS 3.2.
 
 Patching
 =========
@@ -146,7 +148,7 @@ Xen binaries.
 Credits
 ========
 
-See the original Xen Security Advisory.
+See the original Xen Security Advisories.
 
 References
 ===========

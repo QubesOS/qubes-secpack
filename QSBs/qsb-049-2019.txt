@@ -12,8 +12,7 @@ Summary
 
 On 2018-05-14, the Xen Security Team published Xen Security Advisory
 297 (CVE-2018-12126, CVE-2018-12127, CVE-2018-12130, CVE-2019-11091 /
-XSA-297) [1] with the following
-description:
+XSA-297) [1] with the following description:
 
 | Microarchitectural Data Sampling refers to a group of speculative
 | sidechannels vulnerabilities.  They consist of:
@@ -25,14 +24,15 @@ description:
 | 
 | These issues pertain to the Load Ports, Store Buffers and Fill Buffers
 | in the pipeline.  The Load Ports are used to service all memory reads.
-| The Store Buffers service all in-flight speculative writes (including IO
-| Port writes), while the Fill Buffers service all memory writes which are
-| post-retirement, and no longer speculative.
+| The Store Buffers service all in-flight speculative writes (including
+| IO Port writes), while the Fill Buffers service all memory writes
+| which are post-retirement, and no longer speculative.
 | 
-| Under certain circumstances, a later load which takes a fault or assist
-| (an internal condition to processor e.g. setting a pagetable Access or
-| Dirty bit) may be forwarded stale data from these buffers during
-| speculative execution, which may then be leaked via a sidechannel.
+| Under certain circumstances, a later load which takes a fault or
+| assist (an internal condition to processor e.g. setting a pagetable
+| Access or Dirty bit) may be forwarded stale data from these buffers
+| during speculative execution, which may then be leaked via a
+| sidechannel.
 | 
 | MDSUM (Uncacheable Memory) is a special case of the other three.
 | Previously, the use of uncacheable memory was believed to be safe
@@ -41,9 +41,8 @@ description:
 | For more details, see:
 |   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00233.html
 | 
-| 
-| An attacker, which could include a malicious untrusted user process on a
-| trusted guest, or an untrusted guest, can sample the content of
+| An attacker, which could include a malicious untrusted user process on
+| a trusted guest, or an untrusted guest, can sample the content of
 | recently-used memory operands and IO Port writes.
 | 
 | This can include data from:
@@ -53,11 +52,11 @@ description:
 |  * A higher privilege context (kernel, hypervisor, SMM) which
 |    interrupted the attacker's execution.
 | 
-| Vulnerable data is that on the same physical core as the attacker.  This
-| includes, when hyper-threading is enabled, adjacent threads.
+| Vulnerable data is that on the same physical core as the attacker.
+| This includes, when hyper-threading is enabled, adjacent threads.
 | 
-| An attacker cannot use this vulnerability to target specific data.  An
-| attack would likely require sampling over a period of time and the
+| An attacker cannot use this vulnerability to target specific data.
+| An attack would likely require sampling over a period of time and the
 | application of statistical methods to reconstruct interesting data.
 
 This is yet another CPU hardware bug related to speculative execution.
@@ -69,8 +68,8 @@ Patching
 
 The Xen Project has provided patches that mitigate this issue. A CPU
 microcode update is required to take advantage of them. Note that
-microcode update may not be available for older CPUs - see Intel
-advisory for details.
+microcode updates may not be available for older CPUs. (See the Intel
+advisory linked above for details.)
 
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:

@@ -1,0 +1,114 @@
+
+
+             ---===[ Qubes Security Bulletin #49 ]===---
+
+                             2019-05-15
+
+
+    Microarchitectural Data Sampling speculative side channel (XSA-297)
+
+Summary
+========
+
+On 2018-05-14, the Xen Security Team published Xen Security Advisory
+297 (CVE-2018-12126, CVE-2018-12127, CVE-2018-12130, CVE-2019-11091 /
+XSA-297) [1] with the following
+description:
+
+| Microarchitectural Data Sampling refers to a group of speculative
+| sidechannels vulnerabilities.  They consist of:
+| 
+|  * CVE-2018-12126 - MSBDS - Microarchitectural Store Buffer Data Sampling
+|  * CVE-2018-12127 - MLPDS - Microarchitectural Load Port Data Sampling
+|  * CVE-2018-12130 - MFBDS - Microarchitectural Fill Buffer Data Sampling
+|  * CVE-2019-11091 - MDSUM - Microarchitectural Data Sampling Uncacheable Memory
+| 
+| These issues pertain to the Load Ports, Store Buffers and Fill Buffers
+| in the pipeline.  The Load Ports are used to service all memory reads.
+| The Store Buffers service all in-flight speculative writes (including IO
+| Port writes), while the Fill Buffers service all memory writes which are
+| post-retirement, and no longer speculative.
+| 
+| Under certain circumstances, a later load which takes a fault or assist
+| (an internal condition to processor e.g. setting a pagetable Access or
+| Dirty bit) may be forwarded stale data from these buffers during
+| speculative execution, which may then be leaked via a sidechannel.
+| 
+| MDSUM (Uncacheable Memory) is a special case of the other three.
+| Previously, the use of uncacheable memory was believed to be safe
+| against speculative sidechannels.
+| 
+| For more details, see:
+|   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00233.html
+| 
+| 
+| An attacker, which could include a malicious untrusted user process on a
+| trusted guest, or an untrusted guest, can sample the content of
+| recently-used memory operands and IO Port writes.
+| 
+| This can include data from:
+| 
+|  * A previously executing context (process, or guest, or
+|    hypervisor/toolstack) at the same privilege level.
+|  * A higher privilege context (kernel, hypervisor, SMM) which
+|    interrupted the attacker's execution.
+| 
+| Vulnerable data is that on the same physical core as the attacker.  This
+| includes, when hyper-threading is enabled, adjacent threads.
+| 
+| An attacker cannot use this vulnerability to target specific data.  An
+| attack would likely require sampling over a period of time and the
+| application of statistical methods to reconstruct interesting data.
+
+This is yet another CPU hardware bug related to speculative execution.
+
+Only Intel processors are affected.
+
+Patching
+=========
+
+The Xen Project has provided patches that mitigate this issue. A CPU
+microcode update is required to take advantage of them. Note that
+microcode update may not be available for older CPUs - see Intel
+advisory for details.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-6
+  - microcode_ctl 2.1-28.qubes1
+  - kernel-qubes-vm package, version 4.19.43-1 (optional)
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-297.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

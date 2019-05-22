@@ -10,7 +10,7 @@
 Summary
 ========
 
-On 2018-05-14, the Xen Security Team published Xen Security Advisory
+On 2019-05-14, the Xen Security Team published Xen Security Advisory
 297 (CVE-2018-12126, CVE-2018-12127, CVE-2018-12130, CVE-2019-11091 /
 XSA-297) [1] with the following description:
 

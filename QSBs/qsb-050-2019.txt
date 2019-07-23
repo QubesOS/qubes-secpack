@@ -1,0 +1,68 @@
+
+
+             ---===[ Qubes Security Bulletin #50 ]===---
+
+                             2019-07-24
+
+
+      Reinstalling a TemplateVM does not reset the private volume
+
+Description
+===========
+
+In Qubes OS, we have the ability to reinstall a TemplateVM by running
+`qubes-dom0-update --action=reinstall qubes-template-...` in dom0. [1]
+This is supposed to reset the corresponding TemplateVM to the state of
+the published package, i.e., no local changes should remain.
+
+One uncommon reason to perform such a reinstallation is that you suspect
+that a TemplateVM may be compromised. In such cases, it is very
+important that no local changes persist in order to ensure that the
+TemplateVM is no longer compromised.
+
+Due to a regression in R4.0 [2], however, reinstalling a TemplateVM
+using qubes-dom0-update does not completely reset all local changes to
+that TemplateVM. Although the tool itself and our documentation claim
+that the private volume of the TemplateVM is reset during
+reinstallation, the private volume does not actually get reset. This can
+allow a TemplateVM to remain compromised across a reinstallation of that
+TemplateVM using qubes-dom0-update.
+
+Note: Since Marek is traveling, his signature of this QSB and fixed
+packages will be published next week.
+
+Workaround
+==========
+
+Until we have published fixed packages we recommend that you avoid the
+qubes-dom0-update method to reinstall a TemplateVM. Instead, we
+recommend to manual remove the template and the install is again. See
+here for a detailed documentation of this method:
+
+https://www.qubes-os.org/doc/reinstall-template/#manual-method
+
+(Note that we have updated this page with a warning against the
+automatic method.)
+
+
+Patching
+=========
+
+We will update this QSB when fixed packages are available (expected next
+week).
+
+Credits
+========
+
+Thank you to Andrey <hexagonrecursion@gmail.com> for discovering and
+reporting this issue.
+
+References
+===========
+
+[1] https://www.qubes-os.org/doc/reinstall-template/
+[2] https://github.com/QubesOS/qubes-core-admin-linux/commit/552fd062ea2bb6c2d05faa1e64e172503cacbdbf#diff-6b87ee5cdb9e63b703415a14e5a505cdL192
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

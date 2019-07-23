@@ -36,14 +36,13 @@ Workaround
 
 Until we have published fixed packages we recommend that you avoid the
 qubes-dom0-update method to reinstall a TemplateVM. Instead, we
-recommend to manual remove the template and the install is again. See
+recommend to manual remove the template and then install it again. See
 here for a detailed documentation of this method:
 
 https://www.qubes-os.org/doc/reinstall-template/#manual-method
 
 (Note that we have updated this page with a warning against the
 automatic method.)
-
 
 Patching
 =========

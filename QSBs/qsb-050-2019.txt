@@ -24,20 +24,17 @@ Due to a regression in R4.0 [2], however, reinstalling a TemplateVM
 using qubes-dom0-update does not completely reset all local changes to
 that TemplateVM. Although the tool itself and our documentation claim
 that the private volume of the TemplateVM is reset during
-reinstallation, the private volume does not actually get reset. This can
-allow a TemplateVM to remain compromised across a reinstallation of that
-TemplateVM using qubes-dom0-update.
-
-Note: Since Marek is traveling, his signature of this QSB and fixed
-packages will be published next week.
+reinstallation, the private volume does not actually get reset. This
+could allow a TemplateVM to remain compromised across a reinstallation
+of that TemplateVM using qubes-dom0-update.
 
 Workaround
 ==========
 
-Until we have published fixed packages we recommend that you avoid the
-qubes-dom0-update method to reinstall a TemplateVM. Instead, we
-recommend to manual remove the template and then install it again. See
-here for a detailed documentation of this method:
+Fixed packages are forthcoming. In the meantime, we recommend avoiding
+the qubes-dom0-update method of reinstalling a TemplateVM. Instead, we
+recommend manually removing the TemplateVM, then installing it again.
+Detailed instructions for this manual method are documented here:
 
 https://www.qubes-os.org/doc/reinstall-template/#manual-method
 
@@ -47,8 +44,9 @@ automatic method.)
 Patching
 =========
 
-We will update this QSB when fixed packages are available (expected next
-week).
+We expect to have fixed packages available next week. In the meantime,
+please follow the workaround described in the previous section. We will
+update this QSB when fixed packages are available.
 
 Credits
 ========

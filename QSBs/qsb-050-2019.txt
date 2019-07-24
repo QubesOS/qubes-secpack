@@ -51,8 +51,8 @@ update this QSB when fixed packages are available.
 Credits
 ========
 
-Thank you to Andrey <hexagonrecursion@gmail.com> for discovering and
-reporting this issue.
+Thank you to Andrey Bienkowski <hexagonrecursion@gmail.com> for
+discovering and reporting this issue.
 
 References
 ===========

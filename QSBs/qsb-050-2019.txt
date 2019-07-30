@@ -7,6 +7,12 @@
 
       Reinstalling a TemplateVM does not reset the private volume
 
+History
+========
+
+July 30: List of fixed packages
+July 24: Original public release
+
 Description
 ===========
 
@@ -28,25 +34,31 @@ reinstallation, the private volume does not actually get reset. This
 could allow a TemplateVM to remain compromised across a reinstallation
 of that TemplateVM using qubes-dom0-update.
 
-Workaround
-==========
-
-Fixed packages are forthcoming. In the meantime, we recommend avoiding
-the qubes-dom0-update method of reinstalling a TemplateVM. Instead, we
-recommend manually removing the TemplateVM, then installing it again.
-Detailed instructions for this manual method are documented here:
-
-https://www.qubes-os.org/doc/reinstall-template/#manual-method
-
-(Note that we have updated this page with a warning against the
-automatic method.)
-
 Patching
 =========
 
 We expect to have fixed packages available next week. In the meantime,
 please follow the workaround described in the previous section. We will
 update this QSB when fixed packages are available.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - qubes-core-admin-client, python3-qubesadmin version 4.0.26
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
 
 Credits
 ========

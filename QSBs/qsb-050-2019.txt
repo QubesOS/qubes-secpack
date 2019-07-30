@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #50 ]===---
 
-                             2019-07-24
+                             2019-07-30
 
 
       Reinstalling a TemplateVM does not reset the private volume
@@ -10,11 +10,11 @@
 History
 ========
 
-July 30: List of fixed packages
-July 24: Original public release
+2019-07-30: Added list of fixed packages and patching instructions
+2019-07-24: Initial version
 
 Description
-===========
+============
 
 In Qubes OS, we have the ability to reinstall a TemplateVM by running
 `qubes-dom0-update --action=reinstall qubes-template-...` in dom0. [1]
@@ -59,6 +59,19 @@ the qubes-dom0-update command as follows:
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community.
+
+Workaround
+===========
+
+Independently of patching (see above), the following workaround is
+available:
+
+Rather than using the qubes-dom0-update method of reinstalling a
+TemplateVM, you can instead manually remove the TemplateVM, then install
+it again. Detailed instructions for this manual method are documented
+here:
+
+https://www.qubes-os.org/doc/reinstall-template/#manual-method
 
 Credits
 ========

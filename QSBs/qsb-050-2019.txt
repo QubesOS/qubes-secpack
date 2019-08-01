@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #50 ]===---
 
-                             2019-07-30
+                             2019-08-01
 
 
       Reinstalling a TemplateVM does not reset the private volume
@@ -10,7 +10,7 @@
 History
 ========
 
-2019-07-30: Added list of fixed packages and patching instructions
+2019-08-01: Added list of fixed packages and patching instructions
 2019-07-24: Initial version
 
 Description

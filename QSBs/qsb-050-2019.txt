@@ -37,10 +37,6 @@ of that TemplateVM using qubes-dom0-update.
 Patching
 =========
 
-We expect to have fixed packages available next week. In the meantime,
-please follow the workaround described in the previous section. We will
-update this QSB when fixed packages are available.
-
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 

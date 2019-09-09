@@ -4,68 +4,97 @@
 
                              2019-09-10
 
+    Insufficient validation of backup compression filter on restore
 
-        Missing validation of backup-restore compression filter
 
 Summary
 =======
 
-The Qubes backup format has a provision for allowing user-selected
-compression algorithms. Unfortunately, the choice of compression filter
-in a given backup is not sufficiently validated on restore, and
-processing of a maliciously crafted backup can lead to arbitrary
-command execution in Dom0.
+The Qubes backup format has an option for user-selected compression
+filters. While Qubes backups are authenticated and encrypted, the choice
+of compression filter in a given backup is not further validated on
+restore. Under specific conditions, an attacker capable of circumventing
+backup authentication could exploit the lack of compression filter
+validation in order to execute arbitrary commands when a backup is
+restored.
 
-This is a logic error which is possible to reliably exploit without
-arising user suspicion. If you have ever restored a backup from
-untrusted storage without a very strong backup passphrase, it would
-be prudent to consider your machine fully compromised. If you trust
-that your backup passphrases are very secure, you are probably fine.
+Impact
+======
 
-You do not need to have actually extracted any VMs from a malicious
-backup to be compromised - even simply using the standard Qubes tools
-to verify a backup's integrity is enough to compromise your system.
+In Qubes OS, backups are encrypted and authenticated using a passphrase.
+You must enter your backup passphrase when attempting to restore a
+backup. If your passphrase successfully authenticates the backup, it
+will be decrypted and restored. Otherwise, the operation will be aborted
+before the contents of the backup are processed.
+
+In order to exploit this vulnerability, an attacker would have to create
+a malicious backup that would successfully pass authentication and
+induce you to restore it. In practice, this means that the attacker
+would effectively have to (1) learn your backup passphrase and (2)
+replace one of your backups with a malicious version. If the attacker is
+unable to achieve either condition (or an equivalent), the vulnerability
+cannot be exploited.
+
+Therefore, if you have only restored backups protected by strong, secret
+passphrases, then you are not affected. Likewise, if you have only
+restored backups from trusted, secure locations, then you are not
+affected. However, if you have ever restored a backup with a weak or
+non-secret passphrase that was also stored in an untrusted location,
+then your system may be compromised. This bug can be exploited reliably
+and silently only when both conditions are met.
+
+(Note: In this context, "restoring" a backup also includes use of the
+Qubes "verify backup" functionality, since verification works by
+simulating the restore process.)
 
 Details
 =======
 
 The ability to use a user-specified "compression filter" (in practice:
-argument to `tar -I`/`tar --use-compress-program`) was introduced in
-[7]. Alternate compression programs are specified by the user via
-`qvm-backup --compress-filter [...]`, and are stored in the backup
-metadata. Originally they were stored in the `compressed` header field,
-and later stored in the `compression-filter` field. There appears to
-never have been any validation of the contents of this field on restore
-other than whether the whole backup is properly authenticated.
+an argument to `tar -I`/`tar --use-compress-program`) was introduced in
+Qubes Backup Format Version 3. [1] Alternate compression programs are
+specified by the user via `qvm-backup --compress-filter [...]` and are
+stored in the backup metadata. Originally, they were stored in the
+`compressed` header field, then later in the `compression-filter` field.
+The whole backup, including its metadata, is authenticated via an HMAC
+with the backup passphrase. There is no further validation of the
+contents of the specific `compressed` or `compression-filter` field.
 
-Since the backup metadata is authenticated via an HMAC with the backup
-passphrase, an attacker must be able to crack the backup passphrase in
-order to subvert a users existing backup.
+In order to exploit this vulnerability, an attacker would have to create
+or modify a backup for the user to restore. In order for the HMAC
+authentication to succeed, the attacker would have to know the
+passphrase that the user will enter when attempting to restore, e.g., by
+cracking the user's passphrase or somehow inducing the user to enter a
+passphrase provided by the attacker. Furthermore, the attacker would
+have to induce the user to select the attacker's malicious backup for a
+restore operation, e.g., by replacing one of the user's genuine backups
+with a malicious version (which would require that the attacker have
+write access to the user's backup storage location) or somehow
+convincing the user to restore a backup provided by the attacker.
 
 The internal structure of backups is one outer uncompressed
-multi-session-concatinated (via `tar -A`) tar archive. The first
-session contains an uncompressed and unauthenticated `backup-header`.
-This untrusted backup-header file is initially only inspected to
-determine the backup archive format to determine how to proceed with
-further extraction. The following tar sessions contain a
-`backup-header.hmac` file used to authenticate the backup header before
-deeper inspection, and other files (qubes.xml, vmXX/{private,etc.}.img)
-which are each wrapped in their own tar archives and then wrapped in
-their own encryption/authentication.
+multi-session-concatinated (via `tar -A`) tar archive. The first session
+contains an uncompressed and unauthenticated `backup-header`. This
+untrusted backup header file is initially only inspected to determine
+the backup archive format to determine how to proceed with further
+extraction. The following tar sessions contain a `backup-header.hmac`
+file used to authenticate the backup header before deeper inspection,
+and other files (qubes.xml, vmXX/{private,etc.}.img) which are each
+wrapped in their own tar archives and then wrapped in their own
+encryption and authentication.
 
-Unfortunately, because qubes.xml is itself contained in an inner
-potentially-compressed tar archive, this means the (potentially
-malicious) decompression filter is still invoked even when the
-`--verify-only` flag is passed to `qvm-backup-restore`, or equivelantly
-when the "Verify backup integrity, do not restore the data" box is
-checked in the Qubes backup restore GUI.
+Since qubes.xml is itself contained in an inner potentially-compressed
+tar archive, the decompression filter is also used when verifying a
+backup, i.e., when the `--verify-only` flag is passed to
+`qvm-backup-restore` or when the "Verify backup integrity, do not
+restore the data" option is selected in the "Restore qubes" GUI tool.
 
 Patching
 ========
 
-NOTE: patching is not sufficient to recover from a compromised state.
-If you suspect you may have restored a malicious backup, see the
-following section for details and recommendations.
+Note: Patching is not sufficient to recover from a compromised state. If
+you suspect you may have restored a malicious backup, see the next
+section for details and recommendations.
 
 The specific package that resolves the problems discussed in this
 bulletin are as follows:
@@ -86,99 +115,89 @@ These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community.
 
-Recovery
-========
-
-In Qubes OS R3.2, we introduced the concept of "paranoid" backup restore
-mode [1]. Unfortunately, this mode was only implemented in R3.2 and not
-carried over to R4.x. The idea was that with a combination of changes
-that were already being made for Qubes R4, the entire recovery process
-would already be able to be done outside Dom0 in a depriveleged way via
-the Qubes Admin/mgmt API [2]. However, this idea never fully manifested
-in a usable way (until now - as part of addressing this advisory).
+Securely Restoring from Backups
+===============================
 
 The safest way to restore from a backup is to do the actual backup
-processing outside Dom0. In practice, this means:
-1. Installing the `qubes-core-admin-client` package in a VM
-2. Authorizing the appropriate qrexec policies there:
+processing outside dom0.
+
+1. Install the `qubes-core-admin-client` package in a domU.
+
+2. Authorize the appropriate qrexec policies in the domU:
+
    - admin.vm.Create.AppVM
    - admin.vm.Create.TemplateVM
    - admin.vm.Create.StandaloneVM
    - include/admin-local-rwx
    - include/admin-global-ro
-3. Use `qvm-backup-restore` in the VM.
 
-The above procedure will be automated with an `qvm-backup-restore
---paranoid-mode` option, implemented in a subsequent update.
+3. Use `qvm-backup-restore` in the domU.
 
-See the original article[1] for details how to use this mode to
-recover the system.
+In a subsequent update, the above procedure will be automated with a new
+`qvm-backup-restore --paranoid-mode` option. See "Compromise recovery in
+Qubes OS" for details about how to use this mode. [2]
 
-Workaround / Indicator of Compromise
-====================================
+Indicators of Compromise
+========================
 
-This does not solve the actual issue, and will not recover a compromised
-machine, however, it is possible to manually inspect the headers of a
-backup to observe whether the particular issue of this advisory has been
-triggered.
+It is possible to manually inspect the header of a backup to observe
+whether the vulnerability has been exploited. To do so, inspect the
+backup as follows:
 
-To do so, inspect the backup as follows:
-
-1. Verify the backup header integrity according to the "emergency
-   backup restore without Qubes" instructions for your backup. These
-   vary depending on the age of the backup, as the format has changed
-   somewhat over time. Refer to [3][4][5][6].
+1. Verify the backup header integrity according to the "emergency backup
+   restore without Qubes" instructions for your backup. These vary
+   depending on the age of the backup, as the format has changed over
+   time. [3][4][5][6]
 
 2. Check the "compressed" and "compression-filter" header fields for
-   anything anomalous.
+   anything anomalous. For example, you may see something like the
+   following:
 
-This probably looks something like the following:
+   $ tar -ivxf qubes-2019-08-06T121200 backup-header{,.hmac}
+   backup-header
+   backup-header.hmac
+   $ scrypt dec backup-header.hmac backup-header.ok
+   Please enter passphrase: backup-header!<backup-passphrase>
+   $ cmp backup-header.ok backup-header \
+   > && echo integrity ok || echo something is wrong
+   integrity ok
+   $ grep -E '^(compressed|compression-filter)=' backup-header
+   compressed=True
+   compression-filter=gzip
 
-    $ tar -ivxf qubes-2019-08-06T121200 backup-header{,.hmac}
-    backup-header
-    backup-header.hmac
-    $ scrypt dec backup-header.hmac backup-header.ok
-    Please enter passphrase: backup-header!<backup-passphrase>
-    $ cmp backup-header.ok backup-header \
-    > && echo integrity ok || echo something is wrong
-    integrity ok
-    $ grep -E '^(compressed|compression-filter)=' backup-header
-    compressed=True
-    compression-filter=gzip
+If you see anything other than `True` and a legitimate compression
+filter like `gzip` or `bzip2`, this may be a reason for suspicion.
 
-If you see anything other than `True` and `gzip`, this is potentially
-suspicious.
+It is worth noting, however, that depending on how a malicious backup
+has been stored and/or transferred to the machine on which it is
+restored -- and depending on the sophistication of an attacker -- a
+previously malicious backup may have self-modified to appear benign
+after the fact as part of its exploit payload. Therefore, this should
+not be considered an infallible way to detect malicious backups. Storing
+the backup exclusively on immutable media throughout this process can
+provide further assurance.
 
-It's worth noting, however, that depending on how a malicious backup
-has been stored and/or transferred to the machine on which to restore
-it, and depending on the sophistication of an attacker, a previously
-malicious backup may have self-modified to appear benign after the fact
-as part of its exploit payload - so this is not a reliable way to detect
-malicious backups unless they are e.g. stored exclusively on immutable
-media.
-
-Also, the possibility of other similar vulnerabilities cannot be
-completely ruled out, so restoring backups in a depriveleged manner
-(outside Dom0, via the Admin API) is still recommended.
+The possibility of other similar vulnerabilities cannot be completely
+ruled out, so restoring backups in a deprivileged manner (outside dom0,
+as described in the previous section) is still recommended.
 
 Credits
 =======
 
 This issue was discovered and reported by Jean-Philippe Ouellet
 <jpo@vt.edu>, who also provided a fix, a PoC exploit, helped with
-mitigations for this general class of issue in the future, and wrote
-the initial draft of this advisory.
+mitigations for this general class of issue in the future, and wrote the
+initial draft of this advisory.
 
 References
 ==========
 
-[1] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
-[2] https://github.com/QubesOS/qubes-issues/issues/2737#issuecomment-316565022
+[1] https://github.com/QubesOS/qubes-core-admin/commit/0cd8281ac10ee06f4b2fce9f86e27eb25292bc25
+[2] https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/
 [3] https://www.qubes-os.org/doc/backup-restore/
 [4] https://www.qubes-os.org/doc/backup-emergency-restore-v4/
 [5] https://www.qubes-os.org/doc/backup-emergency-restore-v3/
 [6] https://www.qubes-os.org/doc/backup-emergency-restore-v2/
-[7] https://github.com/QubesOS/qubes-core-admin/commit/0cd8281ac10ee06f4b2fce9f86e27eb25292bc25
 
 --
 The Qubes Security Team

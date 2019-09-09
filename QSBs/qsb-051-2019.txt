@@ -161,7 +161,7 @@ backup as follows:
    $ cmp backup-header.ok backup-header \
    > && echo integrity ok || echo something is wrong
    integrity ok
-   $ grep -E '^(compressed|compression-filter)=' backup-header
+   $ grep -E '^(compressed|compression-filter)=' backup-header | cat -v
    compressed=True
    compression-filter=gzip
 

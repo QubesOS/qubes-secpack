@@ -100,7 +100,7 @@ The specific package that resolves the problems discussed in this
 bulletin are as follows:
 
   For Qubes 4.0:
-  - qubes-core-admin-client version 4.0.27 (TODO: verify version)
+  - qubes-core-admin-client version 4.0.27
 
 The packages are to be installed in dom0 via the Qubes VM Manager or via
 the qubes-dom0-update command as follows:
@@ -158,9 +158,8 @@ backup as follows:
    backup-header.hmac
    $ scrypt dec backup-header.hmac backup-header.ok
    Please enter passphrase: backup-header!<backup-passphrase>
-   $ cmp backup-header.ok backup-header \
-   > && echo integrity ok || echo something is wrong
-   integrity ok
+   $ cmp backup-header.ok backup-header && echo ok || echo wrong
+   ok
    $ grep -E '^(compressed|compression-filter)=' backup-header | cat -v
    compressed=True
    compression-filter=gzip

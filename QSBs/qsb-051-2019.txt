@@ -25,7 +25,7 @@ In Qubes OS, backups are encrypted and authenticated using a passphrase.
 You must enter your backup passphrase when attempting to restore a
 backup. If your passphrase successfully authenticates the backup, it
 will be decrypted and restored. Otherwise, the operation will be aborted
-before the contents of the backup are processed.
+before the contents of the backup are further processed.
 
 In order to exploit this vulnerability, an attacker would have to create
 a malicious backup that would successfully pass authentication and

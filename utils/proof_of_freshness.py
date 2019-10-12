@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+import datetime
 import json
 import urllib.request
 import feedparser
@@ -48,6 +49,17 @@ def bitcoin():
     blocks = json.loads(urllib.request.urlopen(block_url).read())
     print(blocks["blocks"][0]["hash"])
 
+def date():
+    """
+    Print date in RFC 5322 format.
+    """
+
+    # "+0000" as a constant, since it's always expected to be UTC.
+    fmt = "%a, %d %b %Y %T +0000"
+    print(datetime.datetime.utcnow().strftime(fmt))
+    print()
+
 if __name__ == "__main__":
+    date()
     news()
     bitcoin()

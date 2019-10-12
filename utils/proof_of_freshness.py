@@ -46,7 +46,7 @@ def bitcoin():
 
     block_url = block_url.format(height-depth)
     blocks = json.loads(urllib.request.urlopen(block_url).read())
-    print("{:s}".format(blocks["blocks"][0]["hash"]))
+    print(blocks["blocks"][0]["hash"])
 
 if __name__ == "__main__":
     news()

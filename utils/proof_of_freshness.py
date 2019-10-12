@@ -33,7 +33,7 @@ def news():
 
 def bitcoin():
     """
-    Print recent bitcoin block hash.
+    Recent bitcoin block hash.
     """
 
     depth = 10

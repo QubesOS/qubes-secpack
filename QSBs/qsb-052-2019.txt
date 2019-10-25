@@ -1,0 +1,153 @@
+
+
+             ---===[ Qubes Security Bulletin #52 ]===---
+
+                             2019-10-31
+
+
+    Xen issues affecting PCI passthrough and PV domains (XSA-299, XSA-302)
+
+Summary
+========
+
+On 2019-10-31, the Xen Security Team published the following Xen
+Security Advisories (XSAs):
+
+
+XSA-299 [1] "Issues with restartable PV type change operations":
+| To avoid using shadow pagetables for PV guests, Xen exposes the actual
+| hardware pagetables to the guest.  In order to prevent the guest from
+| modifying these page tables directly, Xen keeps track of how pages are
+| used using a type system; pages must be "promoted" before being used
+| as a pagetable, and "demoted" before being used for any other type.
+| Xen also allows for "recursive" promotions: i.e., an operating system
+| promoting a page to an L4 pagetable may end up causing pages to be
+| promoted to L3s, which may in turn cause pages to be promoted to L2s,
+| and so on.  These operations may take an arbitrarily large amount of
+| time, and so must be re-startable.
+| 
+| Unfortunately, making recursive pagetable promotion and demotion
+| operations restartable is incredibly complicated, and the code
+| contains several races which, if triggered, can cause Xen to drop or
+| retain extra type counts, potentially allowing guests to get write
+| access to in-use pagetables.
+| 
+| A malicious PV guest administrator may be able to escalate their
+| privilege to that of the host.
+
+XSA-302 [2] "passed through PCI devices may corrupt host memory after
+deassignment":
+| When a PCI device is assigned to an untrusted domain, it is possible
+| for that domain to program the device to DMA to an arbitrary address.
+| The IOMMU is used to protect the host from malicious DMA by making
+| sure that the device addresses can only target memory assigned to the
+| guest. However, when the guest domain is torn down the device is
+| assigned back to dom0, thus allowing any in-flight DMA to potentially
+| target critical host data.
+| 
+| An untrusted domain with access to a physical device can DMA into host
+| memory, leading to privilege escalation.
+
+
+Impact on Qubes OS
+===================
+
+The first issue (XSA-299) applies to PV domains only. While most of
+the domains on Qubes OS 4.0 and PVH and HVM (not affected by the
+issue), PV domains are still supported, and also used to host Qemu
+instance supporting HVM domains. This means, in the default Qubes OS
+setup, the attacker still would need to chain several attacks in order
+to use this vulnerability. Specifically:
+1. Take control over HVM domain (sys-usb, sys-net, or some manually
+   created HVM domain) - most of the domains for user applications are
+   PVH, not affected by the issue.
+2. Successfully attack Qemu instance running in an associated PV
+   stubdomain.
+3. Only then, the attacker is in a position to use bug described in
+   XSA-299.
+
+Additionally, the issue is of race condition type, which makes it
+unreliable to attack in real world scenarios.
+
+The second issue (XSA-302) also affects limited set of domains in the
+Qubes OS - namely, only those with PCI devices assigned - sys-net and
+sys-usb in the default configuration.
+The attacker needs a cooperating device to perform this attack - a
+device that can be programmed to perform DMA with sufficient delay, so
+device is re-assigned to dom0 in that time (order of seconds).
+Depending on internal connections, it may be also necessary for the
+device to lack proper support of Function Level Reset (FLR). This
+condition is true for most of the USB controllers.
+But contrary to the previous issue, if all the above conditions are
+met, it is possible to perform reliable attack using this issue.
+
+
+Note on PCI devices firmware storage
+=====================================
+
+The proposed patches isolate PCI devices out of dom0 using IOMMU, even
+after device is de-assigned from untrusted domain (sys-net, sys-usb
+etc). But PCI devices still can perform DMA into most of the host
+memory during early system startup (before dom0 assigns them
+applicable domains). This means, if the attacker can program the
+device to perform malicious DMA after system reset, they can still
+attack the system, even with XSA-302 patches applied.
+
+In practice this means, devices containing internal writable firmware
+or configuration storage are worse for the system security, than those
+having only read-only storage and requiring firmware to be loaded
+externally by the driver. Many people consider devices requiring
+loading "firmware blobs" less freedom friendly, but the effect of the
+system trustworthiness is exactly the opposite - those devices are
+actually more trustworthy than those having (possibly mutable)
+firmware stored internally. In addition, it's easier to reason about
+the firmware when it is accessible for the user. Even if it's in a
+binary form, it is at least possible to verify its authenticity, that
+it wasn't modified maliciously specifically for this device instance
+(compare with public databases).
+Naturally, a device with an open source firmware (still, loaded
+externally) would be even better. But a device that doesn't require
+loading external firmware in the vast majority cases still has one -
+but hidden inside, impossible to attest.
+
+
+Patching
+=========
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes OS 4.0:
+  - Xen packages version 4.8.5-11
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisories.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-299.html
+[2] https://xenbits.xen.org/xsa/advisory-302.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -49,70 +49,86 @@ deassignment":
 | memory, leading to privilege escalation.
 
 
-Impact on Qubes OS
-===================
+Impact
+=======
 
-The first issue (XSA-299) applies to PV domains only. While most of
-the domains on Qubes OS 4.0 and PVH and HVM (not affected by the
-issue), PV domains are still supported, and also used to host Qemu
-instance supporting HVM domains. This means, in the default Qubes OS
-setup, the attacker still would need to chain several attacks in order
-to use this vulnerability. Specifically:
-1. Take control over HVM domain (sys-usb, sys-net, or some manually
-   created HVM domain) - most of the domains for user applications are
-   PVH, not affected by the issue.
-2. Successfully attack Qemu instance running in an associated PV
+XSA-299 applies only to PV domains. Most of the domains in Qubes 4.0 are
+PVH or HVM domains and are therefore not affected by XSA-299. However,
+PV domains are still supported in Qubes 4.0, and they are specifically
+used to host Qemu-instance-supporting HVM domains.
+
+In the default Qubes 4.0 setup, several attacks would have to be chained
+together in order to exploit this vulnerability. Specifically, an
+attacker would have to:
+
+1. Take control of an HVM domain, e.g., sys-usb, sys-net, or a
+   user-created HVM domain. (Most user domains are PVH and are therefore
+   not affected.)
+
+2. Successfully attack a Qemu instance running in an associated PV
    stubdomain.
-3. Only then, the attacker is in a position to use bug described in
+
+3. Finally, find some way to exploit the vulnerability described in
    XSA-299.
 
-Additionally, the issue is of race condition type, which makes it
-unreliable to attack in real world scenarios.
+Moreover, since this vulnerability is a race condition, it is an
+unreliable attack vector in real world scenarios.
 
-The second issue (XSA-302) also affects limited set of domains in the
-Qubes OS - namely, only those with PCI devices assigned - sys-net and
-sys-usb in the default configuration.
-The attacker needs a cooperating device to perform this attack - a
-device that can be programmed to perform DMA with sufficient delay, so
-device is re-assigned to dom0 in that time (order of seconds).
+XSA-302 also affects a limited set of domains in Qubes, namely, only
+those with PCI devices assigned (sys-net and sys-usb in the default
+configuration).
+
+In order to exploit this vulnerability, an attacker would have to
+control a cooperating device that could be programmed to perform a DMA
+(direct memory access) attack with a sufficient delay (on the order of
+seconds) such that the device had been reassigned to dom0 by the time
+the attack occured.
+
 Depending on internal connections, it may be also necessary for the
-device to lack proper support of Function Level Reset (FLR). This
-condition is true for most of the USB controllers.
-But contrary to the previous issue, if all the above conditions are
-met, it is possible to perform reliable attack using this issue.
+cooperating device to lack proper support for Function Level Reset
+(FLR). (Most USB controllers do, in fact, lack proper support for FLR.)
+
+While XSA-299 is unreliable to exploit in practice, XSA-302 can be
+reliably exploited so long as all the aforementioned conditions are met.
 
 
-Note on PCI devices firmware storage
-=====================================
+Discussion
+===========
 
-The proposed patches isolate PCI devices out of dom0 using IOMMU, even
-after device is de-assigned from untrusted domain (sys-net, sys-usb
-etc). But PCI devices still can perform DMA into most of the host
-memory during early system startup (before dom0 assigns them
-applicable domains). This means, if the attacker can program the
-device to perform malicious DMA after system reset, they can still
-attack the system, even with XSA-302 patches applied.
+The patches below isolate PCI devices out of dom0 using IOMMU, even
+after those devices have been de-assigned from other domains (typically
+less trusted domains like sys-net and sys-usb).
 
-In practice this means, devices containing internal writable firmware
-or configuration storage are worse for the system security, than those
-having only read-only storage and requiring firmware to be loaded
-externally by the driver. Many people consider devices requiring
-loading "firmware blobs" less freedom friendly, but the effect of the
-system trustworthiness is exactly the opposite - those devices are
-actually more trustworthy than those having (possibly mutable)
-firmware stored internally. In addition, it's easier to reason about
-the firmware when it is accessible for the user. Even if it's in a
-binary form, it is at least possible to verify its authenticity, that
-it wasn't modified maliciously specifically for this device instance
-(compare with public databases).
-Naturally, a device with an open source firmware (still, loaded
-externally) would be even better. But a device that doesn't require
-loading external firmware in the vast majority cases still has one -
-but hidden inside, impossible to attest.
+However, PCI devices can still perform DMA into most of the host memory
+during early system startup (before dom0 assigns them to specific
+domains). If the attacker were to program such a device to perform a DMA
+attack in this window of opportunity during system startup, the
+attacker could still compromise the system, even with the XSA-302
+patches applied.
+
+In practice, this means that devices containing internal writable
+firmware or configuration storage are worse for system security than
+those that have read-only storage and require firmware to be loaded
+externally by a driver. Many people consider devices that require
+loading "firmware blobs" to be less freedom-friendly, but the effect on
+system trustworthiness is exactly the opposite. Such devices are
+actually more trustworthy than those that have (possibly mutable)
+firmware stored internally.
+
+In addition, it's easier to reason about the firmware when it is
+accessible to the user. Even if the firmware is in a binary form, it is
+at least possible to verify its authenticity and that it wasn't modified
+maliciously to target your specific device (e.g., by comparing hashes
+against a public database). Naturally, a device with open-source
+firmware (still loaded externally) would be even better. In the vast
+majority of cases, however, a device that doesn't require loading
+external firmware actually still has such firmware -- it's just hidden
+inside and impossible to attest.
 
 
 Patching
 =========
+
 The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 

@@ -1,0 +1,102 @@
+
+
+             ---===[ Qubes Security Bulletin #53 ]===---
+
+                             2019-11-13
+
+
+   	TSX Asynchronous Abort speculative side channel (XSA-305)
+
+Summary
+========
+
+On 2019-11-12, the Xen Security Team published Xen Security Advisory
+305 (CVE-2019-11135 / XSA-305) [1] with the following description:
+
+| This is very closely related to the Microarchitectural Data Sampling
+| vulnerabilities from May 2019.
+| 
+| Please see https://xenbits.xen.org/xsa/advisory-297.html for details
+| about MDS.
+| 
+| A new way to sample data from microarchitectural structures has been
+| identified.  A TSX Asynchronous Abort is a state which occurs between a
+| transaction definitely aborting (usually for reasons outside of the
+| pipeline's control e.g. receiving an interrupt), and architectural state
+| being rolled back to start of the transaction.
+| 
+| During this period, speculative execution may be able to infer the value
+| of data in the microarchitectural structures.
+| 
+| For more details, see:
+|   https://software.intel.com/security-software-guidance/insights/deep-dive-intel-transactional-synchronization-extensions-intel-tsx-asynchronous-abort
+| 
+| An attacker, which could include a malicious untrusted user process on a
+| trusted guest, or an untrusted guest, can sample the content of
+| recently-used memory operands and IO Port writes.
+| 
+| This can include data from:
+| 
+|  * A previously executing context (process, or guest, or
+|    hypervisor/toolstack) at the same privilege level.
+|  * A higher privilege context (kernel, hypervisor, SMM) which
+|    interrupted the attacker's execution.
+| 
+| Vulnerable data is that on the same physical core as the attacker.  This
+| includes, when hyper-threading is enabled, adjacent threads.
+| 
+| An attacker cannot use this vulnerability to target specific data.  An
+| attack would likely require sampling over a period of time and the
+| application of statistical methods to reconstruct interesting data.
+
+This is yet another CPU hardware bug related to speculative execution.
+
+Only Intel processors are affected.
+
+Patching
+=========
+
+The Xen Project has provided patches that mitigate this issue. A CPU
+microcode update is required to take advantage of them. Note that
+microcode updates may not be available for older CPUs. (See the Intel
+advisory linked above for details.)
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-12
+  - microcode_ctl 2.1-29.qubes1
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-305.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

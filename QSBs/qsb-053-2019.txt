@@ -51,7 +51,9 @@ On 2019-11-12, the Xen Security Team published Xen Security Advisory
 
 This is yet another CPU hardware bug related to speculative execution.
 
-Only Intel processors are affected.
+Only Intel processors which support TSX and have hardware mitigation
+against MDS are affected (see the XSA and the Intel advisory linked
+above for details and a list of affected processor families).
 
 Note: There was no embargo period for this XSA.
 

@@ -53,6 +53,8 @@ This is yet another CPU hardware bug related to speculative execution.
 
 Only Intel processors are affected.
 
+Note: There was no embargo period for this XSA.
+
 Patching
 =========
 

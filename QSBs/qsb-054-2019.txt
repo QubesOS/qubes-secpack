@@ -5,15 +5,20 @@
                              2019-11-26
 
 
-                Ineffective fix for XSA-302 (XSA-306)
+Xen fix for XSA-302 found ineffective in Qubes configuration (XSA-306)
 
 Summary
 ========
 
-On 2019-11-26, the Xen Security Team published the following Xen
-Security Advisories (XSAs):
+In the course of re-verifying the fixes for QSB #52 (XSA-299, XSA-302)
+[1], the Qubes Security Team discovered that the fix released by the
+Xen Project for XSA-302 [2] is not effective for the configuration used
+in Qubes OS.
 
-XSA-306 [1] "Device quarantine for alternate pci assignment methods":
+On 2019-11-26, the Xen Security Team published the following Xen
+Security Advisory (XSA):
+
+XSA-306 [3] "Device quarantine for alternate pci assignment methods":
 | XSA-302 relies on the use of libxl's "assignable-add" feature to
 | prepare devices to be assigned to untrusted guests.
 | 
@@ -31,22 +36,24 @@ XSA-306 [1] "Device quarantine for alternate pci assignment methods":
 Impact
 =======
 
-The issue makes original XSA-302[2] fix ineffective in the configuration
-used on Qubes OS. See QSB #52[3] for detailed discussion about the
-impact.
+The original XSA-302 fix provided by the Xen Project is ineffective for
+the configuration used in Qubes OS. Therefore, the impact is the same as
+as the XSA-302 impact originally reported in QSB #52 (XSA-299, XSA-302).
 
 
 Discussion
 ===========
 
-The issue has been discovered by the Qubes Security Team during
-re-verification of QSB #52 fixes, but unfortunately at that time
-XSA-302 and QSB #52 were already public. Based on the Xen Security
-Policy[4] and discussion with the Xen Security Team we've decided to
-treat it as a separate issue, with a separate embargo.
-The new proposed fix for PCI devices isolation is much less
-fragile, because it does not depend on toolstack (libxl) behavior
-anymore.
+The Qubes Security Team discovered this issue while re-verifying the Xen
+Project's fixes for XSA-302. At that time, both XSA-302 and QSB #52 had
+already been made public. Whether a disclosure has been made public is
+significant to the Xen Security Policy [4]. Therefore, after discussion
+with the Xen Security Team, we have decided to treat this as a separate
+security issue, with a separate XSA, QSB, and embargo period.
+
+From a security perspective, the new proposed fix for PCI device
+isolation is much less fragile, since it no longer depends on toolstack
+(libxl) behavior anymore.
 
 
 Patching
@@ -75,6 +82,7 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
+
 Credits
 ========
 
@@ -84,9 +92,9 @@ See the original Xen Security Advisories.
 References
 ===========
 
-[1] https://xenbits.xen.org/xsa/advisory-306.html
+[1] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-052-2019.txt
 [2] https://xenbits.xen.org/xsa/advisory-302.html
-[3] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-052-2019.txt
+[3] https://xenbits.xen.org/xsa/advisory-306.html
 [4] https://xenproject.org/developers/security-policy/
 
 --

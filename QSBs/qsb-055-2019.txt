@@ -7,6 +7,7 @@
 
   Further issues with restartable PV type change operations (XSA-310)
 
+
 Summary
 ========
 
@@ -75,10 +76,12 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
+
 Credits
 ========
 
 See the original Xen Security Advisory.
+
 
 References
 ===========

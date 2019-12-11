@@ -5,14 +5,17 @@
                              2019-12-11
 
 
-  Further issues with restartable PV type change operations (XSA-310)
+ Issues with PV type change and handling IOMMU on AMD (XSA-310, XSA-311)
 
 
 Summary
 ========
 
-On 2019-12-11, the Xen Security Team published Xen Security Advisory
-310 (CVE-2019-19580 / XSA-310) [1] with the following description:
+On 2019-12-11, the Xen Security Team published the following Xen
+Security Advisories (XSAs):
+
+XSA-310 (CVE-2019-19580) [1] Further issues with restartable PV type
+change operations:
 
 | XSA-299 addressed several critical issues in restartable PV type
 | change operations.  Despite extensive testing and auditing, some
@@ -20,6 +23,25 @@ On 2019-12-11, the Xen Security Team published Xen Security Advisory
 | 
 | A malicious PV guest administrator may be able to escalate their
 | privilege to that of the host.
+
+XSA-311 (CVE-2019-19577) [2] Bugs in dynamic height handling for AMD
+IOMMU pagetables:
+
+| When running on AMD systems with an IOMMU, Xen attempted to
+| dynamically adapt the number of levels of pagetables (the pagetable
+| height) in the IOMMU according to the guest's address space size.  The
+| code to select and update the height had several bugs.
+| 
+| Notably, the update was done without taking a lock which is necessary
+| for safe operation.
+| 
+| A malicious guest administrator can cause Xen to access data
+| structures while they are being modified, causing Xen to crash.
+| Privilege escalation is thought to be very difficult but cannot be
+| ruled out.
+| 
+| Additionally, there is a potential memory leak of 4kb per guest boot,
+| under memory pressure.
 
 
 Impact
@@ -46,6 +68,10 @@ attacker would have to:
 
 Moreover, since this vulnerability is a race condition, it is an
 unreliable attack vector in real world scenarios.
+
+XSA-311 affects only systems running on AMD hardware and also is
+thought to be very hard to exploit. But since it can't be ruled out
+completely, we recommend applying updates nevertheless.
 
 
 Patching
@@ -87,6 +113,7 @@ References
 ===========
 
 [1] https://xenbits.xen.org/xsa/advisory-310.html
+[2] https://xenbits.xen.org/xsa/advisory-311.html
 
 --
 The Qubes Security Team

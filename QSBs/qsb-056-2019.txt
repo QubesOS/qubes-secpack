@@ -1,0 +1,143 @@
+             ---===[ Qubes Security Bulletin #56]===---
+
+                              2019-12-19
+
+             Insufficient anti-spoofing firewall rules
+
+Summary
+=======
+
+Firewall configuration in Qubes OS prevents IP address spoofing on
+downstream interfaces (in network-providing qube, down to
+network-consuming qubes, `vif*` interfaces). But it does not prevent
+IP spoofing on upstream interface (normally `eth0`, but in case of VPN
+or other configuration also other). 
+
+
+Impact
+======
+
+Configurations with inter-VM networking allowed[1] or additional
+interfaces created (VPN) are vulnerable to IP spoofing. Combined with
+other vulnerabilities like CVE-2019-14899[2], it allows upstream qube
+(like sys-net) to inject data into established connection.
+
+
+Discussion
+==========
+
+The anti-spoofing firewall rules in network-providing qube looks like
+this:
+
+    *raw
+    ...
+    -A PREROUTING ! -s 10.137.0.5/32 -i vif12.0 -j DROP
+    -A PREROUTING ! -s 10.137.0.6/32 -i vif17.0 -j DROP
+    -A PREROUTING ! -s 10.137.0.7/32 -i vif18.0 -j DROP
+    -A PREROUTING ! -s 10.137.0.8/32 -i vif21.0 -j DROP
+    COMMIT
+
+This, for each `vif*` interface drops packets if their source IP does
+not match the one assigned to the qube behind that interface. But it
+does not ensure such IP does not appear on any other (non-`vif`)
+interface.
+
+The other property in theory should be achieved by the FORWARD chain:
+
+    *filter
+    ...
+    -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    -A FORWARD -j QBS-FORWARD
+    -A FORWARD -i vif+ -o vif+ -j DROP
+    -A FORWARD -i vif+ -j ACCEPT
+    -A FORWARD -j DROP
+    COMMIT
+
+Those rules should reject packets not belonging to established
+connections on non-vif interfaces. And without seeing other packets in
+the connection, it should be prohibitively hard to forge packets to be
+considered a part of an established connection. But bugs like
+CVE-2019-14899[2] allows ones to guess those required parameters. Note
+that if a connection normally goes through a given qube (without any
+further protection like TLS), that qube can always manipulate the
+traffic without guessing anything.
+
+So, in default Qubes configuration, this is enough: network traffic
+either comes directly to the upstream qube (and by definition
+that upstream have access to it), or is an inter-VM connection
+attempt, which is prevented by the third rule (meaning, there are no
+connections in the conntrack table that upstream qube could
+try to hijack).
+But once the user introduce customizations like inter-VM
+communication[1] (allowing traffic between some `vif*` interfaces), or
+a VPN-kind of interface, the default rules are not enough. Upstream
+qube can inject packets (by spoofing source IP) into connections that
+normally do not go in clear through it.
+
+Our solution to this problem is in two phases:
+1. For Qubes OS 4.0 line we introduce conservative change that
+whenever running qube is connected to a network-providing qube,
+additional firewall rule is added that blocks given qube's IP as a
+source on other network interfaces.
+
+2. For Qubes OS 4.1 and later, we will modify firewall mechanism to
+also have a list of connected qubes addresses even when not running at
+the moment and reject all those addresses on upstream network
+interface(s).
+
+The solution for R4.0 differs mostly in lack of protection from
+spoofing addresses of not running qubes. At the same time, it is much
+simpler change and carry much less risk of introducing regression.
+
+
+Patching
+========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes OS 4.0:
+  - qubes-core-agent version 4.0.51
+
+The packages for domUs are to be installed in TemplateVMs and StandaloneVMs via
+the Qubes VM Manager or via the respective package manager:
+
+  For updates to Fedora from the stable repository (not immediately available):
+  $ sudo dnf update
+
+  For updates to Fedora from the security-testing repository:
+  $ sudo dnf update --enablerepo=qubes-vm-*-security-testing
+
+  For updates to Debian from the stable repository (not immediately available):
+  $ sudo apt update && sudo apt dist-upgrade
+
+  For updates to Debian from the security-testing repository:
+  First, uncomment the line below "Qubes security updates testing repository" in
+    /etc/apt/sources.list.d/qubes-r*.list
+  Then:
+  $ sudo apt update && sudo apt dist-upgrade
+
+A restart is required for these changes to take effect. This entails
+shutting down the TemplateVM before restarting all the TemplateBasedVMs based
+on that TemplateVM.
+
+These packages will migrate from the security-testing repository to the current
+(stable) repository over the next two weeks after being tested by the
+community.
+
+
+Credits
+========
+
+The issue was reported by Demi Marie Obenour.
+
+
+References
+==========
+
+[1] https://www.qubes-os.org/doc/firewall/#enabling-networking-between-two-qubes
+[2] https://nvd.nist.gov/vuln/detail/CVE-2019-14899
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

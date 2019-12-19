@@ -19,8 +19,9 @@ Impact
 
 Configurations with inter-VM networking allowed[1] or additional
 interfaces created (VPN) are vulnerable to IP spoofing. Combined with
-other vulnerabilities like CVE-2019-14899[2], it allows upstream qube
-(like sys-net) to inject data into established connection.
+other problems like procedure described in CVE-2019-14899 report[2],
+it allows upstream qube (like sys-net) to inject data into established
+connection.
 
 
 Discussion
@@ -56,11 +57,11 @@ The other property in theory should be achieved by the FORWARD chain:
 Those rules should reject packets not belonging to established
 connections on non-vif interfaces. And without seeing other packets in
 the connection, it should be prohibitively hard to forge packets to be
-considered a part of an established connection. But bugs like
-CVE-2019-14899[2] allows ones to guess those required parameters. Note
-that if a connection normally goes through a given qube (without any
-further protection like TLS), that qube can always manipulate the
-traffic without guessing anything.
+considered a part of an established connection. But procedures like
+the one described in CVE-2019-14899 report[2] allows ones to guess
+those required parameters. Note that if a connection normally goes
+through a given qube (without any further protection like TLS), that
+qube can always manipulate the traffic without guessing anything.
 
 So, in default Qubes configuration, this is enough: network traffic
 either comes directly to the upstream qube (and by definition

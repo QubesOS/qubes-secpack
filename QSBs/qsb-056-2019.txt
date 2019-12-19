@@ -1,6 +1,6 @@
              ---===[ Qubes Security Bulletin #56]===---
 
-                              2019-12-19
+                              2019-12-20
 
              Insufficient anti-spoofing firewall rules
 
@@ -19,9 +19,9 @@ Impact
 
 Configurations with inter-VM networking allowed [1] or additional
 interfaces created (e.g., VPNs) are vulnerable to IP spoofing. Combined
-with other vulnerabilities, such as CVE-2019-14899 [2], this could allow
-an upstream qube (e.g., sys-net) to inject data into an established
-connection.
+with other vulnerabilities, such as the procedure described in the
+CVE-2019-14899 report [2], this could allow an upstream qube (e.g.,
+sys-net) to inject data into an established connection.
 
 
 Discussion
@@ -58,10 +58,11 @@ These rules should reject packets not belonging to established
 connections on non-vif interfaces. Moreover, without seeing other
 packets in the connection, it should be prohibitively difficult to forge
 packets that would be considered to be part of an established
-connection. However, bugs such as CVE-2019-14899 [2] allow one to guess
-the required parameters. Note that if a connection normally goes through
-a given qube (without any further protection like TLS), that qube can
-always manipulate the traffic without guessing anything.
+connection. However, methods like the one described in the
+CVE-2019-14899 report [2] allow one to guess the required parameters.
+Note that if a connection normally goes through a given qube (without
+any further protection like TLS), that qube can always manipulate the
+traffic without guessing anything.
 
 The default Qubes configuration is secure, since network traffic either
 goes directly to the upstream qube (which, by definition, has access to

@@ -7,26 +7,27 @@
 Summary
 =======
 
-Firewall configuration in Qubes OS prevents IP address spoofing on
-downstream interfaces (in network-providing qube, down to
-network-consuming qubes, `vif*` interfaces). But it does not prevent
-IP spoofing on upstream interface (normally `eth0`, but in case of VPN
-or other configuration also other). 
+The firewall configuration in Qubes OS prevents IP address spoofing in
+downstream interfaces (e.g., network-providing qubes, network-consuming
+qubes, and `vif*` interfaces). However, it does not prevent IP spoofing
+in upstream interfaces (normally `eth0`, but in the case of VPNs or
+other configuration, there may also be others). 
 
 
 Impact
 ======
 
-Configurations with inter-VM networking allowed[1] or additional
-interfaces created (VPN) are vulnerable to IP spoofing. Combined with
-other vulnerabilities like CVE-2019-14899[2], it allows upstream qube
-(like sys-net) to inject data into established connection.
+Configurations with inter-VM networking allowed [1] or additional
+interfaces created (e.g., VPNs) are vulnerable to IP spoofing. Combined
+with other vulnerabilities, such as CVE-2019-14899 [2], this could allow
+an upstream qube (e.g., sys-net) to inject data into an established
+connection.
 
 
 Discussion
 ==========
 
-The anti-spoofing firewall rules in network-providing qube looks like
+The anti-spoofing firewall rules in a network-providing qube look like
 this:
 
     *raw
@@ -37,12 +38,12 @@ this:
     -A PREROUTING ! -s 10.137.0.8/32 -i vif21.0 -j DROP
     COMMIT
 
-This, for each `vif*` interface drops packets if their source IP does
-not match the one assigned to the qube behind that interface. But it
-does not ensure such IP does not appear on any other (non-`vif`)
+Each `vif*` interface drops packets if its source IP does not match the
+one assigned to the qube behind that interface. However, it does not
+ensure that the source IP does not appear on any other (non-`vif`)
 interface.
 
-The other property in theory should be achieved by the FORWARD chain:
+The other property could, in theory, be achieved by this FORWARD chain:
 
     *filter
     ...
@@ -53,41 +54,44 @@ The other property in theory should be achieved by the FORWARD chain:
     -A FORWARD -j DROP
     COMMIT
 
-Those rules should reject packets not belonging to established
-connections on non-vif interfaces. And without seeing other packets in
-the connection, it should be prohibitively hard to forge packets to be
-considered a part of an established connection. But bugs like
-CVE-2019-14899[2] allows ones to guess those required parameters. Note
-that if a connection normally goes through a given qube (without any
-further protection like TLS), that qube can always manipulate the
-traffic without guessing anything.
+These rules should reject packets not belonging to established
+connections on non-vif interfaces. Moreover, without seeing other
+packets in the connection, it should be prohibitively difficult to forge
+packets that would be considered to be part of an established
+connection. However, bugs such as CVE-2019-14899 [2] allow one to guess
+the required parameters. Note that if a connection normally goes through
+a given qube (without any further protection like TLS), that qube can
+always manipulate the traffic without guessing anything.
 
-So, in default Qubes configuration, this is enough: network traffic
-either comes directly to the upstream qube (and by definition
-that upstream have access to it), or is an inter-VM connection
-attempt, which is prevented by the third rule (meaning, there are no
-connections in the conntrack table that upstream qube could
-try to hijack).
-But once the user introduce customizations like inter-VM
-communication[1] (allowing traffic between some `vif*` interfaces), or
-a VPN-kind of interface, the default rules are not enough. Upstream
-qube can inject packets (by spoofing source IP) into connections that
-normally do not go in clear through it.
+The default Qubes configuration is secure, since network traffic either
+goes directly to the upstream qube (which, by definition, has access to
+that traffic), or it is an inter-VM connection attempt, which is
+prevented by the third rule (meaning that there are no connections in
+the conntrack table that the upstream qube could try to hijack).
+However, once the user departs from the default configuration, e.g., by
+introducing inter-VM communications [1] (allowing traffic between some
+`vif*` interfaces), or VPN-like interfaces, the default rules are no
+longer sufficient, since an upstream qube can inject packets (by
+spoofing the source IP) into connections that normally do not pass
+through it in the clear.
 
-Our solution to this problem is in two phases:
-1. For Qubes OS 4.0 line we introduce conservative change that
-whenever running qube is connected to a network-providing qube,
-additional firewall rule is added that blocks given qube's IP as a
-source on other network interfaces.
+Our solution to this problem is twofold:
 
-2. For Qubes OS 4.1 and later, we will modify firewall mechanism to
-also have a list of connected qubes addresses even when not running at
-the moment and reject all those addresses on upstream network
-interface(s).
+1. For Qubes OS 4.0, whenever a running qube is connected to a
+   network-providing qube, an additional firewall rule is added that
+   blocks the running qube's IP as a source on other network interfaces.
 
-The solution for R4.0 differs mostly in lack of protection from
-spoofing addresses of not running qubes. At the same time, it is much
-simpler change and carry much less risk of introducing regression.
+2. For Qubes OS 4.1 and later, we will modify the firewall mechanism so
+   that it maintains aa list of connected qubes and their addresses,
+   even when they are not running. All such addresses will be rejected
+   on upstream network interfaces.
+
+The main difference between these two solutions is that fix for Qubes OS
+4.0 does not protect against spoofing the addresses of qubes that are
+not running. However, since 4.0 is a stable release, we must consider
+the impact of such a solution on the stability of this release. This fix
+is a much simpler change that carries a considerably lower risk of
+introducing a regression.
 
 
 Patching
@@ -99,31 +103,35 @@ bulletin are as follows:
   For Qubes OS 4.0:
   - qubes-core-agent version 4.0.51
 
-The packages for domUs are to be installed in TemplateVMs and StandaloneVMs via
-the Qubes VM Manager or via the respective package manager:
+The packages for domUs are to be installed in TemplateVMs and
+StandaloneVMs via the Qube Manager or via their respective package
+managers:
 
-  For updates to Fedora from the stable repository (not immediately available):
+  For updates to Fedora from the stable repository
+  (not immediately available):
   $ sudo dnf update
 
   For updates to Fedora from the security-testing repository:
   $ sudo dnf update --enablerepo=qubes-vm-*-security-testing
 
-  For updates to Debian from the stable repository (not immediately available):
+  For updates to Debian from the stable repository
+  (not immediately available):
   $ sudo apt update && sudo apt dist-upgrade
 
   For updates to Debian from the security-testing repository:
-  First, uncomment the line below "Qubes security updates testing repository" in
+  First, uncomment the line below "Qubes security updates testing
+  repository" in:
     /etc/apt/sources.list.d/qubes-r*.list
   Then:
   $ sudo apt update && sudo apt dist-upgrade
 
 A restart is required for these changes to take effect. This entails
-shutting down the TemplateVM before restarting all the TemplateBasedVMs based
-on that TemplateVM.
+shutting down the TemplateVM before restarting all the TemplateBasedVMs
+based on that TemplateVM.
 
-These packages will migrate from the security-testing repository to the current
-(stable) repository over the next two weeks after being tested by the
-community.
+These packages will migrate from the security-testing repositories to
+their respective current (stable) repositories over the next two weeks
+after being tested by the community.
 
 
 Credits

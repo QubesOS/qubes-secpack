@@ -1,0 +1,116 @@
+
+
+             ---===[ Qubes Security Bulletin #57 ]===---
+
+                             2020-06-09
+
+
+      Special Register Buffer speculative side channel (XSA-320)
+
+Summary
+========
+
+On 2020-06-09, the Xen Security Team published Xen Security Advisory
+320 (CVE-2020-0543 / XSA-320) [1] with the following description:
+
+| This issue is related to the MDS and TAA vulnerabilities.  Please see
+| https://xenbits.xen.org/xsa/advisory-297.html (MDS) and
+| https://xenbits.xen.org/xsa/advisory-305.html (TAA) for details.
+| 
+| Certain processor operations microarchitecturally need to read data from
+| outside the physical core (e.g. to communicate with the random number
+| generator).  In some implementations, this operation is called a Special
+| Register Read.
+| 
+| In some implementations, data are staged in a single shared buffer, and
+| a full cache line at a time is returned to the core which made the
+| Special Register Read.  On parts vulnerable to MFBDS or TAA, an attacker
+| may be able to access stale data requested by other cores in the system.
+| 
+| For more details, see:
+|   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00320.html
+| 
+| 
+| An attacker, which could include a malicious untrusted user process on a
+| trusted guest, or an untrusted guest, can sample the contents of
+| certain off-core accesses by other cores in the system.
+| 
+| This can include data whose use may depend on the secrecy of the value,
+| such as data from the Random Number Generator (e.g. RDRAND/RDSEED
+| instructions).
+
+This is yet another CPU hardware bug related to speculative execution.
+
+Only Intel processors are affected.
+RDRAND instruction is available in Intel processors starting with Ivy
+Bridge (3rd gen Intel Core).
+
+
+Impact
+=======
+
+An attacker can obtain data returned by RDRAND instruction on another
+core on the system (including another VM). In practice, Linux does use
+RDRAND to seed /dev/random and /dev/urandom devices, but RDRAND is not
+the only source of entropy and is not considered sufficient. So, as
+long as other sources of entropy are not compromised, the overall
+security of /dev/(u)random devices is still preserved. In Qubes OS
+this is additionally improved by seeding random number generator at VM
+startup time using random seed provided from dom0.
+This means using /dev/(u)random is still safe.
+
+Besides Linux kernel using RDRAND as one of entropy sources, userspace
+application can also issue RDRAND instruction on its own. Such
+software is affected by the bug discussed here. Specific impact
+depends on what application does with random data obtained this way.
+
+
+Patching
+=========
+
+Intel has provided a microcode update that mitigate the issue. 
+Please note Ivy Bridge processors are considered retired by Intel and
+do not receive microcode updates anymore. This means Ivy Bridge
+processors remains vulnerable to this issue. To mitigate the problem,
+we are masking out RDRAND availability to VMs on those affected
+platforms.
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - microcode_ctl 2.1-30.qubes1
+  - qubes-core-dom0 4.0.51 (needed for Ivy Bridge platforms only)
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+microcode binaries.
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-320.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

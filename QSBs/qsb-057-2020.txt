@@ -41,28 +41,30 @@ On 2020-06-09, the Xen Security Team published Xen Security Advisory
 
 This is yet another CPU hardware bug related to speculative execution.
 
-Only Intel processors are affected.
-RDRAND instruction is available in Intel processors starting with Ivy
-Bridge (3rd gen Intel Core).
-
+Only Intel processors are affected. RDRAND instruction is available in
+Intel processors starting with Ivy Bridge (3rd gen Intel Core). See
+Intel's advisory for a full list of affected CPUs (short version: most
+mobile/desktop CPUs are affected, most Atoms and server Xeons not).
 
 Impact
 =======
 
-An attacker can obtain data returned by RDRAND instruction on another
-core on the system (including another VM). In practice, Linux does use
-RDRAND to seed /dev/random and /dev/urandom devices, but RDRAND is not
-the only source of entropy and is not considered sufficient. So, as
-long as other sources of entropy are not compromised, the overall
-security of /dev/(u)random devices is still preserved. In Qubes OS
-this is additionally improved by seeding random number generator at VM
-startup time using random seed provided from dom0.
-This means using /dev/(u)random is still safe.
+An attacker can obtain data returned by RDRAND/RDSEED instructions on
+another core on the system (including another VM). In practice, Linux
+does use RDRAND/RDSEED to seed it's random number generator
+(/dev/urandom, getrandom(2) etc.), but RDRAND/RDSEED is not the only
+source of entropy. So, as long as other sources of entropy are not
+compromised, the overall security of the random number generator is
+still preserved. In Qubes OS this is additionally improved by seeding
+the random number generator at VM startup time using a random seed
+provided from dom0. This means using Linux's random number generator is
+still safe.
 
-Besides Linux kernel using RDRAND as one of entropy sources, userspace
-application can also issue RDRAND instruction on its own. Such
-software is affected by the bug discussed here. Specific impact
-depends on what application does with random data obtained this way.
+Besides Linux kernel using RDRAND/RDSEED as one of entropy sources,
+userspace application can also issue RDRAND/RDSEED instructions on its
+own. Such software is affected by the bug discussed here. Specific
+impact depends on what application does with random data obtained this
+way.
 
 
 Patching

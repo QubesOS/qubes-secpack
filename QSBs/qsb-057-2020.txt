@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #57 ]===---
 
-                             2020-06-09
+                             2020-06-11
 
 
       Special Register Buffer speculative side channel (XSA-320)

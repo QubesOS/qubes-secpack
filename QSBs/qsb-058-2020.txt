@@ -5,7 +5,7 @@
                              2020-07-07
 
 
-          insufficient cache write-back under VT-d (XSA-321)
+          Insufficient cache write-back under VT-d (XSA-321)
 
 
 Summary
@@ -26,11 +26,11 @@ On 2020-07-07, the Xen Security Team published Xen Security Advisory
 | purpose.  Host crashes (leading to a Denial of Service) and privilege
 | escalation cannot be ruled out.
 
+A malicious HVM qube with a PCI device (such as sys-net or sys-usb in
+Qubes' default configuration) can potentially compromise the whole
+system.
 
-An HVM qube with PCI device (like sys-net or sys-usb in default
-configuration) can potentially compromise the whole system.
-
-Only Intel systems are affected, AMD systems are not affected.
+Only Intel systems are affected. AMD systems are not affected.
 
 
 Patching
@@ -42,7 +42,7 @@ bulletin are as follows:
   For Qubes 4.0:
   - Xen packages, version 4.8.5-19
 
-The packages are to be installed in dom0 via the Qubes VM Manager or via
+The packages are to be installed in dom0 via the Qube Manager or via
 the qubes-dom0-update command as follows:
 
   For updates from the stable repository (not immediately available):

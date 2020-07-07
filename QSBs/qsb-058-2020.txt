@@ -1,0 +1,78 @@
+
+
+             ---===[ Qubes Security Bulletin #58 ]===---
+
+                             2020-07-07
+
+
+          insufficient cache write-back under VT-d (XSA-321)
+
+
+Summary
+========
+
+On 2020-07-07, the Xen Security Team published Xen Security Advisory
+321 (CVE-2020-15565 / XSA-321) [1] with the following description:
+
+| When page tables are shared between IOMMU and CPU, changes to them
+| require flushing of both TLBs.  Furthermore, IOMMUs may be non-coherent,
+| and hence prior to flushing IOMMU TLBs CPU cached also needs writing
+| back to memory after changes were made.  Such writing back of cached
+| data was missing in particular when splitting large page mappings into
+| smaller granularity ones.
+| 
+| A malicious guest may be able to retain read/write DMA access to
+| frames returned to Xen's free pool, and later reused for another
+| purpose.  Host crashes (leading to a Denial of Service) and privilege
+| escalation cannot be ruled out.
+
+
+An HVM qube with PCI device (like sys-net or sys-usb in default
+configuration) can potentially compromise the whole system.
+
+Only Intel systems are affected, AMD systems are not affected.
+
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-19
+
+The packages are to be installed in dom0 via the Qubes VM Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-321.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -54,7 +54,10 @@ XSA-337: A malicious HVM with a PCI device (such as sys-net or sys-usb
 in the default Qubes OS configuration) can potentially compromise the
 whole system.
 
-XSA-340: 
+XSA-340: A malicious VM can exploit this issue to crash the Qubes
+system. This requires winning a tight race condition. Compromise of
+the whole system using this bug is very unlikely, but we cannot
+exclude it completely.
 
 XSA-343: By default, Qubes OS uses PV domains only as stubdomains
 hosting qemu for HVM domains. Therefore, in the default configuration,

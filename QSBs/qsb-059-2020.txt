@@ -17,27 +17,25 @@ Security Advisories (XSAs):
 XSA-337 [1] "PCI passthrough code reading back hardware registers":
 | Code paths in Xen's MSI handling have been identified which act on
 | unsanitized values read back from device hardware registers.  While
-| devices strictly compliant with PCI specifications shouldn't be able to
-| affect these registers, experience shows that it's very common for
+| devices strictly compliant with PCI specifications shouldn't be able
+| to affect these registers, experience shows that it's very common for
 | devices to have out-of-spec "backdoor" operations which can affect the
 | result of these reads.
 | 
-| A not fully trusted guest may be able to crash Xen, leading to a Denial
-| of Service (DoS) for the entire system.  Privilege escalation and
-| information leaks cannot be excluded.
+| A not fully trusted guest may be able to crash Xen, leading to a
+| Denial of Service (DoS) for the entire system.  Privilege escalation
+| and information leaks cannot be excluded.
 
-A malicious HVM qube with a PCI device (such as sys-net or sys-usb in
-Qubes' default configuration) can potentially compromise the whole
-system.
-
-XSA-340 [2] "Missing memory barriers when accessing/allocating an event channel":
-| Event channels control structures can be accessed lockless as long as the port
-| is considered to be valid. Such sequence is missing appropriate memory barrier
-| (e.g smp_*mb()) to prevent both the compiler and CPU to re-order access.
+XSA-340 [2] "Missing memory barriers when accessing/allocating an event
+channel":
+| Event channels control structures can be accessed lockless as long as
+| the port is considered to be valid. Such sequence is missing
+| appropriate memory barrier (e.g smp_*mb()) to prevent both the
+| compiler and CPU to re-order access.
 | 
-| A malicious guest may be able to cause a hypervisor crash resulting in a
-| Denial of Service (DoS). Information leak and privilege escalation cannot be
-| excluded.
+| A malicious guest may be able to cause a hypervisor crash resulting in
+| a Denial of Service (DoS). Information leak and privilege escalation
+| cannot be excluded.
 
 XSA-343 [3] "races with evtchn_reset()":
 | Uses of EVTCHNOP_reset (potentially by a guest on itself) or
@@ -46,14 +44,27 @@ XSA-343 [3] "races with evtchn_reset()":
 | bounds memory accesses or triggering of bug checks.
 | 
 | In particular x86 PV guests may be able to elevate their privilege to
-| that of the host.  Host and guest crashes are also possible, leading to
-| a Denial of Service (DoS).  Information leaks cannot be ruled out.
+| that of the host.  Host and guest crashes are also possible, leading
+| to a Denial of Service (DoS).  Information leaks cannot be ruled out.
 
-In default, configuration Qubes OS uses PV domains only as a
-stubdomains hosting qemu for HVM domains. Attacker cannot attack this
-issue directly, but when chained with a bug in qemu, the whole system
-can be compromised. If the user uses PV domains directly (by setting
-virt_mode property to PV), such domain can perform the attack directly.
+Impact
+=======
+
+XSA-337: A malicious HVM with a PCI device (such as sys-net or sys-usb
+in the default Qubes OS configuration) can potentially compromise the
+whole system.
+
+XSA-340: 
+
+XSA-343: By default, Qubes OS uses PV domains only as stubdomains
+hosting qemu for HVM domains. Therefore, in the default configuration,
+an adversary cannot exploit this vulnerability directly. However, if an
+adversary were also able to identify a complementary qemu vulnerability,
+then chaining the attacks together could theoretically allow the
+adversary to compromise the whole system. Although Qubes OS does not
+contain any PV domains by default, users can create them manually by
+setting the virt_mode property to PV. Such domains can exploit this
+vulnerability directly.
 
 Patching
 =========

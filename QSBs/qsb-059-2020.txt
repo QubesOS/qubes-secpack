@@ -76,7 +76,7 @@ The specific packages that resolve the problems discussed in this
 bulletin are as follows:
 
   For Qubes 4.0:
-  - Xen packages, version 4.8.5-22
+  - Xen packages, version 4.8.5-23
   For Qubes 4.1:
   - Xen packages, version 4.14.0-4
 

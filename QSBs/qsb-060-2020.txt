@@ -41,7 +41,7 @@ XSA-346 [2] "undue deferral of IOMMU TLB flushes":
 | in the same way.  This is because the (typically) final reference of
 | such pages is dropped before the coalesced flush, and hence the pages
 | may have been put to a different use even though DMA initiated by
-| their original owner mightstill be in progress.
+| their original owner might still be in progress.
 | 
 | A malicious guest might be able to cause data corruption and data
 | leaks.  Host or guest Denial of Service (DoS), and privilege
@@ -50,10 +50,11 @@ XSA-346 [2] "undue deferral of IOMMU TLB flushes":
 
 XSA-347 [3] "unsafe AMD IOMMU page table updates":
 | AMD IOMMU page table entries are updated in a step by step manner,
-| without regard to them being potentially in use by the IOMMU.  Therefore
-| it was possible that the IOMMU would read and then use a half-updated
-| entry.  Furthermore, updates to Device Table entries lacked suitable
-| ordering enforcement for certain steps involved in these updates.
+| without regard to them being potentially in use by the IOMMU.
+| Therefore it was possible that the IOMMU would read and then use a
+| half-updated entry.  Furthermore, updates to Device Table entries
+| lacked suitable ordering enforcement for certain steps involved in
+| these updates.
 | 
 | In both case the specific outcome heavily depends on how exactly the
 | compiler translated the affected pieces of code.
@@ -66,17 +67,28 @@ XSA-347 [3] "unsafe AMD IOMMU page table updates":
 Impact
 =======
 
-XSA-345: Default Qubes configuration is safe. Shadow mode HVM/PVH are
-disabled at build time and PCI device-having domains are HVM. But it
-is possible to configure PCI device-having domain to be PV, which is
-vulnerable configuration. It is clearly discouraged in VM settings.
+XSA-345: The default Qubes configuration is safe. Shadow mode for HVM
+and PVH domains is disabled at build time, and domains that have PCI
+devices run in HVM mode by default. Therefore, we do not consider this
+XSA to affect the security of Qubes OS. However, we are including it in
+this QSB anyway since it is technically possible for the user to
+manually change a domain that has PCI devices from HVM to PV, which
+would result in a configuration that is vulnerable to this issue. Having
+anticipated the risk associated with such a manual change, we have
+already implemented appropriate safeguards. In the Qubes GUI for
+changing VM settings, the user would have to go to the "Advanced" tab in
+order to change the setting from HVM to PV. Upon making the change, the
+user would immediately be confronted with a warning in bold red text
+that reads, "Using PV mode exposes more hypervisor attack surface!"
+Therefore, it is nearly impossible users would switch to the vulnerable
+configuration by accident.
 
-XSA-346, XSA-457: A malicious domain with a PCI device (sys-net,
-sys-usb) may try to exploit this vulnerability to crash the host.
-Beyond DoS, it is unlikely that this vulnerability could be exploited
-to compromise the system, but we cannot completely rule out the
-possibility.
-Both those issues apply to system running on AMD hardware only.
+XSA-346, XSA-457: A malicious domain with a PCI device (e.g., sys-net or
+sys-usb in the default configuration) could try to exploit this
+vulnerability in order to crash the host. Beyond DoS, it is unlikely
+that this vulnerability could be exploited to compromise the system, but
+we cannot completely rule out the possibility. Both of these issues
+apply only to systems running on AMD processors.
 
 
 Patching
@@ -113,7 +125,7 @@ Xen binaries.
 Credits
 ========
 
-See the original Xen Security Advisory.
+See the original Xen Security Advisories.
 
 
 References

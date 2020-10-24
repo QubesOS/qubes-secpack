@@ -83,7 +83,7 @@ that reads, "Using PV mode exposes more hypervisor attack surface!"
 Therefore, it is nearly impossible users would switch to the vulnerable
 configuration by accident.
 
-XSA-346, XSA-457: A malicious domain with a PCI device (e.g., sys-net or
+XSA-346, XSA-347: A malicious domain with a PCI device (e.g., sys-net or
 sys-usb in the default configuration) could try to exploit this
 vulnerability in order to crash the host. Beyond DoS, it is unlikely
 that this vulnerability could be exploited to compromise the system, but

@@ -1,0 +1,81 @@
+
+
+             ---===[ Qubes Security Bulletin #61 ]===---
+
+                             2020-11-10
+
+
+           Information leak via power sidechannel (XSA-351)
+
+
+Summary
+========
+
+On 2020-11-10, the Xen Security Team published Xen Security Advisory
+351 (XSA-351) [1] with the following description:
+
+| Researchers have demonstrated using software power/energy monitoring
+| interfaces to create covert channels, and infer the operations/data used
+| by other contexts within the system.
+| 
+| Access to these interfaces should be restricted to privileged software,
+| but it was found that Xen doesn't restrict access suitably, and the
+| interfaces are accessible to all guests.
+| 
+| For more information, see:
+|   https://platypusattack.com
+|   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00389.html
+| 
+| An unprivileged guest administrator can sample platform power/energy
+| data.  This may be used to infer the operations/data used by other
+| contexts within the system.
+| 
+| The research demonstrates using this sidechannel to leak the AES keys
+| used elsewhere in the system.
+
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-26
+  For Qubes 4.1:
+  - Xen packages, version 4.14.0-7
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-351.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

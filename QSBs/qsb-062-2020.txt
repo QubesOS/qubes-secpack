@@ -1,0 +1,71 @@
+
+
+             ---===[ Qubes Security Bulletin #62 ]===---
+
+                             2020-11-23
+
+
+           Stack corruption from XSA-346 change (XSA-355)
+
+
+Summary
+========
+
+On 2020-11-23, the Xen Security Team published Xen Security Advisory
+355 (XSA-355) [1] with the following description:
+
+| One of the two changes for XSA-346 introduced an on-stack array.  The
+| check for guarding against overrunning this array was off by one,
+| allowing for corruption of the first stack slot immediately following
+| this array.
+| 
+| A malicious or buggy HVM or PVH guest can cause Xen to crash, resulting
+| in a Denial of Service (DoS) to the entire host.  Privilege escalation
+| as well as information leaks cannot be excluded.
+
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-27
+  For Qubes 4.1:
+  - Xen packages, version 4.14.0-8
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-355.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

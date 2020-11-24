@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin #62 ]===---
 
-                             2020-11-23
+                             2020-11-24
 
 
            Stack corruption from XSA-346 change (XSA-355)

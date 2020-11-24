@@ -11,7 +11,7 @@
 Summary
 ========
 
-On 2020-11-23, the Xen Security Team published Xen Security Advisory
+On 2020-11-24, the Xen Security Team published Xen Security Advisory
 355 (XSA-355) [1] with the following description:
 
 | One of the two changes for XSA-346 introduced an on-stack array.  The

@@ -1,6 +1,6 @@
 
 
-                    ---===[ Qubes Canary 25 ]===---
+                    ---===[ Qubes Canary 025 ]===---
 
 
 Statements

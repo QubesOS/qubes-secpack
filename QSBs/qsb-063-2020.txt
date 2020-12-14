@@ -1,0 +1,158 @@
+
+
+             ---===[ Qubes Security Bulletin 063 ]===---
+
+                             2020-12-15
+
+
+           Multiple Xen issues (XSA-115, XSA-325, XSA-350)
+
+
+Summary
+========
+
+On 2020-12-15, the Xen Security Team published the following Xen
+Security Advisories (XSAs):
+
+XSA-115 [1] "xenstore watch notifications lacking permission checks"
+| Neither xenstore implementation does any permissions checks when
+| reporting a xenstore watch event.
+| 
+| A guest administrator can watch the root xenstored node, which will
+| cause notifications for every created, modified and deleted key.
+| 
+| A guest administrator can also use the special watches, which will
+| cause a notification every time a domain is created and destroyed.
+| 
+| Data may include:
+|  - number, type and domids of other VMs
+|  - existence and domids of driver domains
+|  - numbers of virtual interfaces, block devices, vcpus
+|  - existence of virtual framebuffers and their backend style (eg,
+|    existence of VNC service)
+|  - Xen VM UUIDs for other domains
+|  - timing information about domain creation and device setup
+|  - some hints at the backend provisioning of VMs and their devices
+| 
+| The watch events do not contain values stored in xenstore, only key
+| names.
+
+XSA-325 [2] "Xenstore: guests can disturb domain cleanup"
+| Xenstored and guests communicate via a shared memory page using a
+| specific protocol. When a guest violates this protocol, xenstored will
+| drop the connection to that guest.
+| 
+| Unfortunately this is done by just removing the guest from xenstored's
+| internal management, resulting in the same actions as if the guest had
+| been destroyed, including sending an @releaseDomain event.
+| 
+| @releaseDomain events do not say guest has been removed.  All watchers
+| of this event must look at the states of all guests to find the guest
+| which has been removed.  When an @releaseDomain is generated due to
+| domain xenstored protocol violation, As the guest is still running, so
+| the watchers will not react.
+| 
+| Later, when the guest is actually destroyed, xenstored will no longer
+| have it stored in its internal data base, so no further @releaseDomain
+| event will be sent. This can lead to a zombie domain; memory mappings
+| of that guest's memory will not be removed, due to the missing
+| event. This zombie domain will be cleaned up only after another domain
+| is destroyed, as that will trigger another @releaseDomain event.
+| 
+| If the device model of the guest which violated the Xenstore protocol
+| is running in a stub-domain, a use-after-free case could happen in
+| xenstored, after having removed the guest from its internal data base,
+| possibly resulting in a crash of xenstored.
+
+XSA-350 [3] "Use after free triggered by block frontend in Linux blkback"
+| The Linux kernel PV block backend expects the kernel thread handler
+| to reset ring->xenblkd to NULL when stopped. However, the handler may
+| not have time to run if the frontend quickly toggle between the states
+| connect and disconnect.
+| 
+| As a consequence, the block backend may re-use a pointer after it was
+| freed.
+
+
+Impact
+=======
+
+XSA-115, as described by Xen Security Team:
+| A guest administrator can observe non-sensitive domain and device
+| lifecycle events relating to other guests.  This information allows
+| some insight into overall system configuration (including number of
+| general nature of other guests), and configuration of other guests
+| (including number and general nature of other guests' devices).  This
+| information might be commercially interesting or might make other
+| attacks easier.
+| 
+| There is not believed to be exposure of sensitive data.  Specifically,
+| there is no exposure of: VNC passwords; port numbers; pathnames in host
+| and guest filesystems; cryptopgraphic keys; or within-guest data.
+
+XSA-325:
+The issue allows a compromised domain to delay resource cleanup,
+including disposing DisposableVMs. The delay will be at
+most until another domain shutdown.
+If a HVM domain (like sys-net or sys-usb) triggers it, it may cause
+use-after-free issue in xenstored daemon. It may cause the daemon to
+crash (preventing most further operations in the system). Beyond DoS,
+it is unlikely that this vulnerability could be exploited to
+compromise the system, but we cannot completely rule out the
+possibility.
+
+XSA-350, as described by Xen Security Team:
+| A misbehaving guest can trigger a dom0 crash by continuously
+| connecting / disconnecting a block frontend. Privileged escalation and
+| information leak cannot be ruled out.
+
+
+Patching
+=========
+
+The specific packages that resolve the problems discussed in this
+bulletin are as follows:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-28
+  - Linux kernel packages, versions 5.9.14-1, 5.4.83-1, 4.19.163-1
+  For Qubes 4.1:
+  - Xen packages, version 4.14.0-9
+  - Linux kernel packages, versions 5.9.14-1, 5.4.83-1, 4.19.163-1
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-115.html
+[2] https://xenbits.xen.org/xsa/advisory-325.html
+[3] https://xenbits.xen.org/xsa/advisory-350.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -140,34 +140,6 @@ XSA-350, as described by Xen Security Team:
 | information leak cannot be ruled out.
 
 
-Non-affecting XSAs
-===================
-
-The Xen Project also released the following XSAs concurrently with those
-discussed above. Unlike those discussed above, the following XSAs do not
-affect the security of Qubes OS, and no user action is required. We list
-them here in order to provide positive assurance that they have been
-analyzed by the Qubes Security Team and have been determined not to
-affect the security of Qubes OS. As a reminder, we do not classify mere
-denial-of-service (DoS) attacks as affecting the security of Qubes OS.
-
- - XSA-322 (domid reuse impractical in Qubes case)
- - XSA-323 (no oxenstored)
- - XSA-324 (DoS only)
- - XSA-330 (DoS only)
- - XSA-348 (DoS only)
- - XSA-349 (DoS only)
- - XSA-352 (no oxenstored)
- - XSA-353 (no oxenstored)
- - XSA-354 (DoS only)
- - XSA-356 (DoS only)
- - XSA-358 (DoS only)
- - XSA-359 (DoS only)
-
-Again, these XSAs do not affect the security of Qubes OS, and no user
-action is required.
-
-
 Credits
 ========
 

@@ -29,7 +29,9 @@ plausible explanation.
 Special announcements
 ----------------------
 
-None.
+The previous version of this canary contained a typographical error.
+"March 2020" has been corrected to "March 2021" in statement 5.
+
 
 Disclaimers and notes
 ----------------------

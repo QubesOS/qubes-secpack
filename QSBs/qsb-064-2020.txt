@@ -1,0 +1,84 @@
+
+
+             ---===[ Qubes Security Bulletin 064 ]===---
+
+                             2021-02-16
+
+
+   Linux: error handling issues in blkback's grant mapping (XSA-365)
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - Linux kernel packages, versions 5.10.16-1, 5.4.98-1, 4.19.176-1
+
+  For Qubes 4.1:
+  - Linux kernel packages, versions 5.10.16-1, 5.4.98-1
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Linux kernel binaries.
+
+
+Summary
+========
+
+On 2021-02-16, the Xen Security Team published the following Xen
+Security Advisory (XSA):
+
+XSA-365 [1] "Linux: error handling issues in blkback's grant mapping"
+| To service requests, the driver maps grant references provided by the
+| frontend.  In this process, errors may be encountered.  In one case an
+| error encountered earlier might be discarded by later processing,
+| resulting in the caller assuming successful mapping, and hence
+| subsequent operations trying to access space that wasn't mapped.  In
+| another case internal state would be insufficiently updated, preventing
+| safe recovery from the error.
+
+
+Impact
+=======
+
+XSA-365, as described by Xen Security Team:
+| A malicious or buggy frontend driver may be able to crash the
+| corresponding backend driver, potentially affecting the entire domain
+| running the backend driver.  In configurations without driver domains
+| or similar disaggregation, that is a host-wide denial of sevice.
+| 
+| Privilege escalation and information leaks cannot be ruled out.
+
+
+Credits
+========
+
+See the original Xen Security Advisories.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-365.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

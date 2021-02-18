@@ -1,0 +1,77 @@
+
+
+             ---===[ Qubes Security Bulletin 065 ]===---
+
+                             2021-02-18
+
+
+              missed flush in XSA-321 backport (XSA-366)
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - Xen packages, versions 4.8.5-30
+
+  For Qubes 4.1: not affected
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+========
+
+On 2021-02-18, the Xen Security Team published the following Xen
+Security Advisory (XSA):
+
+XSA-366 [1] "missed flush in XSA-321 backport"
+| An oversight was made when backporting XSA-320, leading entries in the
+| IOMMU not being properly updated under certain circumstances.
+
+
+
+Impact
+=======
+
+XSA-366, as described by Xen Security Team:
+| A malicious guest may be able to retain read/write DMA access to
+| frames returned to Xen's free pool, and later reused for another
+| purpose.  Host crashes (leading to a Denial of Service) and privilege
+| escalation cannot be ruled out.
+
+
+Credits
+========
+
+See the original Xen Security Advisory.
+
+
+References
+===========
+
+[1] https://xenbits.xen.org/xsa/advisory-366.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -5,7 +5,7 @@
                              2021-02-18
 
 
-              missed flush in XSA-321 backport (XSA-366)
+              Missed flush in XSA-321 backport (XSA-366)
 
 
 User action required
@@ -54,7 +54,7 @@ XSA-366 [1] "missed flush in XSA-321 backport"
 Impact
 =======
 
-XSA-366, as described by Xen Security Team:
+XSA-366, as described by the Xen Security Team:
 | A malicious guest may be able to retain read/write DMA access to
 | frames returned to Xen's free pool, and later reused for another
 | purpose.  Host crashes (leading to a Denial of Service) and privilege

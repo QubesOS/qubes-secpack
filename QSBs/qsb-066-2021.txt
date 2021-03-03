@@ -30,11 +30,9 @@ the qubes-dom0-update command as follows:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
 
 A system restart will be required afterwards.  Alternatively, it is
-possible to restart qubesd with
+possible to restart qubesd with the following command in dom0:
 
   $ systemctl restart qubesd.service
-
-in dom0.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -44,40 +42,42 @@ by the community.
 Summary
 ========
 
-Libvirt domain configuration is an XML file built by filling a
-template with a values specific to a particular domain - mostly its
-properties but in few cases also "features" (extra properties that can
-be freely defined). While most of the properties have strictly defined
-format, some allow very broad range of values - broad enough to
-allow characters that otherwise are special in XML. Using such
-characters in XML values requires escaping - which was not enabled in
-the template engine we use (jinja2). The specific VM metadata that
-allows free text and are used in libvirt XML are:
+The libvirt domain configuration is an XML file built by filling a
+template with values specific to a particular domain -- mostly its
+properties but, in a few cases, "features" (extra properties that can be
+freely defined). While most of the properties have strictly-defined
+formats, some allow for a very broad range of values -- broad enough to
+allow characters that are otherwise special in XML. Using such
+characters in XML values requires escaping them, which was not enabled
+in the template engine we use (jinja2). The specific VM metadata
+properties that allow free text and are used in libvirt XML are as
+follows:
 
- - kernelopts property
- - timezone feature (although it is validated in the template itself)
- - video-model feature
- - audio-model feature (Qubes R4.1 only)
+ - `kernelopts` property
+ - `timezone` feature (although it is validated in the template itself)
+ - `video-model` feature
+ - `audio-model` feature (Qubes R4.1 only)
 
-Normally this wouldn't be an issue if all the VM settings would come
-from a trusted entity (dom0). But with introduction of Admin API[1] in
-Qubes 4.0, it is possible to allow less trusted domains to manage
-subset of VMs or their settings - including affected properties and
-features. This in turn can be used to modify unintended parts of the
-libvirt XML leading to a code execution in dom0 in the worst case.
+Normally, this wouldn't be an issue, since all VM settings come from a
+trusted entity (dom0). However, with the introduction of the Admin API
+[1] in Qubes 4.0, it is possible to allow less trusted domains (known as
+"ManagementVMs") to manage a subset of VMs or their settings, including
+the affected properties and features. This, in turn, can be used to
+modify unintended parts of the libvirt XML. In the worst case, this
+could lead to code execution in dom0.
 
-To fix the issue, we enable autoescape feature of the jinja2 template
-engine. This will cover the current problematic properties, as well as
-others possibly introduced in the future. Additionally, we add an extra
-validation of "features" that otherwise are used in a free text form
-context (specifically net.fake-* features are are expected to be an IP
-address, but lacked such validation).
+To fix the issue, we're enabling the autoescape feature of the jinja2
+template engine. This will cover the current problematic properties as
+well as any others that might be introduced in the future. Additionally,
+we're adding an extra validation step for "features" that are otherwise
+used in a free text form context (specifically, `net.fake-*` features
+are expected to be IP addresses, but they lacked such validation).
 
-Note a Management VM may still break a VM it is given control over,
-for example by setting some property to an improper value in given
-context (things like too little memory, or too short startup timeout).
-But it should not be able to escalate its permissions beyond what it
-is assigned.
+Note that a ManagementVM can still break a VM it has control over, for
+example, by setting some property to an improper value in a given
+context (e.g., too little memory or too short of a startup timeout).
+However, after these changes, it should no longer be able to escalate
+its permissions beyond what it has been assigned.
 
 
 Impact
@@ -85,20 +85,19 @@ Impact
 
 Default Qubes 4.0 and 4.1 configurations are not affected.
 
-If a less trusted domain (Management VM) is given Admin API access
-to set affected properties/features on any domain
-(admin.vm.property.Set and/or admin.vm.feature.Set qrexec services),
-it may use this access to elevate its privileges and take full control
-of the system.
+If a less trusted domain (known as a "ManagementVM") is given Admin API
+access to set any of the affected properties or features on any domain
+(via the `admin.vm.property.Set` or `admin.vm.feature.Set` qrexec
+services), it may use this access to elevate its privileges and
+potentially take full control of the system.
 
-Note that `qubes.FeaturesRequest` is enabled by default, but **is not**
+Note that `qubes.FeaturesRequest` is enabled by default but *is not*
 vulnerable for three reasons.  First, feature names are read from
-qubesd, which enforces an allowlist of permitted characters in paths.
+qubesd, which enforces a whitelist of permitted characters in paths.
 None of the permitted characters are metacharacters in XML.  Second,
-none of the features that dom0 will honor a request for will have
-their values incorporated into libvirt XML.  Third, 
-`qubes.FeaturesRequest` can only unset a feature or set its value to
-`1`.
+none of the features for which dom0 will honor a request have their
+values incorporated into libvirt XML.  Third, `qubes.FeaturesRequest`
+can only unset a feature or set its value to `1`.
 
 Credits
 ========

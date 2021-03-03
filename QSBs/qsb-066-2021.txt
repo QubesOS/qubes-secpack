@@ -1,0 +1,116 @@
+
+
+             ---===[ Qubes Security Bulletin 066 ]===---
+
+                             2021-03-03
+
+
+         XML injection through libvirt domain configuration
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - qubes-core-dom0 package, version 4.0.58-1
+
+  For Qubes 4.1:
+  - qubes-core-dom0 package, version 4.1.20-1
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.  Alternatively, it is
+possible to restart qubesd with
+
+  $ systemctl restart qubesd.service
+
+in dom0.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+
+Summary
+========
+
+Libvirt domain configuration is an XML file built by filling a
+template with a values specific to a particular domain - mostly its
+properties but in few cases also "features" (extra properties that can
+be freely defined). While most of the properties have strictly defined
+format, some allow very broad range of values - broad enough to
+allow characters that otherwise are special in XML. Using such
+characters in XML values requires escaping - which was not enabled in
+the template engine we use (jinja2). The specific VM metadata that
+allows free text and are used in libvirt XML are:
+
+ - kernelopts property
+ - timezone feature (although it is validated in the template itself)
+ - video-model feature
+ - audio-model feature (Qubes R4.1 only)
+
+Normally this wouldn't be an issue if all the VM settings would come
+from a trusted entity (dom0). But with introduction of Admin API[1] in
+Qubes 4.0, it is possible to allow less trusted domains to manage
+subset of VMs or their settings - including affected properties and
+features. This in turn can be used to modify unintended parts of the
+libvirt XML leading to a code execution in dom0 in the worst case.
+
+To fix the issue, we enable autoescape feature of the jinja2 template
+engine. This will cover the current problematic properties, as well as
+others possibly introduced in the future. Additionally, we add an extra
+validation of "features" that otherwise are used in a free text form
+context (specifically net.fake-* features are are expected to be an IP
+address, but lacked such validation).
+
+Note a Management VM may still break a VM it is given control over,
+for example by setting some property to an improper value in given
+context (things like too little memory, or too short startup timeout).
+But it should not be able to escalate its permissions beyond what it
+is assigned.
+
+
+Impact
+=======
+
+Default Qubes 4.0 and 4.1 configurations are not affected.
+
+If a less trusted domain (Management VM) is given Admin API access
+to set affected properties/features on any domain
+(admin.vm.property.Set and/or admin.vm.feature.Set qrexec services),
+it may use this access to elevate its privileges and take full control
+of the system.
+
+Note that `qubes.FeaturesRequest` is enabled by default, but **is not**
+vulnerable for three reasons.  First, feature names are read from
+qubesd, which enforces an allowlist of permitted characters in paths.
+None of the permitted characters are metacharacters in XML.  Second,
+none of the features that dom0 will honor a request for will have
+their values incorporated into libvirt XML.  Third, 
+`qubes.FeaturesRequest` can only unset a feature or set its value to
+`1`.
+
+Credits
+========
+
+This issue was discovered by Demi Marie Obenour.
+
+
+References
+===========
+
+[1] https://www.qubes-os.org/doc/admin-api/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

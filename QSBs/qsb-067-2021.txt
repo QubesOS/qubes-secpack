@@ -1,0 +1,181 @@
+
+
+             ---===[ Qubes Security Bulletin 067 ]===---
+
+                             2021-03-17
+
+
+                     Multiple rpm vulnerabilities
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - rpm 4.14.2.1 (plus rebuilt packages to link with the new rpm)
+  - qubes-core-dom0-linux 4.0.29
+  - qubes-mgmt-salt-dom0-update 4.0.10
+
+  For Qubes 4.1:
+  - qubes-core-dom0-linux 4.1.10
+  - qubes-mgmt-salt-dom0-update 4.1.5
+
+The packages are to be installed in dom0 via the Qubes Update tool[4] or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+After installing the updates in dom0, it is necessary to install
+updates in (at least) Fedora-based TemplateVMs and StandaloneVMs. This
+can be done via the Qubes Update tool[4], or using qubesctl (salt)
+command as follows:
+
+  $ sudo qubesctl --skip-dom0 --templates --standalones state.sls update.qubes-vm
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+
+Summary
+========
+
+Demi M. Obenour has discovered several issues in the rpm package
+manager:
+- CVE-2021-20271[1] rpm: Signature checks bypass via corrupted rpm package
+- CVE-2021-3421[2] rpm: unsigned signature header leads to string
+  injection into an rpm database
+- CVE-2021-20266[3] rpm: missing length checks in hdrblobInit()
+
+Those issues allows an attacker that controls packages the user
+downloads, to inject malicious content that in some conditions may
+slip past the signature check. Specifically, it allows to modify
+parts of the package header that is not protected by the signature,
+but is later integrated into rpm database. This allows corrupting the
+rpm database and preventing further updates of select packages.  In
+the case of Fedora TemplateVMs, it also allows arbitrary code
+execution.
+
+The CVE-2021-20271 exploit takes advantage of multiple headers in the
+RPM package format. In a proper RPM package, the signature is placed
+in a separate header (called "signature header") and if present, is
+verified by librpm when loading the file (according to requested
+verify level). An RPM package contains also a "main header" that
+includes all the other package metadata. The main header is protected
+with a signature in the signature header. The payload is protected
+either with a signature in the signature header, or with a SHA256 hash
+located in the main header. The distinction between those two headers
+is available to librpm internals, but not to external librpm users.
+
+A malformed package may contain a signature in the main header instead
+of the signature header. Librpm will reject such package only if a
+strict signature check was requested, but otherwise will treat the
+package as not signed. On the other hand, DNF have no way to check if
+signature was misplaced.  It will load the package and, seeing a
+signature, will assume that it was checked by librpm. This allows
+bypassing the package signature check.
+
+The other bugs (CVE-2021-20266, CVE-2021-3421) are about incorrect
+parsing of the signature header (that while holds the signature,
+itself is not signed). This leads to either a crash or corrupting an
+RPM database (if such malformed package gets installed).
+
+While Fedora will release patches in due course, we apply a mitigation
+that prevents the privilege escalation aspect of the issue. We
+configure rpm to always verify package signatures, even if upper level
+package manager (like DNF) does not explicitly request it. This way
+bypassing signature check in DNF is not enough to compromise the whole
+template. Note this change prevents also installing unsigned rpm
+packages, even if explicitly requested. See the "Side effects" section
+below.
+
+For the dom0 aspect of the issue in Qubes 4.0, we update rpm to a version not
+vulnerable to this specific issue. We have decided to update to the
+next major version of rpm (from 4.13 to 4.14). This is because,
+besides the security fix itself (which could be backported), it
+has significantly improved its integrity verification. In 4.14, the
+macro _pkgverify_level can be used to require that all packages be
+signed by a trusted key.  It defaults to “digest”, meaning that only
+checksums must be present, but we have set it to “all”, requiring that
+all packages must be signed.  Additionally, the checks performed
+before importing a package have been significantly enhanced, which
+substantially reduces the attack surface prior to integrity
+verification.
+
+In the near future we will additionally deploy an extra tool to
+preform preliminary validation of all rpm packages in dom0, before
+handing them to rpm.
+
+
+Impact
+=======
+
+The impact differs between Fedora templates and dom0:
+
+1. For Fedora templates, an attacker who control packages that user
+   downloads may completely bypass package signature check and fully
+   compromise Fedora templates.
+
+2. For dom0, an attacker who control packages that user downloads may
+   corrupt rpm database and (almost silently) prevent further updates of
+   select packages.
+
+The attack requires control over content of downloaded packages. This
+requirement differs slightly between Fedora templates and dom0:
+
+1. For Fedora templates, the attacker would need to either:
+  - compromise Fedora infrastructure serving updates
+  - perform man-in-the-middle attack on a HTTPS connection used to
+    download repository metadata (which contains package hashes)
+
+2. For dom0, the attacker would need to either perform attack on the
+   repository access - similar to the Fedora templates - or compromise
+   UpdateVM (sys-firewall in the default configuration).
+
+
+Side effects
+=============
+
+The mitigation forces signature check in rpm regardless of other
+options. This means, rpm will refuse to install unsigned package (or
+with not trusted signature) even when explicitly requested to do so.
+This breaks situations like:
+ - installing locally built packages
+ - installing manually downloaded packages whose integrity was
+   verified separately - often the case for closed-source software
+
+In those cases, `dnf install /path/to/the/package.rpm` nor `rpm -i
+/path/to/the/package.rpm` will no longer work. To install a package
+without a trusted signature (that has been verified some other means),
+use the following command:
+
+    rpm --define '_pkgverify_level digest' -i /path/to/the/package.rpm
+
+If the package have some dependencies, the above command will list
+them - those will need to be installed with `dnf` manually.
+
+
+Credits
+========
+
+The issues were discovered and reported by Demi M. Obenour.
+
+
+References
+===========
+
+[1] https://bugzilla.redhat.com/show_bug.cgi?id=1934125
+[2] https://bugzilla.redhat.com/show_bug.cgi?id=1927747
+[3] https://bugzilla.redhat.com/show_bug.cgi?id=1927741
+[4] https://www.qubes-os.org/doc/updating-qubes-os/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

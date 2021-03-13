@@ -1,0 +1,69 @@
+
+
+             ---===[ Qubes Security Bulletin ___ ]===---
+
+                             ____-__-__
+
+
+                                TODO
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - TODO
+
+  For Qubes 4.1:
+  - TODO
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+TODO:
+A system restart will be required afterwards. 
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+TODO:
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+========
+
+TODO
+
+Impact
+=======
+
+TODO
+
+
+Credits
+========
+
+TODO
+
+
+References
+===========
+
+TODO
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

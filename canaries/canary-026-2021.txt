@@ -1,6 +1,6 @@
 
 
-                    ---===[ Qubes Canary 025 ]===---
+                    ---===[ Qubes Canary 026 ]===---
 
 
 Statements
@@ -29,7 +29,16 @@ plausible explanation.
 Special announcements
 ----------------------
 
-None.
+After publishing the initial version of this canary we discovered a
+typographical error in the title (the canary number "025" had not been
+updated to "026"). The title has been later updated and signatures
+updated, which is the reason why signature dates does not match canary
+date. The original signatures and canary text are available in the git
+history of qubes-secpack repository.
+
+After the date of this canary but before publishing this updated
+version, QSB-067, QSB-068, and QSB-069 has been published in addition
+to the previous 66 QSBs mentioned above.
 
 Disclaimers and notes
 ----------------------

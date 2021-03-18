@@ -2,7 +2,7 @@
 
              ---===[ Qubes Security Bulletin 067 ]===---
 
-                             2021-03-17
+                             2021-03-19
 
 
                      Multiple RPM vulnerabilities
@@ -21,7 +21,7 @@ the issues discussed in this bulletin:
 
   For Qubes 4.1:
   - qubes-core-dom0-linux 4.1.10
-  - qubes-mgmt-salt-dom0-update 4.1.5
+  - qubes-mgmt-salt-dom0-update 4.1.6
 
 The packages are to be installed in dom0 via the Qubes Update tool [4]
 or via the qubes-dom0-update command as follows:

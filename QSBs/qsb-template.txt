@@ -30,7 +30,7 @@ the qubes-dom0-update command as follows:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
 
 TODO:
-A system restart will be required afterwards. 
+A system restart will be required afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

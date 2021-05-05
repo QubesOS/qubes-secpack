@@ -1,7 +1,11 @@
-This directory is used to list the official cryptocurrency donation addresses
-for the Qubes OS Project.
+This directory contains the official cryptocurrency donation addresses for the
+Qubes OS Project.
 
-One can verify the authenticity of the addresses listed here in the same way as
-any other sensitive files in this repository: 1) by veryfing the signture on the
-latest git tag, and 2) by veryfing the detached PGP signatures associated with
-each file in this directory.
+In order to allow for the authenticity and integrity of these donation addresses
+to be verified, each address file is PGP-signed in two ways. First, each file is
+accompanied by detached PGP signatures from members of the Qubes Security Team.
+Second, each file is delivered via the Qubes Security Pack (qubes-secpack),
+which is a Git repository. The latest commit in this repository should always
+have a PGP-signed tag from a member of the Qubes Security Team. We strongly
+recommend verifying the authenticity and integrity of these files prior to
+making any donations to the addresses they contain.

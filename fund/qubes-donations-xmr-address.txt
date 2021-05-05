@@ -1,1 +1,19 @@
+The Qubes OS Project has one official Monero (XMR) donation address:
+
 46PrVgXBdD4cps3SVkHoCDZvMfFdG5q4ej5DYKpuKpTnjiL7pv6KGv7dPh4DPijCGqTbxLDPqZJkobd9SttMiauoP1CQU4y
+
+The wallet for this address is controlled by a core team member of the Qubes OS
+Project.
+
+In order to allow for the authenticity and integrity of this message to be
+verified, this file is PGP-signed in two ways. First, this file is accompanied
+by detached PGP signatures from members of the Qubes Security Team. Second, this
+file is delivered via the Qubes Security Pack (qubes-secpack), which is a Git
+repository. The latest commit in this repository should always have a PGP-signed
+tag from a member of the Qubes Security Team. We strongly recommend verifying
+the authenticity and integrity of this message prior to making any donations to
+the above address.
+
+Any future updates to this file can always be found in the Qubes Security Pack.
+
+Last updated: 2021-05-04

@@ -57,7 +57,7 @@ obscures the whole screen, which is a standard practice. In
 XScreenSaver, each such window is assigned a specific property. When a
 video output is disconnected, its corresponding blanking window is
 destroyed, and its XScreenSaver-specific property is removed so that it
-will not be used by `xscreensaver-command` anymore). This is handled by
+will not be used by `xscreensaver-command` anymore. This is handled by
 the `update_screen_layout()` function in the `driver/screens.c` file:
 
      985 /* Synchronize the contents of si->ssi to the current state of the monitors.

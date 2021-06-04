@@ -14,16 +14,16 @@ User action required
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
-  For Qubes 4.0:
+  For Qubes 4.0, in dom0:
   - xscreensaver 5.45-5
 
-  For Qubes 4.1:
+  For Qubes 4.1, in dom0:
   - xscreensaver 5.45-5
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
-in dom0 via the Qubes Update Tool. [2]
+via the Qubes Update Tool or its command-line equivalents. [2]
 
 After installing this update, the XScreenSaver daemon process must be
 restarted in order for the changes to take effect. This can be done by
@@ -55,10 +55,10 @@ Details
 On X11, screen locking and blanking is done by creating a window that
 obscures the whole screen, which is a standard practice. In
 XScreenSaver, each such window is assigned a specific property. When a
-display is disconnected, its corresponding blanking window is destroyed,
-and its XScreenSaver-specific property is removed so that it will not be
-used by `xscreensaver-command` anymore). This is handled by the
-`update_screen_layout()` function in the `driver/screens.c` file:
+video output is disconnected, its corresponding blanking window is
+destroyed, and its XScreenSaver-specific property is removed so that it
+will not be used by `xscreensaver-command` anymore). This is handled by
+the `update_screen_layout()` function in the `driver/screens.c` file:
 
      985 /* Synchronize the contents of si->ssi to the current state of the monitors.
      986    Doesn't change anything if nothing has changed; otherwise, alters and
@@ -113,16 +113,16 @@ used by `xscreensaver-command` anymore). This is handled by the
 
 The initial portion of the function counts how many outputs are defined
 (the `count` variable) and how many of them are connected (the
-`good_count` variable). Then, the `si->screens` array is allocated (or
-re-allocated) to fit information about connected displays, with an extra
+`good_count` variable). Then, the `si->screens` array is allocated or
+re-allocated to fit information about connected outputs, with an extra
 margin of 10 entries. However, the loop at the end iterates over the
-array up to the total number of outputs, not only those that are
+array up to the total number of outputs, not just the ones that are
 connected.
 
 If there are 10 or fewer disconnected outputs, this works fine. However,
 if there are more than 10, it will access the array beyond its end,
 reading unrelated data from memory. It will interpret this data as an
-XScreenSaver window ID. If that unrelated data happen to be non-zero
+XScreenSaver window ID. If that unrelated data happens to be non-zero
 (which is very likely), then the condition at line 1095 will not skip
 it, and the `XDeleteProperty` call will operate on that (most likely
 invalid) window ID. This, in turn, will cause the XScreenSaver process
@@ -154,12 +154,12 @@ notified about this issue and decided not to publish an advisory, as the
 issue does not affect the most recent version.
 
 The Qubes Security Team has decided to address this issue in Qubes OS by
-patching this specific bug rather than immediately updating to the 6.00
+patching this specific bug rather than immediately upgrading to the 6.00
 version. The reason is that XScreenSaver 6.00 is a major update with
 major architectural changes. As such, it poses an increased risk of
 introducing unrelated problems. However, this decision does not preclude
-the possibility of updating to XScreenSaver 6.00 at some point,
-independently of this particular security patch.
+the possibility of updating to XScreenSaver 6.00 at some point in the
+future, independently of this particular security patch.
 
 Credits
 ========

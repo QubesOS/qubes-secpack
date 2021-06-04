@@ -1,0 +1,177 @@
+
+
+             ---===[ Qubes Security Bulletin 068 ]===---
+
+                             2021-06-04
+
+
+       Xscreensaver crashes when disconnecting external display
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - xscreensaver 5.45-5
+
+  For Qubes 4.1:
+  - xscreensaver 5.45-5
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+The xscreensaver daemon process needs to be restarted afterwards. It
+can be achieved by system restart, logout+login, or issuing the
+following commands in dom0's terminal:
+
+    xscreensaver-command -exit; xscreensaver &
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community.
+
+
+Summary
+========
+
+Xscreensaver tracks what displays are connected to the system, to
+properly blank them. When an output gets disconnected, in some
+specific hardware configuration, Xscreensaver crashes, leaving the
+system unlocked.
+
+
+Details
+========
+
+On X11, the screen locking and blanking is done with a window
+obscuring the whole screen, which is a standard practice. When a
+display is disconnected, relevant blanking window is destroyed, but
+also it gets its Xscreensaver-specific property removed (to not be
+used anymore by xscreensaver-command). This is handled in
+update_screen_layout() function in `driver/screens.c` file:
+
+     985 /* Synchronize the contents of si->ssi to the current state of the monitors.
+     986    Doesn't change anything if nothing has changed; otherwise, alters and
+     987    reuses existing saver_screen_info structs as much as possible.
+     988    Returns True if anything changed.
+     989  */
+     990 Bool
+     991 update_screen_layout (saver_info *si)
+     992 {
+     993   monitor **monitors = scan_monitors (si);
+     994   int count = 0;
+     995   int good_count = 0;
+    ...
+    1009   while (monitors[count])
+    1010     {
+    1011       if (monitors[count]->sanity == S_SANE)
+    1012         good_count++;
+    1013       count++;
+    1014     }
+    1015 
+    1016   if (si->ssi_count == 0)
+    1017     {
+    1018       si->ssi_count = 10;
+    1019       si->screens = (saver_screen_info *)
+    1020         calloc (sizeof(*si->screens), si->ssi_count);
+    1021     }
+    1022 
+    1023   if (si->ssi_count <= good_count)
+    1024     {
+    1025       si->ssi_count = good_count + 10;
+    1026       si->screens = (saver_screen_info *)
+    1027         realloc (si->screens, sizeof(*si->screens) * si->ssi_count);
+    1028       memset (si->screens + si->nscreens, 0,
+    1029               sizeof(*si->screens) * (si->ssi_count - si->nscreens));
+    1030     }
+    ...
+    1092   for (; j < count; j++)
+    1093     {
+    1094       saver_screen_info *ssi = &si->screens[j];
+    1095       if (!ssi->screensaver_window)
+    1096         continue;
+    1097       fprintf (stderr, "%s: %d: screen now unused, disabling.\n",
+    1098                blurb(), j);
+    1099       /* Undo store_saver_id() so that xscreensaver-command doesn't attempt
+    1100          to communicate with us through this window. It might make more
+    1101          sense to destroy the window, but I'm not 100% sure that there are
+    1102          no outstanding grabs on it that have yet been transferred.
+    1103        */
+    1104       XDeleteProperty (si->dpy, ssi->screensaver_window,
+    1105                        XA_SCREENSAVER_VERSION);
+    1106     }
+
+The initial portion of the function counts how many outputs are
+defined (`count` variable) and how many of them are connected
+(`good_count` variable). Then, the `si->screens` array is allocated
+(or re-allocated) to fit info about connected displays, with an extra
+margin of 10 entries. But the loop at the end, iterates over the array
+up to the total number of outputs, not only those connected.
+
+If there are 10 or less disconnected outputs, it works fine. But if
+there are more, it will access the array beyond its end, reading
+unrelated data from the memory. It will interpret it as a screensaver
+window id. If that unrelated data happen to be non-zero (which is very
+likely), then the condition at line 1095 will not skip it, and then
+`XDeleteProperty` call will operate on (most likely) invalid window
+id. This, in turn, will make Xscreensaver process to crash, as that's
+what the error handler do (`saver_ehandler()` function in the
+`driver/xscreensaver.c` file).
+
+The error message will look like this:
+
+    ##############################################################################
+    
+    xscreensaver: 11:17:59: X Error!  PLEASE REPORT THIS BUG.
+    xscreensaver: 11:17:59: screen 0/0: 0x2ae, 0x0, 0x6600001
+    xscreensaver: 11:17:59: screen 0/1: 0x2ae, 0x0, 0x0
+    
+    ##############################################################################
+    
+    X Error of failed request:  BadWindow (invalid Window parameter)
+      Major opcode of failed request:  19 (X_DeleteProperty)
+      Resource id in failed request:  0x188dba0
+      Serial number of failed request:  4284
+      Current serial number in output stream:  4286
+    
+    #######################################################################
+
+
+The issue affects only Xscreensaver version 5.45. Versions 5.44 and
+older, as well as 6.00 are not affected. The Xscreensaver author was
+notified about the issue and refused to release advisory, as the issue
+does not affect the most recent version.
+
+The Qubes Security Team has decided to fix this security issue by
+patching the specific bug only, instead of updating to the 6.00 version.
+Xscreensaver 6.00 is a major update, with major architecture changes.
+But as such, it poses an increased risk of introducing other issues.
+This does not exclude possibility of releasing update to 6.00
+separately - outside of the security fix.
+
+Impact
+=======
+
+On some hardware configurations (those with more than 10
+disconnect-able video outputs), an attacker with physical 
+access to a locked system may be able to unlock it, bypassing
+authentication step.
+
+Credits
+========
+
+The issue was reported by Mustafa Kuscu
+
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

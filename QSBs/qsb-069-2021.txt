@@ -1,0 +1,156 @@
+
+
+             ---===[ Qubes Security Bulletin 069 ]===---
+
+                             2021-06-09
+
+
+    Multiple Xen-related issues (XSA-373, XSA-374, XSA-375, XSA-377)
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - Xen packages, version TODO
+  - Linux kernel packages, versions TODO (relevant only for users of
+    the "latest" kernel flavor)
+
+  For Qubes 4.1:
+  - Xen packages, version TODO
+  - Linux kernel packages, versions TODO
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update Tool or its command-line equivalents. [2]
+
+A system restart will be required afterwards.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+========
+
+On 2021-06-09, the Xen Security Team published the following Xen
+Security Advisories (XSAs):
+
+XSA-373 [3] "inappropriate x86 IOMMU timeout detection / handling"
+| IOMMUs process commands issued to them in parallel with the operation
+| of the CPU(s) issuing such commands.  In the current implementation in
+| Xen, asynchronous notification of the completion of such commands is
+| not used.  Instead, the issuing CPU spin-waits for the completion of
+| the most recently issued command(s).  Some of these waiting loops try
+| to apply a timeout to fail overly-slow commands.  The course of action
+| upon a perceived timeout actually being detected is inappropriate:
+|  - on Intel hardware guests which did not originally cause the timeout
+|    may be marked as crashed,
+|  - on AMD hardware higher layer callers would not be notified of the
+|    issue, making them continue as if the IOMMU operation succeeded.
+
+XSA-374 [4] "Guest triggered use-after-free in Linux xen-netback"
+| A malicious or buggy network PV frontend can force Linux netback to
+| disable the interface and terminate the receive kernel thread
+| associated with queue 0 in response to the frontend sending a
+| malformed packet.
+| 
+| Such kernel thread termination will lead to a use-after-free in Linux
+| netback when the backend is destroyed, as the kernel thread associated
+| with queue 0 will have already exited and thus the call to
+| kthread_stop will be performed against a stale pointer.
+
+XSA-375 [5] "Speculative Code Store Bypass"
+| Modern superscalar processors may employ sophisticated decoding and
+| caching of the instruction stream to improve performance.  However, a
+| consequence is that self-modifying code updates may not take effect
+| instantly.
+| 
+| Whatever the architectural guarantees, some CPUs have microarchitectural
+| behaviour whereby the stale instruction stream may be speculatively
+| decoded and executed.
+| 
+| Speculation of this form can suffer from type confusion in registers,
+| and potentially leak data.
+
+XSA-377 [6] "x86: TSX Async Abort protections not restored after S3"
+| This issue relates to the TSX Async Abort speculative security vulnerability.
+| Please see https://xenbits.xen.org/xsa/advisory-305.html for details.
+| 
+| Mitigating TAA by disabling TSX (the default and preferred option) requires
+| selecting a non-default setting in MSR_TSX_CTRL.  This setting isn't restored
+| after S3 suspend.
+
+TODO
+
+Impact
+=======
+
+XSA-373, as described by Xen Security Team:
+| A malicious guest may be able to elevate its privileges to that of the
+| host, cause host or guest Denial of Service (DoS), or cause information
+| leaks.
+
+Only a guest with a PCI device can leverage this issue. In the default
+Qubes OS configuration, this means `sys-net` or `sys-usb`.
+
+XSA-374:
+A malicious or buggy VM can trigger its network-providing VM to crash. In
+most cases of the default configuration this VM is `sys-firewall` or
+`sys-whonix`. Privilege escalation (to that network-providing VM) and
+information leaks cannot be ruled out.
+
+The issue affects Linux kernel version 5.5 and newer. Qubes OS R4.0 by
+default uses Linux 5.4.x, so it isn't affected, unless newer kernel
+was installed explicitly (`kernel-latest-qubes-vm` package).
+
+XSA-375, as described by the Xen Security Team:
+| In attacker might be able to infer the contents of arbitrary host
+| memory, including memory assigned to other guests.
+
+XSA-377:
+The impact is the same as XSA-305, explained in QSB-053:
+| An attacker, which could include a malicious untrusted user process on a
+| trusted guest, or an untrusted guest, can sample the content of
+| recently-used memory operands and IO Port writes.
+|
+| This can include data from:
+|
+|  * A previously executing context (process, or guest, or
+|    hypervisor/toolstack) at the same privilege level.
+|  * A higher privilege context (kernel, hypervisor, SMM) which
+|    interrupted the attacker's execution.
+|
+| Vulnerable data is that on the same physical core as the attacker.  This
+| includes, when hyper-threading is enabled, adjacent threads.
+|
+| An attacker cannot use this vulnerability to target specific data.  An
+| attack would likely require sampling over a period of time and the
+| application of statistical methods to reconstruct interesting data.
+
+TODO
+
+Credits
+========
+
+See the original Xen Security Advisories.
+
+
+References
+===========
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/updating-qubes-os/
+[3] https://xenbits.xen.org/xsa/advisory-373.html
+[4] https://xenbits.xen.org/xsa/advisory-374.html
+[5] https://xenbits.xen.org/xsa/advisory-375.html
+[6] https://xenbits.xen.org/xsa/advisory-377.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

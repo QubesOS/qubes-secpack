@@ -2,10 +2,11 @@
 
              ---===[ Qubes Security Bulletin 069 ]===---
 
-                             2021-06-09
+                             2021-06-08
 
 
-    Multiple Xen-related issues (XSA-373, XSA-374, XSA-375, XSA-377)
+              Multiple Xen and Intel-related issues
+        (XSA-373, XSA-374, XSA-375, XSA-377, INTEL-SA-00442)
 
 
 User action required
@@ -14,14 +15,17 @@ User action required
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
-  For Qubes 4.0, in TODO:
-  - Xen packages, version TODO
-  - Linux kernel packages, versions TODO (relevant only for users of
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-34
+  - Linux kernel packages, versions 5.12.9-1 (relevant only for users of
     the "latest" kernel flavor)
+  - microcode_ctl package, version 2.1-33.qubes1
 
-  For Qubes 4.1, in TODO:
-  - Xen packages, version TODO
-  - Linux kernel packages, versions TODO
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.1-5
+  - Linux kernel packages, versions 5.10.42-1, 5.12.9-1 (for
+    users of the "latest" kernel flavor)
+  - microcode_ctl package, version 2.1-33.qubes1
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -91,7 +95,12 @@ XSA-377 [6] "x86: TSX Async Abort protections not restored after S3":
 | requires selecting a non-default setting in MSR_TSX_CTRL.  This
 | setting isn't restored after S3 suspend.
 
-TODO
+INTEL-SA-00442 [7] "Intel® VT-d Advisory":
+
+| A potential security vulnerability in some Intel® Virtualization
+| Technology for Directed I/0 (VT-d) products may allow escalation of
+| privilege. Intel is releasing firmware updates to mitigate this
+| potential vulnerability.
 
 Impact
 =======
@@ -125,7 +134,7 @@ to other guests."
 
 XSA-377:
 
-The impact is the same as XSA-305, which we explained in QSB-053 [7]:
+The impact is the same as XSA-305, which we explained in QSB-053 [8]:
 
 | An attacker, which could include a malicious untrusted user process on
 | a trusted guest, or an untrusted guest, can sample the content of
@@ -145,12 +154,16 @@ The impact is the same as XSA-305, which we explained in QSB-053 [7]:
 | An attack would likely require sampling over a period of time and the
 | application of statistical methods to reconstruct interesting data.
 
-TODO
+INTEL-SA-00442:
+
+As explained by Intel, "Incomplete cleanup in some Intel(R) VT-d
+products may allow an authenticated user to potentially enable
+escalation of privilege via local access."
 
 Credits
 ========
 
-See the original Xen Security Advisories.
+See the original Security Advisories.
 
 References
 ===========
@@ -161,7 +174,8 @@ References
 [4] https://xenbits.xen.org/xsa/advisory-374.html
 [5] https://xenbits.xen.org/xsa/advisory-375.html
 [6] https://xenbits.xen.org/xsa/advisory-377.html
-[7] https://www.qubes-os.org/news/2019/11/13/qsb-053/
+[7] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00442.html
+[8] https://www.qubes-os.org/news/2019/11/13/qsb-053/
 
 --
 The Qubes Security Team

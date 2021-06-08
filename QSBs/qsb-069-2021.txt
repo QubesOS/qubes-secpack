@@ -5,7 +5,7 @@
                              2021-06-08
 
 
-              Multiple Xen and Intel-related issues
+                    Multiple Xen and Intel issues
         (XSA-373, XSA-374, XSA-375, XSA-377, INTEL-SA-00442)
 
 
@@ -17,22 +17,23 @@ the issues discussed in this bulletin:
 
   For Qubes 4.0, in dom0:
   - Xen packages, version 4.8.5-34
-  - Linux kernel packages, versions 5.12.9-1 (relevant only for users of
-    the "latest" kernel flavor)
-  - microcode_ctl package, version 2.1-33.qubes1
+  - Linux kernel packages, versions 5.12.9-1 (for users of the "latest"
+    kernel flavor)
+  - microcode_ctl package, version 2.1-33.qubes1 (for Intel CPU users)
 
   For Qubes 4.1, in dom0:
   - Xen packages, version 4.14.1-5
-  - Linux kernel packages, versions 5.10.42-1, 5.12.9-1 (for
-    users of the "latest" kernel flavor)
-  - microcode_ctl package, version 2.1-33.qubes1
+  - Linux kernel packages, versions 5.10.42-1, 5.12.9-1 (for users of
+    the "latest" kernel flavor)
+  - microcode_ctl package, version 2.1-33.qubes1 (for Intel CPU users)
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
 via the Qubes Update Tool or its command-line equivalents. [2]
 
-A system restart will be required afterwards.
+Dom0 must be restarted afterward in order for the updates to take
+effect.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
@@ -42,8 +43,7 @@ Xen binaries.
 Summary
 ========
 
-On 2021-06-09, the Xen Security Team published the following Xen
-Security Advisories (XSAs):
+The following security advisories were published on 2021-06-08:
 
 XSA-373 [3] "Inappropriate x86 IOMMU timeout detection / handling":
 
@@ -159,6 +159,8 @@ INTEL-SA-00442:
 As explained by Intel, "Incomplete cleanup in some Intel(R) VT-d
 products may allow an authenticated user to potentially enable
 escalation of privilege via local access."
+
+Only Intel CPUs are affected.
 
 Credits
 ========

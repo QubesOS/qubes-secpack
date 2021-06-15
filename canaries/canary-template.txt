@@ -22,9 +22,9 @@ Project (e.g. to hand out the private signing keys or to introduce
 backdoors).
 
 5. We plan to publish the next of these canary statements in the first
-two weeks of _____ ____. Special note should be taken if no new canary
-is published by that time or if the list of statements changes without
-plausible explanation.
+fourteen days of _____ ____ in the UTC time zone. Special note should
+be taken if no new canary is published by that time or if the list of
+statements changes without plausible explanation.
 
 Special announcements
 ----------------------
@@ -70,4 +70,5 @@ canary in the qubes-secpack.git repo, and (2) via digital signatures
 on the corresponding qubes-secpack.git repo tags. [2]
 
 [2] Don't just trust the contents of this file blindly! Verify the
-digital signatures!
+digital signatures! Instructions to do so are documented here:
+https://www.qubes-os.org/security/pack/#how-to-obtain-verify-and-read

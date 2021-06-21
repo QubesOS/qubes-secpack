@@ -11,13 +11,21 @@
 User action required
 =====================
 
-Users must install the following specific packages in order to address
-the issues discussed in this bulletin:
+TODO:
+No special user action required. Continue to update normally and restart your
+system when notified. [1]
 
-  For Qubes 4.0:
+Patching
+=========
+
+The specific packages that address the issues discussed in this bulletin
+are as follows:
+
+TODO:
+  For Qubes 4.0, in dom0:
   - TODO
 
-  For Qubes 4.1:
+  For Qubes 4.1, in dom0:
   - TODO
 
 The packages are to be installed in dom0 via the Qube Manager or via
@@ -29,18 +37,17 @@ the qubes-dom0-update command as follows:
   For updates from the security-testing repository:
   $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
 
-TODO:
-A system restart will be required afterwards.
+The Qubes update system will notify you if a system restart is required
+afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community.
+by the community. [2]
 
 TODO:
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
-
 
 Summary
 ========
@@ -52,16 +59,16 @@ Impact
 
 TODO
 
-
 Credits
 ========
 
 TODO
 
-
 References
 ===========
 
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
 TODO
 
 --

@@ -132,6 +132,16 @@ Similar to the XSA-379. XSA-382 affects only Xen version 4.10 or newer,
 thus only Qubes OS R4.1 is affected.
 
 
+Notes on the fix
+=================
+
+Besides applying patches for specific issues described here, we have
+decided to disable Grant Tables v2 in Xen globally. None of the
+software included in Qubes OS uses it (both Linux and Windows use
+Grant Tables v1), and this is another set of issues related to this
+feature.
+
+
 Credits
 ========
 

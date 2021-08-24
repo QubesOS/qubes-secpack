@@ -1,0 +1,152 @@
+
+
+             ---===[ Qubes Security Bulletin 070 ]===---
+
+                             2021-08-25
+
+
+           Xen issues related to grant-tables v2 and IOMMU
+                    (XSA-378, XSA-379, XSA-382)
+
+
+User action required
+=====================
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0:
+  - Xen packages, version 4.8.5-35
+
+  For Qubes 4.1:
+  - Xen packages, version 4.14.2-2
+
+The packages are to be installed in dom0 via the Qube Manager or via
+the qubes-dom0-update command as follows:
+
+  For updates from the stable repository (not immediately available):
+  $ sudo qubes-dom0-update
+
+  For updates from the security-testing repository:
+  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
+
+A system restart will be required afterwards.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update Tool or its command-line equivalents. [2]
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+========
+
+The following security advisories were published on 2021-08-25:
+
+XSA-378 [3] "IOMMU page mapping issues on x86":
+
+| Both AMD and Intel allow ACPI tables to specify regions of memory
+| which should be left untranslated, which typically means these
+| addresses should pass the translation phase unaltered.  While these
+| are typically device specific ACPI properties, they can also be
+| specified to apply to a range of devices, or even all devices.
+| 
+| On all systems with such regions Xen failed to prevent guests from
+| undoing/replacing such mappings (CVE-2021-28694).
+| 
+| On AMD systems, where a discontinuous range is specified by firmware,
+| the supposedly-excluded middle range will also be identity-mapped
+| (CVE-2021-28695).
+| 
+| Further, on AMD systems, upon de-assigment of a physical device from a
+| guest, the identity mappings would be left in place, allowing a guest
+| continued access to ranges of memory which it shouldn't have access to
+| anymore (CVE-2021-28696).
+| 
+
+XSA-379 [4] "grant table v2 status pages may remain accessible after
+de-allocation":
+
+| Guest get permitted access to certain Xen-owned pages of memory.  The
+| majority of such pages remain allocated / associated with a guest for
+| its entire lifetime.  Grant table v2 status pages, however, get
+| de-allocated when a guest switched (back) from v2 to v1.  The freeing
+| of such pages requires that the hypervisor know where in the guest
+| these pages were mapped.  The hypervisor tracks only one use within
+| guest space, but racing requests from the guest to insert mappings of
+| these pages may result in any of them to become mapped in multiple
+| locations.  Upon switching back from v2 to v1, the guest would then
+| retain access to a page that was freed and perhaps re-used for other
+| purposes.
+| 
+| A malicious guest may be able to elevate its privileges to that of the
+| host, cause host or guest Denial of Service (DoS), or cause information
+| leaks.
+
+XSA-382 [5] "inadequate grant-v2 status frames array bounds check"
+| The v2 grant table interface separates grant attributes from grant
+| status.  That is, when operating in this mode, a guest has two tables.
+| As a result, guests also need to be able to retrieve the addresses that
+| the new status tracking table can be accessed through.
+| 
+| For 32-bit guests on x86, translation of requests has to occur because
+| the interface structure layouts commonly differ between 32- and 64-bit.
+| 
+| The translation of the request to obtain the frame numbers of the
+| grant status table involves translating the resulting array of frame
+| numbers.  Since the space used to carry out the translation is limited,
+| the translation layer tells the core function the capacity of the array
+| within translation space.  Unfortunately the core function then only
+| enforces array bounds to be below 8 times the specified value, and would
+| write past the available space if enough frame numbers needed storing.
+| 
+| Malicious or buggy guest kernels may be able to mount a Denial of
+| Service (DoS) attack affecting the entire system.  Privilege escalation
+| and information leaks cannot be ruled out.
+
+
+Impact
+=======
+
+XSA-378:
+
+As the Xen Security Team explains, "The precise impact is system
+specific, but can - on affected systems - be any or all of privilege
+escalation, denial of service, or information leaks.". Only a guest
+with a PCI device can leverage this vulnerability, such as `sys-net`
+or `sys-usb` in a default Qubes OS configuration.
+
+XSA-379:
+
+As the Xen Security Team explains, "A malicious guest may be able to
+elevate its privileges to that of the host, cause host or guest Denial
+of Service (DoS), or cause information leaks."
+
+XSA-382:
+
+Similar to the XSA-379. XSA-382 affects only Xen version 4.10 or newer,
+thus only Qubes OS R4.1 is affected.
+
+
+Credits
+========
+
+See the original Security Advisories.
+
+
+References
+===========
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/updating-qubes-os/
+[3] https://xenbits.xen.org/xsa/advisory-378.html
+[4] https://xenbits.xen.org/xsa/advisory-379.html
+[5] https://xenbits.xen.org/xsa/advisory-382.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

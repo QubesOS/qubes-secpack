@@ -14,27 +14,20 @@ User action required
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
-  For Qubes 4.0:
+  For Qubes 4.0, in TODO:
   - TODO
 
-  For Qubes 4.1:
+  For Qubes 4.1, in TODO:
   - TODO
-
-The packages are to be installed in dom0 via the Qube Manager or via
-the qubes-dom0-update command as follows:
-
-  For updates from the stable repository (not immediately available):
-  $ sudo qubes-dom0-update
-
-  For updates from the security-testing repository:
-  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
-
-TODO:
-A system restart will be required afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community.
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update Tool or its command-line equivalents. [2]
+
+TODO:
+Dom0 must be restarted afterward in order for the updates to take
+effect.
 
 TODO:
 If you use Anti Evil Maid, you will need to reseal your secret
@@ -62,6 +55,8 @@ TODO
 References
 ===========
 
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/updating-qubes-os/
 TODO
 
 --

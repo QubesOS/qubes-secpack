@@ -5,7 +5,7 @@
                              2021-08-25
 
 
-           Xen issues related to grant-tables v2 and IOMMU
+           Xen issues related to grant tables v2 and IOMMU
                     (XSA-378, XSA-379, XSA-382)
 
 
@@ -15,27 +15,19 @@ User action required
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
-  For Qubes 4.0:
+  For Qubes 4.0, in dom0:
   - Xen packages, version 4.8.5-35
 
-  For Qubes 4.1:
+  For Qubes 4.1, in dom0:
   - Xen packages, version 4.14.2-2
-
-The packages are to be installed in dom0 via the Qube Manager or via
-the qubes-dom0-update command as follows:
-
-  For updates from the stable repository (not immediately available):
-  $ sudo qubes-dom0-update
-
-  For updates from the security-testing repository:
-  $ sudo qubes-dom0-update --enablerepo=qubes-dom0-security-testing
-
-A system restart will be required afterwards.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
 via the Qubes Update Tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
@@ -116,9 +108,9 @@ XSA-378:
 
 As the Xen Security Team explains, "The precise impact is system
 specific, but can - on affected systems - be any or all of privilege
-escalation, denial of service, or information leaks.". Only a guest
-with a PCI device can leverage this vulnerability, such as `sys-net`
-or `sys-usb` in a default Qubes OS configuration.
+escalation, denial of service, or information leaks." Only a guest
+with a PCI device can leverage this vulnerability, such as sys-net
+or sys-usb in a default Qubes OS configuration.
 
 XSA-379:
 
@@ -132,14 +124,14 @@ Similar to the XSA-379. XSA-382 affects only Xen version 4.10 or newer,
 thus only Qubes OS R4.1 is affected.
 
 
-Notes on the fix
-=================
+Discussion
+===========
 
-Besides applying patches for specific issues described here, we have
-decided to disable Grant Tables v2 in Xen globally. None of the
-software included in Qubes OS uses it (both Linux and Windows use
-Grant Tables v1), and this is another set of issues related to this
-feature.
+This is yet another set of problems related to grant tables v2. Since
+none of the software included in Qubes OS uses this feature (both Linux
+and Windows use grant tables v1), we have decided to disable grant
+tables v2 in Xen globally in addition to apply the specific patches
+described above.
 
 
 Credits

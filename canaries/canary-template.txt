@@ -1,6 +1,5 @@
 
-
-                    ---===[ Qubes Canary ___ ]===---
+                    ---===[ Qubes Canary TODO ]===---
 
 
 Statements
@@ -9,20 +8,20 @@ Statements
 The Qubes core developers who have digitally signed this file [1] state
 the following:
 
-1. The date of issue of this canary is _____  __, ____.
+1. The date of issue of this canary is TODO.
 
-2. There have been __ Qubes Security Bulletins published so far.
+2. There have been TODO Qubes Security Bulletins published so far.
 
 3. The Qubes Master Signing Key fingerprint is:
 
-    427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
 
 4. No warrants have ever been served to us with regard to the Qubes OS
    Project (e.g. to hand out the private signing keys or to introduce
    backdoors).
 
 5. We plan to publish the next of these canary statements in the first
-   fourteen days of _____ ____. Special note should be taken if no new
+   fourteen days of TODO TODO. Special note should be taken if no new
    canary is published by that time or if the list of statements changes
    without plausible explanation.
 

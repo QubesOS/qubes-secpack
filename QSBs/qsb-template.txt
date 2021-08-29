@@ -1,15 +1,13 @@
 
+             ---===[ Qubes Security Bulletin TODO ]===---
 
-             ---===[ Qubes Security Bulletin ___ ]===---
-
-                             ____-__-__
-
+                                TODO
 
                                 TODO
 
 
 User action required
-=====================
+---------------------
 
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
@@ -34,26 +32,23 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
-
 Summary
-========
+--------
 
 TODO
 
 Impact
-=======
+-------
 
 TODO
-
 
 Credits
-========
+--------
 
 TODO
 
-
 References
-===========
+-----------
 
 [1] https://www.qubes-os.org/doc/testing/
 [2] https://www.qubes-os.org/doc/updating-qubes-os/

@@ -1,0 +1,49 @@
+2021-08-31
+
+Dear Qubes community,
+
+As you can see in Qubes Canary 028 [1], Joanna has requested that she be
+removed from the list of canary signers [2], and we have agreed to this
+request. A careful reader might recall that, when Joanna left the Qubes
+security team in 2018, we wrote [3]:
+
+| However, due to the nature of PGP keys, there is no way to
+| guarantee that Joanna will not retain a copy of the QMSK after
+| transferring ownership to Marek. Since anyone in possession of the
+| QMSK is a potential attack vector against the project, Joanna will
+| continue to sign Qubes Canaries in perpetuity.
+
+So, why this change now? It's still true that we (except Joanna herself,
+of course) can't guarantee that Joanna did not really retain any copies
+of the private portion of the Qubes Master Signing Key. Continuing to
+have her sign the canaries on time every few months seemed like a
+harmless commitment back then but turned out to require quite a lot of
+effort now that Joanna is no longer involved in the project's day-to-day
+business. Therefore, we reevaluated whether this is worth the effort
+and decided against it. If Joanna were lying about deleting all her
+copies of the private portion of the Qubes Master Signing Key, it is
+equally possible that she could lie when signing a canary. Therefore,
+we do not believe that her ceasing to sign canaries constitutes a
+security problem.
+
+This is a good reminder that canaries help only in a very specific
+scenario, namely if someone (1) wants to act honestly, (2) is prevented
+from stating that a compromise has occurred, and (3) is not forced to
+state that no compromise has occurred. For example, this canary scheme
+is designed to help if we were ever served with a government warrant
+with an attached gag order that prohibited us from discussing the
+warrant (the second condition) but that did not compel us to continue
+signing and publishing canaries against our will (the third condition).
+However, this will not work if the adversary is willing to coerce us
+into signing and publishing statements or if signers are willing to lie
+by signing statements they know to be false. Hence, this canary scheme
+is limited and fallible, which is why we have always included a
+statement to this effect in every canary.
+
+Regards,
+The Qubes security team
+https://www.qubes-os.org/security/
+
+[1] https://github.com/QubesOS/qubes-secpack/blob/master/canaries/canary-028-2021.txt
+[2] https://github.com/QubesOS/qubes-secpack/blob/master/canaries/canary-028-2021-letter-joanna.txt
+[3] https://www.qubes-os.org/news/2018/11/05/qubes-security-team-update/

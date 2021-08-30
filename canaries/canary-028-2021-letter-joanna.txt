@@ -1,0 +1,43 @@
+2021-08-31
+
+Hello again, Qubes community!
+
+I hope you've all been well. As many of you know, I've continued to sign
+Qubes canaries [1] ever since I left the project [2]. At the time, I
+thought I could just continue to sign them forever, but I didn't
+consider that this would effectively make my secure Qubes laptop like a
+ball-and-chain that I'd have to bring with me wherever I go. :)
+
+At this point in my life, I'd really like to do much more traveling
+while being able to pack light and feel free of too many physical
+possessions. Since I am not willing to compromise the security of the
+Qubes OS Project or the security of the Qubes laptop I've been using to
+sign canaries in any way just to make my own personal life easier, I've
+decided it would be best to request that I be removed from the list of
+canary signers. Otherwise, there would be canaries that I wouldn't be
+able to sign on-time, which would create headaches for Marek and Simon,
+as well as confusion for users looking for my signature and not finding
+it.
+
+So, I've requested that the current Qubes security team remove me from
+the Qubes canary signing process. And, FWIW, I confirm that I --
+according to the best of my knowledge -- destroyed all copies of the
+Qubes Master Signing Key which were in my possession when I passed
+project lead to Marek, and no one has approached me in an attempt to
+subvert the Qubes OS Project in any way. This request is solely for my
+own personal reasons, as explained above.
+
+Canary 028 [3] should contain a description of this event under the
+"Special announcements" section, and that canary should be accompanied
+by my signature as well as those of the current Qubes security team,
+Marek Marczykowski-Górecki and Simon Gaiser. Canary 028 is the final
+canary I will sign.
+
+I wish the Qubes OS Project continued success!
+
+Sincerely,
+Joanna
+
+[1] https://www.qubes-os.org/security/canary/
+[2] https://www.qubes-os.org/news/2018/10/25/the-next-chapter/
+[3] https://github.com/QubesOS/qubes-secpack/blob/master/canaries/canary-028-2021.txt

@@ -10,7 +10,7 @@ the following:
 
 1. The date of issue of this canary is August 31, 2021.
 
-2. There have been TODO Qubes security bulletins published so far.
+2. There have been 70 Qubes security bulletins published so far.
 
 3. The Qubes Master Signing Key fingerprint is:
 
@@ -72,7 +72,31 @@ the statements made here.
 Proof of freshness
 -------------------
 
-TODO
+Mon, 30 Aug 2021 22:38:19 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Afghan Vice President in Letter to DER SPIEGEL: "A Deal for Surrender Won't Happen"
+Afghanistan Disaster: Debacle in Kabul Could Overshadow Biden's Presidency
+The End of the German Airlift: What Will Become of the Afghans Left Behind?
+Terror Expert on Afghanistan: "The Real Threat Is Islamic State, not Al-Qaida"
+Redistributing Mafia Assets: The Palaces and Ruins of the Drug Bosses
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Afghanistan Live Updates: The United States Occupation Is Over
+U.S. Conducts Drone Strike in Kabul and Winds Down Airlift as Deadline Nears
+Colombia’s Troubles Put a President’s Legacy on the Line
+North Korea Restarted Plutonium-Producing Reactor, U.N. Agency Warns
+How 2 Afghan Paralympians Defied the Odds to Get From Kabul to Tokyo
+
+Source: BBC News - World (https://feeds.bbci.co.uk/news/world/rss.xml)
+Afghanistan: US investigates civilian deaths in Kabul strike
+Hurricane Ida: One million people in Louisiana without power
+Covid: EU recommends new travel restrictions for US as cases rise
+Brazil bank robbers tie hostages to getaway cars in Araçatuba
+China cuts children's online gaming to one hour
+
+Source: Blockchain.info
+00000000000000000005db015b1a4120308f9993ad9ebabe1207dd3a574269e0
 
 Footnotes
 ----------

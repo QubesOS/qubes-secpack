@@ -5,8 +5,8 @@
 Statements
 -----------
 
-The Qubes core developers who have digitally signed this file [1] state
-the following:
+The Qubes security team members who have digitally signed this file [1]
+state the following:
 
 1. The date of issue of this canary is TODO.
 

@@ -72,7 +72,7 @@ the statements made here.
 Proof of freshness
 -------------------
 
-Mon, 30 Aug 2021 22:38:19 +0000
+Tue, 31 Aug 2021 00:03:05 +0000
 
 Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
 Afghan Vice President in Letter to DER SPIEGEL: "A Deal for Surrender Won't Happen"
@@ -82,7 +82,7 @@ Terror Expert on Afghanistan: "The Real Threat Is Islamic State, not Al-Qaida"
 Redistributing Mafia Assets: The Palaces and Ruins of the Drug Bosses
 
 Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
-Afghanistan Live Updates: The United States Occupation Is Over
+Afghanistan Live Updates: The U.S. Occupation Is Over, Ending America’s Longest War
 U.S. Conducts Drone Strike in Kabul and Winds Down Airlift as Deadline Nears
 Colombia’s Troubles Put a President’s Legacy on the Line
 North Korea Restarted Plutonium-Producing Reactor, U.N. Agency Warns
@@ -96,7 +96,7 @@ Brazil bank robbers tie hostages to getaway cars in Araçatuba
 China cuts children's online gaming to one hour
 
 Source: Blockchain.info
-00000000000000000005db015b1a4120308f9993ad9ebabe1207dd3a574269e0
+000000000000000000059580872127a33754c4f4fb4e251ace298fea01ee73ca
 
 Footnotes
 ----------

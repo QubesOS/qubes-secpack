@@ -68,4 +68,5 @@ in the qubes-secpack.git repo, and (2) via digital signatures on the
 corresponding qubes-secpack.git repo tags. [2]
 
 [2] Don't just trust the contents of this file blindly! Verify the
-digital signatures!
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/

@@ -21,7 +21,7 @@ the issues discussed in this bulletin:
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
-via the Qubes Update Tool or its command-line equivalents. [2]
+via the Qubes Update tool or its command-line equivalents. [2]
 
 TODO:
 Dom0 must be restarted afterward in order for the updates to take

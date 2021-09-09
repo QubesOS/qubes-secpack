@@ -30,8 +30,8 @@ Summary
 Split GPG [2] is designed to isolate private keys from the application using
 them in order to protect them from being extracted and to allow the user to
 retain control over when they are used. This isolation is implemented by
-forwarding calls to gpg into a backend qube that holds the private keys and
-allowing only specific gpg options. This option filtering mechanism rejects
+forwarding calls to `gpg` into a backend qube that holds the private keys and
+allowing only specific `gpg` options. This option filtering mechanism rejects
 options like `--export-secret-keys` and others that might leak private keys to
 the frontend qube. Unfortunately, several options were declared incorrectly,
 which allowed this filtering mechanism to be bypassed.
@@ -47,11 +47,10 @@ can extract an arbitrary file (including a secret key) from the backend qube.
 Discussion
 -----------
 
-Several gpg options were declared incorrectly in Split GPG, which resulted in
-Split GPG interpreting them differently when filtering than gpg when invoked in
-the backend qube holding the private keys. If Split GPG interpreted one option
-as an argument to another option, Split GPG would allow it, since option
-filtering is performed at the level of the options themselves, not their
+Several `gpg` options were declared incorrectly in Split GPG, which resulted in
+Split GPG interpreting them differently than `gpg`. If Split GPG interpreted
+one option as an argument to another option, Split GPG would allow it, since
+option filtering is performed at the level of the options themselves, not their
 arguments. This would allow options misinterpreted as arguments to bypass the
 filtering mechanism. Specifically:
 
@@ -70,7 +69,7 @@ For our immediate, initial response, we have corrected all of these
 inconsistencies and added automated testing to verify that GnuPG and Split GPG
 both understand the options in the same way.
 
-More generally, we will prioritize finishing split-gpg2 [3], which does not
+More generally, we will prioritize finishing Split GPG 2 [3], which does not
 rely on option filtering at all. Instead, it uses `gpg-agent`'s protocol to
 delegate only secret key processing to the backend qube. In addition to
 obviating the need for fragile option filtering, this dramatically reduces the

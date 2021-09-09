@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 071 ]===---
 
-                              2021-09-09
+                             2021-09-09
 
               Fatal options filtering flaw in Split GPG
 
@@ -9,74 +9,73 @@
 User action required
 ---------------------
 
-Users must install the following specific packages in order to address
-the issues discussed in this bulletin:
+Users must install the following specific packages in order to address the
+issues discussed in this bulletin:
 
-  For Qubes 4.0, in templates/standalones:
+  For Qubes 4.0, in templates and standalones:
   - qubes-gpg-split 2.0.53
 
-  For Qubes 4.1, in templates/standalones:
+  For Qubes 4.1, in templates and standalones:
   - qubes-gpg-split 2.0.53
 
-Due to easiness of this issue exploitation, the packages are available
-in current (stable) repository immediately. They are to be installed
-via the Qubes Update Tool or its command-line equivalents. [1]
+Due to the ease with which this flaw can be exploited, we are immediately
+migrating these packages to the current (stable) repository, bypassing the
+usual testing period. These packages are to be installed via the Qubes Update
+tool or its command-line equivalents. [1]
 
 
 Summary
 --------
 
-Split GPG[2] is designed to isolate private keys from the application
-using them - to prevent extracting them, and control when are used.
-The isolation is done by forwarding gpg calls into a "backend" VM
-(that holds the actual keys), but with only some options allowed.
-This filtering includes rejecting options like `--export-secret-keys`,
-or options that could otherwise leak private keys to the frontend
-VM. Unfortunately, several options were declared incorrectly,
-which allowed to bypass the filtering.
+Split GPG [2] is designed to isolate private keys from the application using
+them in order to protect them from being extracted and to allow the user to
+retain control over when they are used. This isolation is implemented by
+forwarding GnuPG calls into a backend qube that holds the private keys and
+allowing only specific GnuPG options. This option filtering mechanism rejects
+options like `--export-secret-keys` and others that might leak private keys to
+the frontend qube. Unfortunately, several options were declared incorrectly,
+which allowed this filtering mechanism to be bypassed.
 
 
 Impact
 -------
 
-Attacker controlling a frontend VM (the one where qubes-gpg-client is
-executed) can extract arbitrary file (including secret key) from the
-backend VM.
+An attacker controlling a frontend qube (where `qubes-gpg-client` is executed)
+can extract an arbitrary file (including a secret key) from the backend qube.
 
 
 Discussion
 -----------
 
-Several gpg options were declared incorrectly in split-gpg, making
-the latter interpret them differently than the actual gpg called in the
-backend VM (the one keeping the keys). If an option would
-be interpreted as an argument to another option by split-gpg, it would
-be allowed by split-gpg (as the filtering is done on the options
-level, not their arguments), thus bypassing the filtering.
+Several GnuPG options were declared incorrectly in Split GPG, which resulted in
+the latter interpreting them differently than the way GnuPG operated in the
+backend qube holding the private keys. If Split GPG interpreted one option as
+an argument to another option, Split GPG would allow it, since option filtering
+is performed at the level of the options themselves, not their arguments. This
+would allow options misinterpreted as arguments to bypass the filtering
+mechanism. Specifically:
 
-Specifically, this applies to:
- - all `--s2k-*` options were declares as not taking an argument,
- while in fact they do take an argument
- - `--export-ssh-key` was declares as taking an argument, while it
- doesn't take one directly; it does change the meaning of the
- positional arguments, though
- - `--with-colons` was aliased with `-k`, which differs in argument
- requirement
- - `--default-recipient` (taking an argument) was interpreted as
- `--default-recipient-self` (not taking an argument)
- - `--display` was interpreted as `--display-charset`, thus
- `--display` was allowed while it should be denied
+- All `--s2k-*` options were declared as not taking arguments when in fact they
+  do take arguments.
+- `--export-ssh-key` was declared as taking an argument when it doesn't take
+  one directly; it does change the meanings of positional arguments, however.
+- `--with-colons` was aliased with `-k`, which differs in its argument
+  requirements.
+- `--default-recipient`, which takes an argument, was interpreted as
+  `--default-recipient-self`, which does not take an argument.
+- `--display` was interpreted as `--display-charset`, which resulted in
+  `--display` being allowed when it should have been denied.
 
-As the immediate fix, we have adjusted all those inconsistencies, and also
-we have added automated test that verifies if gpg's understanding of the
-options matches what split-gpg understood.
+For our immediate, initial response, we have corrected all of these
+inconsistencies and added automated testing to verify that GnuPG and Split GPG
+both understand the options in the same way.
 
-But generally, we will prioritize finishing split-gpg2[3], which does not
-rely on option filtering at all. Instead, it utilizes gpg-agent's
-protocol to delegate only secret keys processing to the backend VM.
-This, besides removing the fragile options filtering, hugely reduce
-attack surface, because most of the untrusted data processing is done
-on the frontend VM and never reaches the backend one.
+More generally, we will prioritize finishing Split GPG 2 [3], which does not
+rely on option filtering at all. Instead, it uses `gpg-agent`'s protocol to
+delegate only secret key processing to the backend qube. In addition to
+obviating the need for fragile option filtering, this dramatically reduces the
+attack surface, as most of the untrusted data processing is done in the
+frontend qube and never reaches the backend qube.
 
 Credits
 --------

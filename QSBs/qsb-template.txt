@@ -51,7 +51,7 @@ References
 -----------
 
 [1] https://www.qubes-os.org/doc/testing/
-[2] https://www.qubes-os.org/doc/updating-qubes-os/
+[2] https://www.qubes-os.org/doc/how-to-update/
 TODO
 
 --

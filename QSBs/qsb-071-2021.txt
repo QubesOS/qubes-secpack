@@ -47,8 +47,8 @@ Impact
 -------
 
 An attacker controlling a frontend qube (where `qubes-gpg-client` is executed)
-can extract an arbitrary file (including a secret key) from the
-backend qube, or execute arbitrary command there.
+can execute arbitrary commands and extract arbitrary files (including secret
+keys) from the backend qube.
 
 
 Discussion

@@ -9,7 +9,7 @@ Changelog
 ----------
 
 2021-09-09: Original QSB published
-2021-09-14: Updated impact section
+2021-09-17: Updated impact section
 
 
 User action required

@@ -1,0 +1,117 @@
+
+             ---===[ Qubes Security Bulletin 072 ]===---
+
+                              2021-09-24
+
+           Inconsistent handling of override-redirect flag
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - qubes-gui-dom0 version 4.0.15 
+
+  For Qubes 4.1, in dom0 and template(s) of GUI qube(s):
+  - qubes-gui-daemon version 4.1.16
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+User session must be restarted afterward in order for the updates to
+take effect. For example by logging out and back in.
+
+
+Summary
+--------
+
+An override-redirect flag in X11 protocol tells the window manager to
+not manage a particular window. Windows with such flag won't get
+borders or title bar from the window manger, nor their position won't
+be managed. This feature is used for application menus, tooltip and
+similar accessory windows.
+
+Since window manager ignores such windows, GUI daemon applies some
+extra constrains for them (like drawing thin colorful border).
+Unfortunately, there were several cases where window manager and GUI
+daemon would not agree on the override-redirect flag state, leading to
+none of them applying constrains. Such windows could try to belong to
+other qubes, or obstruct critical screen areas (like panel).
+
+
+Impact
+-------
+
+Malicious qube could create a window that would not have forced
+colorful frame and thus it could pretend to be something else.
+Furthermore, such window could bypass other limits of
+windows with override-redirect flag, and thus prevent the user from
+interacting with the system, or showing misleading interface.
+
+
+Discussion
+-----------
+
+There were several cases where GUI daemon's view of override-redirect
+flag wouldn't match window manager expectations:
+
+1. Changing override-redirect flag of an already mapped (visible)
+window with a MSG_CONFIGURE GUI protocol[3] command. In this case, GUI
+daemon saved the new state of the flag (and thus, stopped applying
+constrains on its own), but it hasn't really send this flag to the X
+server.
+
+2. Changing override-redirect flag of an already mapped (visible) 
+window with a MSG_MAP GUI protocol[3] command. In this case, the
+attribute was updated in the X server, but at least XFCE window
+manager does not pick up such change, if the window is already mapped
+(visible).
+
+3. override-redirect protection feature (that prevents the window
+covering more than 90% of the screen, if it has override-redirect
+flag) suffered the same issue as in the first point.
+
+4. It's unclear how docked windows (tray icons) should interact with
+override-redirect flag. Neither XEmbed Protocol Specification[4]
+nor System Tray Protocol Specification[5] defines how they should
+interact.
+
+5. Docking a window passes control over mapping and unmapping the
+window to the embedder (the application holding tray icons). To avoid
+confusing it, or the GUI daemon, prevent docking a window that is
+already mapped (visible).
+
+To fix those issues, GUI daemon will not accept changes to
+override-redirect flag in those cases. The override-redirect flag can
+be changed only in two cases now:
+
+1. If the window isn't visible yet (either as a normal window, or as a
+tray icon).
+
+2. In case of override-redirect protection forcefully clearing the
+flag, the window first gets unmapped, gets the flag cleared, and then
+mapped again.
+
+
+Credits
+--------
+
+This issue was discovered by Demi Marie Obenour.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://www.qubes-os.org/doc/gui/
+[4] https://specifications.freedesktop.org/xembed-spec/xembed-spec-latest.html
+[5] https://specifications.freedesktop.org/systemtray-spec/systemtray-spec-latest.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

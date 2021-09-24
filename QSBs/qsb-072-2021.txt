@@ -15,8 +15,7 @@ the issues discussed in this bulletin:
   For Qubes 4.0, in dom0:
   - qubes-gui-dom0 version 4.0.15 
 
-  For Qubes 4.1, in the Admin qube and the template(s) of the GUI
-  qube(s):
+  For Qubes 4.1, in dom0 and the template(s) of any GUI qube(s):
   - qubes-gui-daemon version 4.1.16
 
 These packages will migrate from the security-testing repository to the
@@ -37,11 +36,11 @@ their frames or title bars from the window manger, nor does the window
 manager determine their positions. This feature is used for application
 menus, tooltips, and similar accessory windows.
 
-Since the window manager ignores such windows, the GUI daemon applies
+Since the window manager ignores such windows, the GUI daemon imposes
 certain extra constraints on them, such as drawing thin colored frames.
 Unfortunately, there are several cases in which the window manager and
 GUI daemon do not agree on the override-redirect flag state, leading to
-neither of them applying the appropriate constraints.
+neither of them imposing the appropriate constraints.
 
 
 Impact
@@ -53,9 +52,11 @@ unspoofable colored frame. The flaws described in this bulletin allow a
 malicious qube to create a window that has no such colored frame. Such a
 window might be made to appear as though it belongs to a different qube.
 For example, a malicious qube with an untrusted color label might draw a
-fake frame in a trusted color along the inside edge of the window in an
-attempt to fool the user into accepting the fake frame as a reliable
-indicator that the window can be trusted.
+passphrase prompt window. Then, in order to induce the user into
+entering a valuable passphrase into this window, the malicious qube
+might draw a fake frame in a trusted color along the inside edge of the
+window in an attempt to fool the user into accepting the fake frame as a
+reliable indicator that the window can be trusted.
 
 Such windows are also capable of bypassing limits normally imposed on
 windows with the override-redirect flag. For example, such windows are
@@ -98,7 +99,9 @@ override-redirect flag did not match the window manager's expectations:
 5. Docking a window passes control over mapping and unmapping the window
    to the embedder (the application that "holds" the docked windows). To
    avoid confusing the embedder and the GUI daemon, windows that were
-   already mapped were prevented from being docked.
+   already mapped were prevented from being docked. This implications of
+   this behavior are unclear, and we cannot rule out the possibility
+   that this could be abused in some way.
 
 To fix these problems, the GUI daemon will no longer accept changes to
 the override-redirect flag in the cases described above. Instead, the
@@ -109,7 +112,7 @@ override-redirect flag can now be changed in only two cases:
 
 - When override-redirect protection forcefully clears the flag, in which
   case the window is unmapped, the flag is cleared, and the window is
-  mapped again.
+  mapped again
 
 
 Credits

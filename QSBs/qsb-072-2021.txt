@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 072 ]===---
 
-                              2021-09-24
+                              2021-09-27
 
          Inconsistent handling of the override-redirect flag
 

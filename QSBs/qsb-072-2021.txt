@@ -15,13 +15,13 @@ the issues discussed in this bulletin:
   For Qubes 4.0, in dom0:
   - qubes-gui-dom0 version 4.0.15 
 
-  For Qubes 4.1, in dom0 and the template(s) of any GUI qube(s):
+  For Qubes 4.1, in dom0 and the template(s) of any GUI qube(s) [1]:
   - qubes-gui-daemon version 4.1.16
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [1] Once available, the packages are to be installed
-via the Qubes Update tool or its command-line equivalents. [2]
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [3]
 
 The user session must be restarted afterward in order for the updates to
 take effect, e.g., by logging out then logging back in.
@@ -46,25 +46,26 @@ neither of them imposing the appropriate constraints.
 Impact
 -------
 
-Normally, every window belonging to a qube other than dom0 (in Qubes 4.0
-and earlier) and the GUI qube(s) (in Qubes 4.1 and later) has an
-unspoofable colored frame. The flaws described in this bulletin allow a
-malicious qube to create a window that has no such colored frame. Such a
-window might be made to appear as though it belongs to a different qube.
-For example, a malicious qube with an untrusted color label might draw a
-passphrase prompt window. Then, in order to induce the user into
-entering a valuable passphrase into this window, the malicious qube
-might draw a fake frame in a trusted color along the inside edge of the
-window in an attempt to fool the user into accepting the fake frame as a
-reliable indicator that the window can be trusted.
+Normally, every window in Qubes OS has an unspoofable colored frame,
+except for those belonging to dom0 or a GUI qube. [1] The flaws
+described in this bulletin allow a malicious qube to create a window
+that has no such colored frame. Such a window might be made to appear as
+though it belongs to a different qube. For example, a malicious qube
+with an untrusted color label might draw a passphrase prompt window.
+Then, in order to induce the user to enter a valuable passphrase into
+this window, the malicious qube might draw a fake frame in a different
+color (more trusted than its own) along the inside edge of the window.
+Since the window has no externally-imposed colored frame of its own, the
+user might be deceived into accepting the fake internally-drawn frame as
+a reliable indicator of the window's trust level or origin.
 
 Such windows are also capable of bypassing limits normally imposed on
 windows with the override-redirect flag. For example, such windows are
 capable of covering desktop environment panels, potentially preventing
-users from interacting with certain parts of the system or displaying a
-misleading interface. Since such windows also lack colored frames, they
-could be made to appear as though they belong to dom0 or a GUI qube in
-an attempt to deceive users into believing that they are interacting
+users from interacting with certain parts of the system or displaying
+fake interface elements. Since such windows also lack colored frames,
+they could be made to appear as though they belong to dom0 or a GUI qube
+in an attempt to deceive users into believing that they are interacting
 with trusted parts of the system.
 
 
@@ -74,13 +75,13 @@ Discussion
 There were several cases in which the GUI daemon's view of the
 override-redirect flag did not match the window manager's expectations:
 
-1. Using an MSG_CONFIGURE GUI protocol [3] command to change the
+1. Using an MSG_CONFIGURE GUI protocol [4] command to change the
    override-redirect flag of a window that has already been mapped
    (i.e., made visible). In this case, the GUI daemon saved the new
    state of the flag (and thus stopped applying its own constraints),
    but it had not yet sent this flag to the X server.
 
-2. Using an MSG_MAP GUI protocol [3] command to change the
+2. Using an MSG_MAP GUI protocol [4] command to change the
    override-redirect flag of a window that has already been mapped. In
    this case, the attribute was updated in the X server, but the window
    manager did not pick up the change, since the window was already
@@ -93,15 +94,13 @@ override-redirect flag did not match the window manager's expectations:
 
 4. It was unclear how docked windows (aka "tray icons") should interact
    with the override-redirect flag. Neither the XEmbed Protocol
-   Specification [4] nor the System Tray Protocol Specification [5]
+   Specification [5] nor the System Tray Protocol Specification [6]
    defines how they should interact.
 
 5. Docking a window passes control over mapping and unmapping the window
-   to the embedder (the application that "holds" the docked windows). To
-   avoid confusing the embedder and the GUI daemon, windows that were
-   already mapped were prevented from being docked. This implications of
-   this behavior are unclear, and we cannot rule out the possibility
-   that this could be abused in some way.
+   to the embedder (the application that "holds" the docked windows).
+   The implications of this behavior are unclear, and we cannot rule
+   out the possibility that this could be abused in some way.
 
 To fix these problems, the GUI daemon will no longer accept changes to
 the override-redirect flag in the cases described above. Instead, the
@@ -114,20 +113,27 @@ override-redirect flag can now be changed in only two cases:
   case the window is unmapped, the flag is cleared, and the window is
   mapped again
 
+Moreover, in order to avoid confusing the embedder and the GUI daemon,
+windows that are already mapped will now be prevented from being docked.   
+
 
 Credits
 --------
 
 This issue was discovered by Demi Marie Obenour.
 
-References
------------
 
-[1] https://www.qubes-os.org/doc/testing/
-[2] https://www.qubes-os.org/doc/how-to-update/
-[3] https://www.qubes-os.org/doc/gui/
-[4] https://specifications.freedesktop.org/xembed-spec/xembed-spec-latest.html
-[5] https://specifications.freedesktop.org/systemtray-spec/systemtray-spec-latest.html
+Notes
+------
+
+[1] In Qubes 4.1, certain GUI functions historically served by dom0 can
+    be delegated to separate template-based "GUI qubes." A single Qubes
+    4.1 system can have multiple GUI qubes.
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://www.qubes-os.org/doc/how-to-update/
+[4] https://www.qubes-os.org/doc/gui/
+[5] https://specifications.freedesktop.org/xembed-spec/xembed-spec-latest.html
+[6] https://specifications.freedesktop.org/systemtray-spec/systemtray-spec-latest.html
 
 --
 The Qubes Security Team

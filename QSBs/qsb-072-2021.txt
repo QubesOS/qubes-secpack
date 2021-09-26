@@ -102,19 +102,28 @@ override-redirect flag did not match the window manager's expectations:
    The implications of this behavior are unclear, and we cannot rule
    out the possibility that this could be abused in some way.
 
+6. A child of a window with the override-redirect flag do not have
+   override-redirect related constraints applied by the GUI daemon,
+   even though it is rendered as a content of its parent (with the
+   override-redirect flag set).
+
+7. The same issue as above applies to constraints forced on docked
+   windows too, like forced border, or coloring the content.
+
 To fix these problems, the GUI daemon will no longer accept changes to
 the override-redirect flag in the cases described above. Instead, the
 override-redirect flag can now be changed in only two cases:
 
 - When the window is not yet visible (either as a normal window or as a
-  tray icon)
+  tray icon) and has no children
 
 - When override-redirect protection forcefully clears the flag, in which
   case the window is unmapped, the flag is cleared, and the window is
   mapped again
 
 Moreover, in order to avoid confusing the embedder and the GUI daemon,
-windows that are already mapped will now be prevented from being docked.   
+windows that are already mapped or have any children, will now be
+prevented from being docked.
 
 
 Credits

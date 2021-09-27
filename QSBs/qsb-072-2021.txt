@@ -102,11 +102,16 @@ override-redirect flag did not match the window manager's expectations:
    The implications of this behavior are unclear, and we cannot rule
    out the possibility that this could be abused in some way.
 
-6. When a window with the override-redirect flag creates a child window,
-   the child window also has the override-redirect flag and is rendered
-   as part of the content of the parent window. Nonetheless, the GUI
-   daemon fails to apply the appropriate constraints to the child
-   window. This also applies to docked windows.
+6. Any window, including a docked window, can have a "child" window,
+   which is a separate window embedded in the parent window. Children do
+   not have the override-redirect flag, even when their parents do.
+   Children also do not have externally-imposed colored frames, even
+   when their parents do. Therefore, it is possible for a child window
+   to extend its position to cover the parent window's
+   externally-imposed colored frame, then draw a fake frame in a
+   different color directly on top of the parent window's colored frame.
+   A malicious qube could exploit this in order to make it appear that a
+   window belongs to a higher trust level than its actual trust level.
 
 To fix these problems, the GUI daemon will no longer accept changes to
 the override-redirect flag in the cases described above. Instead, the
@@ -120,8 +125,8 @@ override-redirect flag can now be changed in only two cases:
   mapped again
 
 Moreover, in order to avoid confusing the embedder and the GUI daemon,
-windows that are already mapped or have children will now be
-prevented from being docked.
+windows that are already mapped or have children will now be prevented
+from being docked.
 
 
 Credits

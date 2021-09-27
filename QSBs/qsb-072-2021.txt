@@ -102,16 +102,30 @@ override-redirect flag did not match the window manager's expectations:
    The implications of this behavior are unclear, and we cannot rule
    out the possibility that this could be abused in some way.
 
-6. Any window, including a docked window, can have a "child" window,
+6. There are two things that draw externally-imposed colored frames in
+   Qubes OS: the window manager and the GUI daemon. The GUI daemon draws
+   colored frames around windows with the override-redirect flag and
+   docked windows (aka "tray icons"), while the window manager draws all
+   other colored frames, e.g., for "normal" windows. (The window manager
+   also controls the title bar, which is another type of trusted window
+   decoration.)
+
+   Any window, including a docked window, can have a "child" window,
    which is a separate window embedded in the parent window. Children do
    not have the override-redirect flag, even when their parents do.
-   Children also do not have externally-imposed colored frames, even
-   when their parents do. Therefore, it is possible for a child window
-   to extend its position to cover the parent window's
-   externally-imposed colored frame, then draw a fake frame in a
-   different color directly on top of the parent window's colored frame.
-   A malicious qube could exploit this in order to make it appear that a
-   window belongs to a higher trust level than its actual trust level.
+   Children also do not have colored frames externally imposed by the
+   GUI daemon, even when their parents do.
+
+   Therefore, it is possible for a child window to extend its position
+   to cover the parent window's GUI-daemon-imposed colored frame, then
+   draw a fake frame in a different color directly on top of the parent
+   window's colored frame. A malicious qube could exploit this in order
+   to make it appear that a window belongs to a higher trust level than
+   its actual trust level.
+
+   Likewise, since the GUI daemon also forces coloring on docked windows
+   by default, a child window could cover its parent's docked window in
+   order to draw a "tray icon" in a different color.
 
 To fix these problems, the GUI daemon will no longer accept changes to
 the override-redirect flag in the cases described above. Instead, the

@@ -1,0 +1,95 @@
+
+             ---===[ Qubes Security Bulletin 073 ]===---
+
+                              2021-10-15
+
+         Race condition when setting override-redirect flag
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - qubes-gui-dom0 version 4.0.17
+
+  For Qubes 4.1, in dom0 and the template(s) of any GUI qube(s) [1]:
+  - qubes-gui-daemon version 4.1.18
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [3]
+
+The user session must be restarted afterward in order for the updates to
+take effect, e.g., by logging out then logging back in.
+
+
+Summary
+--------
+
+An override-redirect flag in the X11 protocol tells the window manager
+not to manage a particular window. Windows with such flags do not get
+their frames or title bars from the window manger, nor does the window
+manager determine their positions. This feature is used for application
+menus, tooltips, and similar accessory windows.
+
+Unfortunately, some window managers are getting confused if the
+override-redirect flag is set shortly before making the window
+visible. If that happens, window manager may try to move or resize the
+window without respecting size/position constrains enforced by the GUI
+daemon. Normally, every window more or resize of a VM window
+requested by the VM is validated by the GUI daemon. But if the action
+is initiated by the window manager, it doesn't need to pass through
+GUI daemon's validation.
+
+
+Impact
+-------
+
+A malicious application may try to hide its unspoofable colored frame
+off screen. Hiding all four sides is prevented by another constrain
+(forbidding a override-redirect window covering more than 90% of the
+screen), but hiding some sides is possible.
+
+The issue affects at least XFCE and KDE. Other environments may be
+affected too.
+
+
+Discussion
+-----------
+
+This is yet another corner case in handling override-redirect flag. In
+the long term we will try to eliminate using this flag completely. As
+an immediate fix, we are adding additional validation of constrains
+placed on windows override-redirect flag. This validation is done
+whenever a window is moved or resized - regardless of who initiated
+the action. If incorrect size or position is detected, the GUI daemon
+will try to move or resize window back to the allowed size. While it a
+reactive solution (a window may be in incorrect place for a very short
+time), it will cover several more cases - including some other
+applications resizing the window behind GUI daemon's back (this QSB).
+But also, it adds additional safety check in case GUI daemon itself
+missed some case.
+
+
+Credits
+--------
+
+This issue was discovered by Demi Marie Obenour.
+
+
+Notes
+------
+
+[1] In Qubes 4.1, certain GUI functions historically served by dom0 can
+    be delegated to separate template-based "GUI qubes." A single Qubes
+    4.1 system can have multiple GUI qubes.
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://www.qubes-os.org/doc/how-to-update/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

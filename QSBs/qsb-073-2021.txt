@@ -36,43 +36,42 @@ their frames or title bars from the window manger, nor does the window
 manager determine their positions. This feature is used for application
 menus, tooltips, and similar accessory windows.
 
-Unfortunately, some window managers are getting confused if the
-override-redirect flag is set shortly before making the window
-visible. If that happens, window manager may try to move or resize the
-window without respecting size/position constrains enforced by the GUI
-daemon. Normally, every window more or resize of a VM window
-requested by the VM is validated by the GUI daemon. But if the action
-is initiated by the window manager, it doesn't need to pass through
-GUI daemon's validation.
+Unfortunately, some window managers get confused if the
+override-redirect flag is set shortly before making the window visible.
+When that happens, the window manager may try to move or resize the
+window without respecting any size and position constraints imposed by
+the GUI daemon. Normally, every window move and resize action requested
+by the VM is validated by the GUI daemon. However, if the action is
+initiated by the window manager, it doesn't require the GUI daemon's
+validation.
 
 
 Impact
 -------
 
 A malicious application may try to hide its unspoofable colored frame
-off screen. Hiding all four sides is prevented by another constrain
-(forbidding a override-redirect window covering more than 90% of the
-screen), but hiding some sides is possible.
-
-The issue affects at least XFCE and KDE. Other environments may be
-affected too.
+off-screen. Hiding all four sides is prevented by another constraint
+(forbidding a override-redirect window from covering more than 90% of
+the screen), but hiding some sides is possible. The issue is known to
+affect XFCE and KDE. Other desktop environments may also be affected.
 
 
 Discussion
 -----------
 
-This is yet another corner case in handling override-redirect flag. In
-the long term we will try to eliminate using this flag completely. As
-an immediate fix, we are adding additional validation of constrains
-placed on windows override-redirect flag. This validation is done
-whenever a window is moved or resized - regardless of who initiated
-the action. If incorrect size or position is detected, the GUI daemon
-will try to move or resize window back to the allowed size. While it a
-reactive solution (a window may be in incorrect place for a very short
-time), it will cover several more cases - including some other
-applications resizing the window behind GUI daemon's back (this QSB).
-But also, it adds additional safety check in case GUI daemon itself
-missed some case.
+This is yet another corner case in handling the override-redirect flag.
+In the long term, we will try to eliminate use of this flag completely.
+As an immediate fix, we are adding additional validation of constraints
+placed on windows with the override-redirect flag. This validation is
+done whenever a window is moved or resized, regardless of what initiated
+the action. If an illegal size or position is detected, the GUI daemon
+will try to resize or move the window back to a legal size and position.
+While this is a reactive solution (in the sense that it allows windows
+to enter illegal states before correcting them), it will cover several
+more cases, including the case in which another application resizes a
+window behind the GUI daemon's back (which is the case being reported in
+this QSB). Moreover, this solution serves as an additional safety check
+in case the GUI daemon itself misses any other edge cases.
 
 
 Credits

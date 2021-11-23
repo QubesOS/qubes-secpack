@@ -79,20 +79,20 @@ XSA-389 [4] "issues with partially successful P2M updates on x86":
 Impact
 -------
 
-Malicious or buggy guest kernels may be able to mount a Denial of
-Service (DoS) attack affecting the entire system.  Privilege escalation
-and information leaks cannot be ruled out.
+Malicious or buggy guest kernels may be able to mount Denial of Service
+(DoS) attacks affecting the entire system. Privilege escalation and
+information leaks cannot be ruled out.
 
-The issue affects only qubes which has dynamic memory balancing
-enabled. In default configuration, this excludes sys-net and sys-usb,
-which have memory assigned statically. All other Linux-based qubes are
-affected.
+These issues affect only qubes that have dynamic memory balancing
+enabled. In the default Qubes OS configuration, this excludes sys-net
+and sys-usb, which have memory assigned statically. All other
+Linux-based qubes are affected.
 
 
 Credits
 --------
 
-See the original Security Advisories.
+See the original Xen Security Advisories.
 
 
 References

@@ -1,0 +1,19 @@
+Keys no longer in active use:
+
+joanna-qubes-code-signing-keys.asc:
+ - 3CD43E80F9BD17D125B21846E2A783B8C37BB66B - expired
+ - 30A6D48BB104C0CAA1D6F027C235DF9A1E30A75D - expired
+ - 4ECABE54FD205FB517866818A14B0A7874EADABC - expired
+ - 4CF3016FE42900CAB87178B2FB5DAEE165EF29CA - expired
+ - 9AB3241224446FA555AF73237397C8B034898310 - no longer an active Qubes developer
+
+marmarek-qubes-code-signing-keys.asc:
+ - F7F8EC2F55B220F8B106BD51928DD427AB5EEF90 - expired
+ - 53A8F7BE4BD42579FDD70D1AEE570349A603BCB6 - expired
+ - 3AD545B529761A7452AB59A6F2804017B298547C - expired
+
+omeg-qubes-code-signing-keys.asc:
+ - 3AC87FA304E459D0DF0821A1045A13284C85173A - no longer an active Qubes developer
+
+woju-qubes-code-signing-keys.asc:
+ - FF1A147CAA9A17A12A447F23C92A047EF2CD312B - no longer an active Qubes developer

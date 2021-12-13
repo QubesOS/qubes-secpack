@@ -1,0 +1,96 @@
+
+                    ---===[ Qubes Canary 029 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is December 13, 2021.
+
+2. There have been 74 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of March 2022. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+Special announcements
+----------------------
+
+None.
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+Proof of freshness
+-------------------
+
+Mon, 13 Dec 2021 01:15:23 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Resurrection of the SP: The Unexpected Rise of Germany's New Chancellor, Olaf Scholz
+BioNTech Founder Şahin on the Omicron Variant: “It Will Make Scientific Sense To Offer Booster after Three Months”
+City of Warriors: Resistance Across the Border to the Myanmar Military Junta
+Deadly Intrigue: The Story of the Destruction of an Aid Organization
+The One-Man State: Viktor Orbán and the Fall of Democracy in Hungary
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Haiti’s Leader Kept a List of Drug Traffickers. His Assassins Came for It.
+‘Our Boat Was Surrounded by Dead Bodies’: Witnessing a Migrant Tragedy
+Israeli Leader Travels to U.A.E., Showcasing Deepening Ties
+New Caledonia Says ‘Non’ to Independence
+Diplomats Warn Russia of ‘Massive Consequences’ if It Invades Ukraine
+
+Source: BBC News - World (https://feeds.bbci.co.uk/news/world/rss.xml)
+Kentucky tornadoes: Death toll likely to pass 100, governor says
+Kentucky tornadoes: 100 year-old-church destroyed in seconds
+Vladimir Putin: I moonlighted as a taxi driver in the 1990s
+Black Axe: Leaked documents shine spotlight on secretive Nigerian gang
+Alibaba fires woman who claimed sexual assault
+
+Source: Blockchain.info
+00000000000000000001b7c62afe91ab5ddb7ce534f4868fc71e4c9e4797f7b2
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/

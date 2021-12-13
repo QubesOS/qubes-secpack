@@ -29,7 +29,32 @@ state the following:
 Special announcements
 ----------------------
 
-None.
+Many PGP keys in the Qubes security pack (qubes-secpack) that are used
+elsewhere in the project (such as the Qubes builder), including the
+Qubes Master Signing Key (QMSK), were signed or self-signed using the
+SHA-1 hash function. Unlike some other uses of SHA-1, its use in PGP
+signatures does not pose a security risk unless an adversary is capable
+of performing a successful preimage attack (not merely a collision
+attack). Since there are presently no known feasible attacks against the
+preimage resistance of full SHA-1, our use of SHA-1 in PGP signatures
+does not currently pose any security risk. Nonetheless, as a preemptive
+defense-in-depth enhancement, we have decided to re-(self-)sign many of
+these keys using SHA-256 or SHA-512. [3]
+
+In addition, there are several expired code signing keys, old release
+keys, and keys belonging to individuals who are no longer active Qubes
+core developers. We have decided to move these keys into a new "retired"
+subdirectory. (We've decided to move them rather than delete them, since
+some users may wish to use them to authenticate old signatures. Note
+that this is merely a matter of convenience, since even deleted files
+always remain in the Git repository's history and can always be
+retrieved that way.)
+
+To be clear, none of the actions described here constitute a response to
+any security incident. To our knowledge, the keys in the qubes-secpack
+are not and have never been at risk. No key fingerprints have changed as
+a result of these actions. We consider this updating and cleanup of the
+keys to be more of "housekeeping" task.
 
 
 Disclaimers and notes
@@ -98,6 +123,8 @@ corresponding qubes-secpack.git repo tags. [2]
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
+
+[3] https://github.com/QubesOS/qubes-issues/issues/6470
 
 --
 The Qubes Security Team

@@ -25,10 +25,12 @@ state the following:
    canary is published by that time or if the list of statements changes
    without plausible explanation.
 
+
 Special announcements
 ----------------------
 
 None.
+
 
 Disclaimers and notes
 ----------------------
@@ -54,10 +56,12 @@ guarantee or warranty. It is not legally binding in any way to anybody.
 None of the signers should be ever held legally responsible for any of
 the statements made here.
 
+
 Proof of freshness
 -------------------
 
 TODO
+
 
 Footnotes
 ----------
@@ -70,3 +74,7 @@ corresponding qubes-secpack.git repo tags. [2]
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

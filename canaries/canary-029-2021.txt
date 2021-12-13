@@ -25,10 +25,12 @@ state the following:
    canary is published by that time or if the list of statements changes
    without plausible explanation.
 
+
 Special announcements
 ----------------------
 
 None.
+
 
 Disclaimers and notes
 ----------------------
@@ -53,6 +55,7 @@ This declaration is merely a best effort and is provided without any
 guarantee or warranty. It is not legally binding in any way to anybody.
 None of the signers should be ever held legally responsible for any of
 the statements made here.
+
 
 Proof of freshness
 -------------------
@@ -83,6 +86,7 @@ Alibaba fires woman who claimed sexual assault
 Source: Blockchain.info
 00000000000000000001b7c62afe91ab5ddb7ce534f4868fc71e4c9e4797f7b2
 
+
 Footnotes
 ----------
 
@@ -94,3 +98,7 @@ corresponding qubes-secpack.git repo tags. [2]
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

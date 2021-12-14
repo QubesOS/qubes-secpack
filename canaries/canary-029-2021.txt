@@ -44,18 +44,18 @@ of these keys using SHA-256 or SHA-512. [3]
 
 In addition, the qubes-secpack contains several expired code signing
 keys, old release keys, and keys belonging to individuals who are no
-longer active Qubes core developers. We have decided to move these keys
-into a new "retired" subdirectory. (We've decided to move them rather
-than delete them, since some users may wish to use them to authenticate
-old signatures. Note that this is merely a matter of convenience, since
-even deleted files always remain in the Git repository's history and can
+longer active Qubes developers. We have decided to move these keys into
+new "retired" subdirectories. (We've decided to move them rather than
+delete them, since some users may wish to use them to authenticate old
+signatures. Note that this is merely a matter of convenience, since even
+deleted files always remain in the Git repository's history and can
 always be retrieved that way.)
 
 To be clear, none of the actions described here constitute a response to
 any security incident. To our knowledge, the keys in the qubes-secpack
 are not and have never been at risk. No key fingerprints have changed as
 a result of these actions. We consider this updating and cleanup of the
-keys to be more of "housekeeping" task.
+keys to be more of a "housekeeping" task.
 
 
 Disclaimers and notes

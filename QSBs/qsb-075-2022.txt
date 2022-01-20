@@ -1,0 +1,81 @@
+
+             ---===[ Qubes Security Bulletin 075 ]===---
+
+                             2022-01-25
+
+    Insufficient cleanup of passed-through device IRQs (XSA-395)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-37
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.3-8
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+The following security advisory was published on 2022-01-25:
+
+XSA-395 [3] "Insufficient cleanup of passed-through device IRQs":
+
+| The management of IRQs associated with physical devices exposed to x86
+| HVM guests involves an iterative operation in particular when cleaning
+| up after the guest's use of the device.  In the case where an interrupt
+| is not quiescent yet at the time this cleanup gets invoked, the cleanup
+| attempt may be scheduled to be retried.  When multiple interrupts are
+| involved, this scheduling of a retry may get erroneously skipped.  At
+| the same time pointers may get cleared (resulting in a de-reference of
+| NULL) and freed (resulting in a use-after-free), while other code would
+| continue to assume them to be valid.
+
+
+Impact
+-------
+
+The precise impact is system specific, but would typically be a Denial
+of Service (DoS) affecting the entire host.  Privilege escalation and
+information leaks cannot be ruled out.
+
+Only x86 HVM guests with one or more passed-through physical devices
+using (together) multiple physical interrupts can leverage the
+vulnerability. In Qubes this applies to sys-usb and sys-net, although
+whether relevant devices use together multiple interrupts is system
+specific.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-395.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

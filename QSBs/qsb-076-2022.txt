@@ -1,0 +1,91 @@
+
+             ---===[ Qubes Security Bulletin 076 ]===---
+
+                             2022-02-11
+
+           Intel microcode updates published February 2022
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - microcode_ctl package, version 2.1-34.qubes1
+
+  For Qubes 4.1, in dom0:
+  - microcode_ctl package, version 2.1-34.qubes1
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR19 will change due to the new
+microcode in the initramfs.
+
+
+Summary
+--------
+
+On 2022-02-08 Intel published microcode updates [3] for some of their
+CPUs that fix security issues [4]. Red Hat provides a good overview [5].
+
+For Qubes users INTEL-SA-00561 [7] [8] (CVE-2021-0145) is relevant on
+affected CPUs. Quoting from Red Hat's description:
+
+| A flaw was found in microcode. Fast store forwarding prediction in one
+| domain could be controlled by software previously executed in another
+| domain. Such control helps a malicious program running in user mode (or
+| guest VM) to trigger transient execution gadgets in supervisor mode (or
+| VMM), potentially leading to sensitive data disclosure.
+
+If you are using some of Intel's low-power architecture CPUs (Atom,
+etc.) INTEL-SA-00589 [9] (CVE-2021-33120) might affect you. Based on the
+sparse description of the issue we can't judge the relevance to Qubes.
+
+Impact
+-------
+
+INTEL-SA-00561:
+
+This is another CPU issue related to speculative execution (also called
+transient execution) that allows an attacker, if exploited successfully,
+to read information across security boundaries (in this case an attacker
+controlled VM could read information that should only be accessible to
+the hypervisor).
+
+This affects, beside others, 10th generation mobile, and 11th generation
+mobile and desktop Intel Core CPUs. For a full list see Intel's list [6]
+or Red Hat's summary [5]. 
+
+
+Credits
+--------
+
+See the original Security Advisories. Additional thanks to Red Hat for
+their helpful overview of the microcode updates.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-2022027
+[4] https://www.intel.com/content/www/us/en/security-center/default.html
+[5] https://access.redhat.com/articles/6716541
+[6] https://www.intel.com/content/www/us/en/developer/topic-technology/software-security-guidance/processors-affected-consolidated-product-cpu-model.html
+[7] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00561.html
+[8] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/fast-store-forwarding-predictor.html
+[9] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00589.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

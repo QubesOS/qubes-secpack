@@ -3,7 +3,7 @@
 
                              2022-02-11
 
-           Intel microcode updates published February 2022
+                      Intel microcode updates
 
 
 User action required
@@ -34,42 +34,41 @@ microcode in the initramfs.
 Summary
 --------
 
-On 2022-02-08 Intel published microcode updates [3] for some of their
-CPUs that fix security issues [4]. Red Hat provides a good overview [5].
-
-For Qubes users INTEL-SA-00561 [7] [8] (CVE-2021-0145) is relevant on
-affected CPUs. Quoting from Red Hat's description:
+On 2022-02-08, Intel published microcode updates [3] for some of their
+CPUs that fix security issues [4]. For Qubes users, INTEL-SA-00561
+(CVE-2021-0145) [7][8] is recommended for affected CPUs. Red Hat
+provides a good overview [5]:
 
 | A flaw was found in microcode. Fast store forwarding prediction in one
 | domain could be controlled by software previously executed in another
-| domain. Such control helps a malicious program running in user mode (or
-| guest VM) to trigger transient execution gadgets in supervisor mode (or
-| VMM), potentially leading to sensitive data disclosure.
+| domain. Such control helps a malicious program running in user mode
+| (or guest VM) to trigger transient execution gadgets in supervisor
+| mode (or VMM), potentially leading to sensitive data disclosure.
 
-If you are using some of Intel's low-power architecture CPUs (Atom,
-etc.) INTEL-SA-00589 [9] (CVE-2021-33120) might affect you. Based on the
-sparse description of the issue we can't judge the relevance to Qubes.
+There is also a separate vulnerability -- INTEL-SA-00589
+(CVE-2021-33120) [9] -- that seems to affect mainly low-power
+architecture CPUs, e.g., Atom. However, due to the sparse description of
+the issue, we cannot judge whether it affects Qubes OS.
 
 Impact
 -------
 
-INTEL-SA-00561:
+INTEL-SA-00561 (CVE-2021-0145) is another CPU vulnerability related to
+speculative execution (also called transient execution). If successfully
+exploited, it could allow an attacker to read information across
+security boundaries. In this case, the successful exploitation could
+allow an attacker-controlled VM to read information that should be
+accessible only to the hypervisor.
 
-This is another CPU issue related to speculative execution (also called
-transient execution) that allows an attacker, if exploited successfully,
-to read information across security boundaries (in this case an attacker
-controlled VM could read information that should only be accessible to
-the hypervisor).
-
-This affects, beside others, 10th generation mobile, and 11th generation
-mobile and desktop Intel Core CPUs. For a full list see Intel's list [6]
-or Red Hat's summary [5]. 
+This affects at least 10th generation mobile and 11th generation mobile
+and desktop Intel Core CPUs. For a full list of affected CPU models, see
+Intel's table [6] or Red Hat's summary [5]. 
 
 
 Credits
 --------
 
-See the original Security Advisories. Additional thanks to Red Hat for
+See the original security advisories. Additional thanks to Red Hat for
 their helpful overview of the microcode updates.
 
 

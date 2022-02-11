@@ -35,9 +35,9 @@ Summary
 --------
 
 On 2022-02-08, Intel published microcode updates [3] for some of their
-CPUs that fix security issues [4]. For Qubes users, INTEL-SA-00561
-(CVE-2021-0145) [7][8] is recommended for affected CPUs. Red Hat
-provides a good overview [5]:
+CPUs that fix security issues [4]. INTEL-SA-00561 (CVE-2021-0145) [7][8]
+affects Qubes installations on hardware with affected CPU models. Red
+Hat provides a good overview [5]:
 
 | A flaw was found in microcode. Fast store forwarding prediction in one
 | domain could be controlled by software previously executed in another
@@ -62,7 +62,7 @@ accessible only to the hypervisor.
 
 This affects at least 10th generation mobile and 11th generation mobile
 and desktop Intel Core CPUs. For a full list of affected CPU models, see
-Intel's table [6] or Red Hat's summary [5]. 
+Intel's table [6] or Red Hat's summary [5].
 
 
 Credits

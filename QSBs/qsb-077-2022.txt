@@ -1,0 +1,98 @@
+
+             ---===[ Qubes Security Bulletin 077 ]===---
+
+                             2022-03-09
+
+             Multiple speculative security issues (XSA-398)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-38
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.4-2
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Note: at the time of publishing this QSB, patches for R4.1 are
+incomplete, they do not protect systems running on CET-capable Intel
+platforms (11th gen or later). They are expected to be provided in
+upcoming days.
+
+Summary
+--------
+
+On 2022-03-08, the Xen project published XSA-398, "Multiple
+speculative security issues" [3]:
+
+| 1) Researchers at VU Amsterdam have discovered Spectre-BHB, pertaining
+|    to the use of Branch History between privilege levels.
+| 
+|    ARM have assigned CVE-2022-23960.  Intel have assigned CVE-2022-0001
+|    (Branch History Injection) and CVE-2022-0002 (Intra-mode BTI).  AMD
+|    have no statement at the time of writing.
+| 
+|    For more details, see:
+|      https://vusec.net/projects/bhi-spectre-bhb
+|      https://developer.arm.com/support/arm-security-updates/speculative-processor-vulnerability
+|      https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00598.html
+| 
+| 2) Researchers at Open Source Security, Inc. have discovered that AMD
+|    CPUs may speculate beyond direct branches.
+| 
+|    AMD have assigned CVE-2021-26341.
+| 
+|    For more details, see:
+|      https://grsecurity.net/amd_branch_mispredictor_part_2_where_no_cpu_has_gone_before
+|      https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1026
+| 
+| 3) Researchers at Intel have discovered that previous Spectre-v2
+|    recommendations of using lfence/jmp is incomplete.
+| 
+|    AMD have assigned CVE-2021-26401.
+| 
+|    For more details, see:
+|      https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1036
+| 
+
+
+Impact
+-------
+
+The first issue in practice does not affect any configuration
+supported in Qubes OS.
+Remaining two issues may allow an attacker to infer the contents of
+arbitrary host memory, including memory assigned to other guests.
+
+Credits
+--------
+
+See the original Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-398.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

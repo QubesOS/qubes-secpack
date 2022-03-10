@@ -81,10 +81,13 @@ Impact
 -------
 
 The Xen Project's summary above enumerates three security issues. The
-first issue does not, in practice, affect any configuration supported by
-Qubes OS. The second and third issues may allow an attacker to infer the
-contents of arbitrary host memory, including memory assigned to other
-guests.
+first one, in practice, affects only newer Intel systems (11th
+generation and later). For other systems, previous mitigations
+are already sufficient. The second issue does not, in practice, affect
+any configuration supported by Qubes OS. The third issue affects only
+AMD systems.
+On affected systems, an attacker might be able to infer the contents
+of arbitrary host memory, including memory assigned to other guests.
 
 Credits
 --------

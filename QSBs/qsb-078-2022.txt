@@ -25,8 +25,7 @@ current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
 via the Qubes Update tool or its command-line equivalents. [2]
 
-All qubes must be restarted afterward in order for the updates to take
-effect.
+A system restart is required in order for the updates to take effect.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new

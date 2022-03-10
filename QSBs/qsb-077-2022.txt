@@ -30,15 +30,20 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
-Note: at the time of publishing this QSB, patches for R4.1 are
-incomplete, they do not protect systems running on CET-capable Intel
-platforms (11th gen or later). They are expected to be provided in
-upcoming days.
+Note: As of the publication date of this QSB, the Xen Project's patches
+for XSA-398 are incomplete. Specifically, they do not protect systems
+running on CET-capable Intel platforms (11th generation and later). This
+limitation affects Qubes 4.1 but not Qubes 4.0. In light of this
+situation, we have decided to push both the complete 4.0 patches and the
+incomplete 4.1 patches to the security-testing repository immediately.
+The Xen Project expects to make complete patches available in the near
+future. We will push the complete 4.1 patches as soon as possible after
+they become available to us.
 
 Summary
 --------
 
-On 2022-03-08, the Xen project published XSA-398, "Multiple
+On 2022-03-08, the Xen Project published XSA-398, "Multiple
 speculative security issues" [3]:
 
 | 1) Researchers at VU Amsterdam have discovered Spectre-BHB, pertaining
@@ -75,15 +80,16 @@ speculative security issues" [3]:
 Impact
 -------
 
-The first issue in practice does not affect any configuration
-supported in Qubes OS.
-Remaining two issues may allow an attacker to infer the contents of
-arbitrary host memory, including memory assigned to other guests.
+The Xen Project's summary above enumerates three security issues. The
+first issue does not, in practice, affect any configuration supported by
+Qubes OS. The second and third issues may allow an attacker to infer the
+contents of arbitrary host memory, including memory assigned to other
+guests.
 
 Credits
 --------
 
-See the original Security Advisory.
+See the original Xen Security Advisory.
 
 
 References

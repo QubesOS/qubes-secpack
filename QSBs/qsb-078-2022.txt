@@ -1,0 +1,149 @@
+
+             ---===[ Qubes Security Bulletin 078 ]===---
+
+                              2022-03-10
+
+       Linux kernel PV driver issues and LVM misconfiguration
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Kernel packages 5.4.183-2, 5.16.13-2, 4.19.233-2
+  - LVM2 2.02.167-4
+
+  For Qubes 4.1, in dom0:
+  - Kernel packages 5.10.104-2, 5.16.13-2
+  - LVM2 2.03.09-2
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+All qubes must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Dom0 kernel binaries.
+
+By default, qube kernels are provided by dom0. However, advanced users
+may instead opt to install a different kernel inside of a qube, e.g.,
+from an upstream distribution like Fedora or Debian. [3] Such users
+should consult that distribution's update channels for any kernel
+updates that might be relevant to this bulletin.
+
+In addition, advanced users with customized setups are advised that the
+LVM patch changes the LVM's default value for "global_filter" [5]. This
+means you must ensure that the device that contains the LVM with Qubes'
+rootfs is allowed, or else your system will not boot.
+
+
+Summary
+--------
+
+On 2022-03-10, the Xen project published XSA-396, "Linux PV device
+frontends vulnerable to attacks by backends" [4]:
+
+| Several Linux PV device frontends are using the grant table interfaces
+| for removing access rights of the backends in ways being subject to
+| race conditions, resulting in potential data leaks, data corruption
+| by malicious backends, and denial of service triggered by malicious
+| backends:
+| 
+| blkfront, netfront, scsifront and the gntalloc driver are testing
+| whether a grant reference is still in use. If this is not the case,
+| they assume that a following removal of the granted access will always
+| succeed, which is not true in case the backend has mapped the granted
+| page between those two operations. As a result the backend can keep
+| access to the memory page of the guest no matter how the page will be
+| used after the frontend I/O has finished. The xenbus driver has a
+| similar problem, as it doesn't check the success of removing the
+| granted access of a shared ring buffer.
+| blkfront: CVE-2022-23036
+| netfront: CVE-2022-23037
+| scsifront: CVE-2022-23038
+| gntalloc: CVE-2022-23039
+| xenbus: CVE-2022-23040
+| 
+| blkfront, netfront, scsifront, usbfront, dmabuf, xenbus, 9p, kbdfront,
+| and pvcalls are using a functionality to delay freeing a grant
+| reference until it is no longer in use, but the freeing of the related
+| data page is not synchronized with dropping the granted access. As a
+| result the backend can keep access to the memory page even after it
+| has been freed and then re-used for a different purpose.
+| CVE-2022-23041
+| 
+| 
+| netfront will fail a BUG_ON() assertion if it fails to revoke access
+| in the rx path. This will result in a Denial of Service (DoS)
+| situation of the guest which can be triggered by the backend.
+| CVE-2022-23042
+
+As a separate matter, there is a misconfiguration in the Linux Volume
+Manager (LVM) in dom0 that affects certain custom storage configurations
+(see below). In affected systems, the LVM fails to ignore devices that
+are controlled by other qubes. This exposes the LVM metadata parser in
+dom0 to untrusted data, which could, hypothetically, be exploited in
+combination with an another vulnerability and which may result in the
+LVM becoming "confused" about which devices it should use.
+
+
+Impact
+-------
+
+Regarding XSA-396, due to race conditions and missing tests of return
+codes in the Linux PV device frontend drivers, a malicious backend could
+gain access (both read and write) to memory pages to which it should not
+have such access, or it could directly trigger a denial of service (DoS)
+in the qube in which it is running. A backend gaining full control over
+its frontend qube is unlikely but cannot be ruled out. In the default
+Qubes OS configuration, this allows malicious sys-net, sys-firewall, and
+sys-usb qubes to attack any qube to which they are connected (either as
+network provider or as a block-device provider via `qvm-block`). XSA-396
+does not affect qubes that are not connected to any network and that do
+not have any extra disks attached.
+
+The LVM misconfiguration affects only systems that (a) use both an LVM
+storage pool and another non-LVM storage pool or (b) enable the
+"ephemeral" volume property (available in R4.1). The default Qubes OS
+configuration is not affected. In affected systems, a malicious qube
+that controls a non-LVM, writable storage volume may "confuse" the LVM
+in dom0 about which storage devices should be used. This may prevent
+many management actions on qubes from being performed, including
+creating, removing, starting, and resizing. If such a malicious qube
+knows dom0's volume group UUID, it could also imitate the disks of other
+qubes, but it cannot directly extract their original content).
+Extracting the volume group UUID itself is not possible by exploiting
+this misconfiguration. Finally, since this misconfiguration results in
+the LVM metadata parser in dom0 being exposed to untrusted data, it's
+possible that it could be chained with another attack.
+
+
+Credits
+--------
+
+Demi Marie Obenour and Simon Gaiser discovered the Linux PV driver
+vulnerabilities (XSA-396).
+
+Demi Marie Obenour discovered the LVM misconfiguration.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://www.qubes-os.org/doc/managing-vm-kernels/
+[4] https://xenbits.xen.org/xsa/advisory-396.html
+[5]
+https://github.com/QubesOS/qubes-lvm2/blob/master/lvm2-set-default-global_filter.patch
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

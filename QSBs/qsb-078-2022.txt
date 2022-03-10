@@ -13,12 +13,12 @@ Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
   For Qubes 4.0, in dom0:
-  - Kernel packages 5.4.183-2, 5.16.13-2, 4.19.233-2
-  - LVM2 2.02.167-4
+  - Kernel packages, versions 5.4.183-2, 5.16.13-2, 4.19.233-2
+  - LVM2 packages, version 2.02.167-4
 
   For Qubes 4.1, in dom0:
-  - Kernel packages 5.10.104-2, 5.16.13-2
-  - LVM2 2.03.09-2
+  - Kernel packages, versions 5.10.104-2, 5.16.13-2
+  - LVM2 packages, version 2.03.09-2
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -141,8 +141,7 @@ References
 [2] https://www.qubes-os.org/doc/how-to-update/
 [3] https://www.qubes-os.org/doc/managing-vm-kernels/
 [4] https://xenbits.xen.org/xsa/advisory-396.html
-[5]
-https://github.com/QubesOS/qubes-lvm2/blob/master/lvm2-set-default-global_filter.patch
+[5] https://github.com/QubesOS/qubes-lvm2/blob/v2.03.09-2/lvm2-set-default-global_filter.patch
 
 --
 The Qubes Security Team

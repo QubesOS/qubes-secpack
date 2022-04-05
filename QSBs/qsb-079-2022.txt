@@ -1,0 +1,101 @@
+
+             ---===[ Qubes Security Bulletin 079 ]===---
+
+                             2022-04-05
+
+            Two IOMMU-related Xen issues (XSA-399, XSA-400)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-39
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.4-4
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+The following security advisories were published on 2022-04-05:
+
+XSA-399 [3] "race in VT-d domain ID cleanup":
+
+| Xen domain IDs are up to 15 bits wide.  VT-d hardware may allow for only
+| less than 15 bits to hold a domain ID associating a physical device with
+| a particular domain.  Therefore internally Xen domain IDs are mapped to
+| the smaller value range.  The cleaning up of the housekeeping structures
+| has a race, allowing for VT-d domain IDs to be leaked and flushes to be
+| bypassed.
+
+
+XSA-400 [4] "IOMMU: RMRR (VT-d) and unity map (AMD-Vi) handling
+issues":
+
+| Certain PCI devices in a system might be assigned Reserved Memory
+| Regions (specified via Reserved Memory Region Reporting, "RMRR") for
+| Intel VT-d or Unity Mapping ranges for AMD-Vi.  These are typically used
+| for platform tasks such as legacy USB emulation.
+| 
+| Since the precise purpose of these regions is unknown, once a device
+| associated with such a region is active, the mappings of these regions
+| need to remain continuouly accessible by the device.  This requirement
+| has been violated.
+| 
+| Subsequent DMA or interrupts from the device may have unpredictable
+| behaviour, ranging from IOMMU faults to memory corruption.
+| 
+
+
+Impact
+-------
+
+The precise impact of XSA-399 and XSA-400 is system specific, but
+would typically be a Denial of Service (DoS) affecting the entire
+host. Privilege escalation and information leaks cannot be ruled out.
+
+XSA-399 affects only Qubes OS 4.1, Qubes OS 4.0 is not affected due to
+the Xen version used there. The issue affects only qubes with PCI
+devices assigned, which are sys-net and sys-usb in default Qubes OS
+configuration.
+
+XSA-400 affects both Qubes OS 4.0 and 4.1. It affects only qubes with
+assigned PCI devices that have associated RMRR or unity map. This
+usually applies to USB controllers, which in default Qubes OS
+configuration are assigned sys-usb qube.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-399.html
+[4] https://xenbits.xen.org/xsa/advisory-400.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

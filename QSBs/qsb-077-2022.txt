@@ -5,6 +5,12 @@
 
              Multiple speculative security issues (XSA-398)
 
+Changelog
+----------
+
+2022-03-09: Original QSB published
+2022-04-04: Updated package version for R4.1 to include complete fix
+
 
 User action required
 ---------------------
@@ -16,7 +22,7 @@ the issues discussed in this bulletin:
   - Xen packages, version 4.8.5-38
 
   For Qubes 4.1, in dom0:
-  - Xen packages, version 4.14.4-2
+  - Xen packages, version 4.14.4-3
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -30,15 +36,6 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
-Note: As of the publication date of this QSB, the Xen Project's patches
-for XSA-398 are incomplete. Specifically, they do not protect systems
-running on CET-capable Intel platforms (11th generation and later). This
-limitation affects Qubes 4.1 but not Qubes 4.0. In light of this
-situation, we have decided to push both the complete 4.0 patches and the
-incomplete 4.1 patches to the security-testing repository immediately.
-The Xen Project expects to make complete patches available in the near
-future. We will push the complete 4.1 patches as soon as possible after
-they become available to us.
 
 Summary
 --------

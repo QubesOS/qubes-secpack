@@ -9,7 +9,8 @@ Changelog
 ----------
 
 2022-03-09: Original QSB published
-2022-04-04: Updated package version for R4.1 to include complete fix
+2022-04-04: Updated package version for Qubes 4.1 to include complete
+            fix and removed note about this
 
 
 User action required

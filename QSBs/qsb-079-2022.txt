@@ -61,25 +61,24 @@ issues":
 | 
 | Subsequent DMA or interrupts from the device may have unpredictable
 | behaviour, ranging from IOMMU faults to memory corruption.
-| 
 
 
 Impact
 -------
 
-The precise impact of XSA-399 and XSA-400 is system specific, but
-would typically be a Denial of Service (DoS) affecting the entire
+The precise impact of XSA-399 and XSA-400 is system-specific but
+would typically be a denial of service (DoS) affecting the entire
 host. Privilege escalation and information leaks cannot be ruled out.
 
-XSA-399 affects only Qubes OS 4.1, Qubes OS 4.0 is not affected due to
-the Xen version used there. The issue affects only qubes with PCI
-devices assigned, which are sys-net and sys-usb in default Qubes OS
+XSA-399 affects only Qubes OS 4.1. Qubes OS 4.0 is not affected due to
+the version of Xen it uses. This issue affects only qubes with assigned
+PCI devices, which are sys-net and sys-usb in the default Qubes OS
 configuration.
 
 XSA-400 affects both Qubes OS 4.0 and 4.1. It affects only qubes with
-assigned PCI devices that have associated RMRR or unity map. This
-usually applies to USB controllers, which in default Qubes OS
-configuration are assigned sys-usb qube.
+assigned PCI devices that have an associated RMRR or unity map. This
+usually applies to USB controllers, which are assigned to the sys-usb
+qube in the default Qubes OS configuration.
 
 
 Credits

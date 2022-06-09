@@ -71,10 +71,10 @@ host. However, in the default Qubes OS configuration, these
 vulnerabilities affect only the stubdomains for sys-net and sys-usb.
 Therefore, in order to exploit these vulnerabilities in a default Qubes
 installation, an adversary would first have to discover and exploit an
-independent hypothetical vulnerability in QEMU in order to gain control
-of an appropriate stubdomain. Only after having done so would the
-adversary be in a position to attempt to exploit the vulnerabilities
-discussed in this bulletin.
+independent vulnerability in QEMU in order to gain control of an
+appropriate stubdomain. Only after having done so would the adversary be
+in a position to attempt to exploit the vulnerabilities discussed in
+this bulletin.
 
 XSA-402 affects only AMD systems and Intel systems before Ivy Bridge
 (the third generation of the Intel Core processors). Newer Intel systems

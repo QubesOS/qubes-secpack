@@ -38,42 +38,47 @@ The following security advisories were published on 2022-06-09:
 
 XSA-401 [3] "x86 pv: Race condition in typeref acquisition":
 
-| Xen maintains a type reference count for pages, in addition to a regular
-| reference count.  This scheme is used to maintain invariants required
-| for Xen's safety, e.g. PV guests may not have direct writeable access to
-| pagetables; updates need auditing by Xen.
+| Xen maintains a type reference count for pages, in addition to a
+| regular reference count.  This scheme is used to maintain invariants
+| required for Xen's safety, e.g. PV guests may not have direct
+| writeable access to pagetables; updates need auditing by Xen.
 | 
 | Unfortunately, the logic for acquiring a type reference has a race
-| condition, whereby a safely TLB flush is issued too early and creates a
-| window where the guest can re-establish the read/write mapping before
-| writeability is prohibited.
+| condition, whereby a safely TLB flush is issued too early and creates
+| a window where the guest can re-establish the read/write mapping
+| before writeability is prohibited.
 
 XSA-402 [4] "x86 pv: Insufficient care with non-coherent mappings":
 
-| Xen maintains a type reference count for pages, in addition to a regular
-| reference count.  This scheme is used to maintain invariants required
-| for Xen's safety, e.g. PV guests may not have direct writeable access to
-| pagetables; updates need auditing by Xen.
+| Xen maintains a type reference count for pages, in addition to a
+| regular reference count.  This scheme is used to maintain invariants
+| required for Xen's safety, e.g. PV guests may not have direct
+| writeable access to pagetables; updates need auditing by Xen.
 | 
-| Unfortunately, Xen's safety logic doesn't account for CPU-induced cache
-| non-coherency; cases where the CPU can cause the content of the cache to
-| be different to the content in main memory.  In such cases, Xen's safety
-| logic can incorrectly conclude that the contents of a page is safe.
+| Unfortunately, Xen's safety logic doesn't account for CPU-induced
+| cache non-coherency; cases where the CPU can cause the content of the
+| cache to be different to the content in main memory.  In such cases,
+| Xen's safety logic can incorrectly conclude that the contents of a
+| page is safe.
 
 
 Impact
 -------
 
-Each of the issues allows a malicious PV domain that has PCI devices
-assigned to escalate their privilege to control the whole host. In
-default Qubes OS configuration, that affects only stubdomains for
-sys-net and sys-usb. This means, the attacker first needs to exploit
-a hypothetical vulnerability in QEMU to gain control over the
-stubdomain.
+These vulnerabilities, if exploited, could allow malicious PV domains
+with assigned PCI devices to escalate their privileges to that of the
+host. However, in the default Qubes OS configuration, these
+vulnerabilities affect only the stubdomains for sys-net and sys-usb.
+Therefore, in order to exploit these vulnerabilities in a default Qubes
+installation, an adversary would first have to discover and exploit an
+independent hypothetical vulnerability in QEMU in order to gain control
+of an appropriate stubdomain. Only after having done so would the
+adversary be in a position to attempt to exploit the vulnerabilities
+discussed in this bulletin.
 
-The XSA-402 issue affects only AMD systems, and Intel systems before
-IvyBridge (3rd generation of Intel Core processors). Newer Intel
-systems are not affected.
+XSA-402 affects only AMD systems and Intel systems before Ivy Bridge
+(the third generation of the Intel Core processors). Newer Intel systems
+are not affected.
 
 
 Credits

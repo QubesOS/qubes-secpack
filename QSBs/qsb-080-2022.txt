@@ -1,0 +1,95 @@
+
+             ---===[ Qubes Security Bulletin 080 ]===---
+
+                             2022-06-09
+
+     Issues with PV domains and PCI passthrough (XSA-401, XSA-402)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-40
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.5-2
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+The following security advisories were published on 2022-06-09:
+
+XSA-401 [3] "x86 pv: Race condition in typeref acquisition":
+
+| Xen maintains a type reference count for pages, in addition to a regular
+| reference count.  This scheme is used to maintain invariants required
+| for Xen's safety, e.g. PV guests may not have direct writeable access to
+| pagetables; updates need auditing by Xen.
+| 
+| Unfortunately, the logic for acquiring a type reference has a race
+| condition, whereby a safely TLB flush is issued too early and creates a
+| window where the guest can re-establish the read/write mapping before
+| writeability is prohibited.
+
+XSA-402 [4] "x86 pv: Insufficient care with non-coherent mappings":
+
+| Xen maintains a type reference count for pages, in addition to a regular
+| reference count.  This scheme is used to maintain invariants required
+| for Xen's safety, e.g. PV guests may not have direct writeable access to
+| pagetables; updates need auditing by Xen.
+| 
+| Unfortunately, Xen's safety logic doesn't account for CPU-induced cache
+| non-coherency; cases where the CPU can cause the content of the cache to
+| be different to the content in main memory.  In such cases, Xen's safety
+| logic can incorrectly conclude that the contents of a page is safe.
+
+
+Impact
+-------
+
+Each of the issues allows a malicious PV domain that has PCI devices
+assigned to escalate their privilege to control the whole host. In
+default Qubes OS configuration, that affects only stubdomains for
+sys-net and sys-usb. This means, the attacker first needs to exploit
+a hypothetical vulnerability in QEMU to gain control over the
+stubdomain.
+
+The XSA-402 issue affects only AMD systems, and Intel systems before
+IvyBridge (3rd generation of Intel Core processors). Newer Intel
+systems are not affected.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-401.html
+[4] https://xenbits.xen.org/xsa/advisory-402.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

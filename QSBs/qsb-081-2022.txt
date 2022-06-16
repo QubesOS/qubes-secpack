@@ -1,0 +1,93 @@
+
+             ---===[ Qubes Security Bulletin 081 ]===---
+
+                             2022-06-16
+
+            x86: MMIO Stale Data vulnerabilities (XSA-404)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-41
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.5-3
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+On 2022-06-14, the Xen Project published XSA-404, "x86: MMIO Stale
+Data vulnerabilities" [3]:
+
+| This issue is related to the SRBDS, TAA and MDS vulnerabilities.  Please
+| see:
+| 
+|   https://xenbits.xen.org/xsa/advisory-320.html (SRBDS)
+|   https://xenbits.xen.org/xsa/advisory-305.html (TAA)
+|   https://xenbits.xen.org/xsa/advisory-297.html (MDS)
+| 
+| Please see Intel's whitepaper:
+| 
+|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html
+
+A VM with assigned PCI device may use speculative execution to
+infer memory content of other guests or Xen itself. In default Qubes
+OS configuration, only sys-net and/or sys-usb can perform the attack.
+Specific impact and possible mitigations depend on system CPU and
+installed microcode.
+
+Affected systems
+-----------------
+
+All Intel systems are affected. Mitigations require functionality
+included in microcode update released in May 2022. List of CPU models
+for this those mitigations are available can be seen at [4] (the
+"microcode-20220510" section). CPU models not listed in this section
+are vulnerable and there is no mitigation available.
+
+
+Further plans regarding PCI passthrough
+----------------------------------------
+
+This is yet another issue affecting only VMs with access to PCI
+devices. As a protective measure, we will be changing how we treat
+those VMs in future Qubes OS versions. Specifically - they will be
+treated as more privileged VMs, that require additional protection.
+Specific protection mechanisms will be discussed in public outside of
+this security bulletin. 
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-404.html
+[4] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20220510
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

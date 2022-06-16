@@ -87,6 +87,9 @@ only be accessible to Xen or another VM (and potentially use that
 information for further attacks). So unfortunately those VMs need to be
 treated as (more) trusted.
 
+Please note the official table of affected CPUs at [5] is not fully
+accurate at the time of writing this advisory.
+
 Further plans regarding PCI passthrough
 ----------------------------------------
 
@@ -113,6 +116,7 @@ References
 [2] https://www.qubes-os.org/doc/how-to-update/
 [3] https://xenbits.xen.org/xsa/advisory-404.html
 [4] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20220510
+[5] https://www.intel.com/content/www/us/en/developer/topic-technology/software-security-guidance/processors-affected-consolidated-product-cpu-model.html
 
 --
 The Qubes Security Team

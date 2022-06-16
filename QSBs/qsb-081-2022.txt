@@ -59,40 +59,81 @@ installed microcode.
 Affected hardware
 ------------------
 
-Unfortunately, all Intel systems are affected, and there is no way to
-completely fix the problem. While certain mitigations are possible,
-these mitigations are available only to a proper subset of Intel CPUs,
-namely those that were eligible for the Intel microcode update released
-in May 2022. See the "microcode-20220510" section of Intel's release
-notes [4] for the complete list. (Since this list may be difficult for
-end users to interpret, we will also work to provide more detailed
-end-user instructions for determining whether a given CPU is affected.)
-If your device's CPU is in this list, then installing the Xen packages
-listed in the "user action required" section above will apply the
-aforementioned mitigations.
+All Intel systems are affected. While mitigations are available, they
+are available only for some Intel CPU models. Normally, it should be a
+simple matter to look up a given CPU model number in a table to see
+whether it is affected and whether it is eligible for any mitigations.
+Indeed, Intel has published a table [4] that claims to serve this
+purpose. Unfortunately, however, we have found several inaccuracies in
+this table. Since we cannot rely on the table, we have had to devise an
+alternative method using other published Intel technical documents that
+appear to be more accurate. This has turned out to be quite confusing
+and difficult. We present the alternative method below, but be warned
+that it is quite complex and is likely to prove challenging for all but
+the most tech-savvy users.
 
-Regrettably, all Intel CPU models that do *not* appear on the
+Our best evidence indicates that mitigations are available for all and
+only those CPUs that are both eligible for and updated with the Intel
+microcode update released in May 2022. First, have a look at the
+"microcode-20220510" section of Intel's release notes [5] for the
+complete list of CPU models. Note that Intel uses three different naming
+schemes for their CPUs, so the retail model numbers with which we are
+most familiar do not appear on this table. Instead, compare the
+numerical values in the "F-M-S/PI" column against `/proc/cpuinfo` or
+`lscpu`. "F-M-S/PI" stands for "Family-Model-Stepping/Platform ID," the
+last of which (PI) can be ignored. Note that `/proc/cpu` presents the
+values in decimal, while the table presents them in hexadecimal, so
+conversion is required. This is all described in further detail in
+Intel's README [6].
+
+Now, if your device's CPU is in this list and has the required
+microcode-20220510 update, then installing the Xen packages listed in
+the "user action required" section of this QSB will apply the
+aforementioned mitigations. To check whether your CPU has the required
+microcode update, you can compare the "microcode" field of
+`/proc/cpuinfo` against the aforementioned list. Alternatively, you can
+check whether you have `microcode_ctl-2.1-35.qubes1` installed, but keep
+in mind that this alone can't tell you whether the update actually
+applies to your CPU.
+
+Unfortunately, all Intel CPU models that do *not* appear on the
 aforementioned list remain vulnerable, and there is *no* known
 mitigation available for them. If your system has one of these CPUs,
 then installing The Xen packages listed in the "user action required"
 section above is *not* expected to mitigate the problem described in
-this bulletin. Nonetheless, we still recommend installing the updates
-anyway (once available), since they will not make the problem any worse,
-and there is a chance that they could help (e.g., if the mitigation
+this bulletin. There is simply nothing we can do for these CPUs (in
+terms of patching) unless or until we receive a fix from Intel or Xen
+(or confirmation that the current fix actually does benefit them after
+all). Nonetheless, we still recommend installing the updates anyway
+(once available), since they will not make the problem any worse, and
+there is a chance that they could help (e.g., if the mitigation
 eligibility criteria turn out to be overly conservative). Moreover,
 keeping up-to-date with all security updates is a general best practice,
-and future security updates may depend on this one.
+and future updates will be based on the latest version.
+
+However, hope is not entirely lost for users whose CPUs are not eligible
+for software mitigations. Since the vulnerability discussed in this
+bulletin does not affect VMs without PCI passthrough devices, users
+still have the option of altering their habits to treat VMs like sys-usb
+and sys-net as more trusted. (Essentially, we must assume that an
+adversary with the ability to execute arbitrary code in a VM with an
+assigned PCI device can read information that should be accessible only
+to Xen or another VM and may use that information to launch further
+attacks.) While this can be especially challenging in the case of
+sys-net, it at least affords users *some* latitude in working around the
+problem by being mindful of when such VMs are running, how trusted their
+templates are, and similar considerations.
 
 
 Further plans regarding PCI passthrough
 ----------------------------------------
 
 This is yet another issue affecting only VMs with access to PCI devices.
-As a defensive measure, we will be changing how we handle such VMs in
-future Qubes OS releases. Specifically, they will be treated as more
-privileged VMs that require additional protection. Specific protective
-measures will be discussed with the community following the publication
-of this bulletin.
+This pattern of vulnerabilities has prompted us to research more secure
+ways of handling such VMs in future Qubes releases. Eventually, we plan
+to treat them as more privileged VMs that require additional protection.
+Specific protective measures will be discussed with the community as
+part of our ongoing research and development efforts.
 
 
 Credits
@@ -107,7 +148,10 @@ References
 [1] https://www.qubes-os.org/doc/testing/
 [2] https://www.qubes-os.org/doc/how-to-update/
 [3] https://xenbits.xen.org/xsa/advisory-404.html
-[4] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20220510
+[4] https://www.intel.com/content/www/us/en/developer/topic-technology/software-security-guidance/processors-affected-consolidated-product-cpu-model.html
+[5] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20220510
+[6] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files#about-processor-signature-family-model-stepping-and-platform-id
+
 
 --
 The Qubes Security Team

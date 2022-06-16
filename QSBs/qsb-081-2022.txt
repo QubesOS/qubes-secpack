@@ -59,17 +59,17 @@ installed microcode.
 Affected hardware
 ------------------
 
-Unfortunately, all Intel systems are affected, and there is no way to
-completely fix the problem. While certain mitigations are possible,
-these mitigations are available only to a proper subset of Intel CPUs,
-namely those that were eligible for the Intel microcode update released
-in May 2022. See the "microcode-20220510" section of Intel's release
-notes [4] for the complete list. (Since this list may be difficult for
-end users to interpret, we will also work to provide more detailed
-end-user instructions for determining whether a given CPU is affected.)
-If your device's CPU is in this list, then installing the Xen packages
-listed in the "user action required" section above will apply the
-aforementioned mitigations.
+Unfortunately, all Intel systems are affected. Mitigations are available
+only to a subset of Intel CPUs, namely those that were eligible for the
+Intel microcode update released in May 2022. See the
+"microcode-20220510" section of Intel's release notes [4] for the
+complete list. (Since this list may be difficult for end users to
+interpret, we will also work to provide more detailed end-user
+instructions for determining whether a given CPU is affected.) If your
+device's CPU is in this list, then installing the Xen packages listed in
+the "user action required" section above will apply the aforementioned
+mitigations (assuming you already have installed the microcode update in
+the past).
 
 Regrettably, all Intel CPU models that do *not* appear on the
 aforementioned list remain vulnerable, and there is *no* known
@@ -78,11 +78,14 @@ then installing The Xen packages listed in the "user action required"
 section above is *not* expected to mitigate the problem described in
 this bulletin. Nonetheless, we still recommend installing the updates
 anyway (once available), since they will not make the problem any worse,
-and there is a chance that they could help (e.g., if the mitigation
-eligibility criteria turn out to be overly conservative). Moreover,
-keeping up-to-date with all security updates is a general best practice,
-and future security updates may depend on this one.
+and future updates will be based on the latest version.
 
+For CPU models without available mitigations you need to assume that a
+competent attacker that gains code execution on a VM with assigned PCI
+devices (typically sys-usb and sys-net) can read information that should
+only be accessible to Xen or another VM (and potentially use that
+information for further attacks). So unfortunately those VMs need to be
+treated as (more) trusted.
 
 Further plans regarding PCI passthrough
 ----------------------------------------
@@ -92,7 +95,9 @@ As a defensive measure, we will be changing how we handle such VMs in
 future Qubes OS releases. Specifically, they will be treated as more
 privileged VMs that require additional protection. Specific protective
 measures will be discussed with the community following the publication
-of this bulletin.
+of this bulletin. Design and implementation of those measures will take
+time and if they are more invasive will be probably restricted to
+further releases.
 
 
 Credits

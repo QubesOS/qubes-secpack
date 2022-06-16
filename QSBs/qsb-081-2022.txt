@@ -9,7 +9,8 @@
 User action required
 ---------------------
 
-Users must install the following specific packages in order to address
+Users with appropriate hardware (see the "affected hardware" section
+below) must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
   For Qubes 4.0, in dom0:
@@ -37,8 +38,8 @@ Summary
 On 2022-06-14, the Xen Project published XSA-404, "x86: MMIO Stale
 Data vulnerabilities" [3]:
 
-| This issue is related to the SRBDS, TAA and MDS vulnerabilities.  Please
-| see:
+| This issue is related to the SRBDS, TAA and MDS vulnerabilities.
+| Please see:
 | 
 |   https://xenbits.xen.org/xsa/advisory-320.html (SRBDS)
 |   https://xenbits.xen.org/xsa/advisory-305.html (TAA)
@@ -48,31 +49,51 @@ Data vulnerabilities" [3]:
 | 
 |   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html
 
-A VM with assigned PCI device may use speculative execution to
-infer memory content of other guests or Xen itself. In default Qubes
-OS configuration, only sys-net and/or sys-usb can perform the attack.
-Specific impact and possible mitigations depend on system CPU and
+A VM with an assigned PCI device can use speculative execution to infer
+the memory content of other guests or Xen itself. In the default Qubes
+OS configuration, only sys-net and sys-usb can perform this attack. The
+specific impact and possible mitigations depend on the device's CPU and
 installed microcode.
 
-Affected systems
------------------
 
-All Intel systems are affected. Mitigations require functionality
-included in microcode update released in May 2022. List of CPU models
-for this those mitigations are available can be seen at [4] (the
-"microcode-20220510" section). CPU models not listed in this section
-are vulnerable and there is no mitigation available.
+Affected hardware
+------------------
+
+Unfortunately, all Intel systems are affected, and there is no way to
+completely fix the problem. While certain mitigations are possible,
+these mitigations are available only to a proper subset of Intel CPUs,
+namely those that were eligible for the Intel microcode update released
+in May 2022. See the "microcode-20220510" section of Intel's release
+notes [4] for the complete list. (Since this list may be difficult for
+end users to interpret, we will also work to provide more detailed
+end-user instructions for determining whether a given CPU is affected.)
+If your device's CPU is in this list, then installing the Xen packages
+listed in the "user action required" section above will apply the
+aforementioned mitigations.
+
+Regrettably, all Intel CPU models that do *not* appear on the
+aforementioned list remain vulnerable, and there is *no* known
+mitigation available for them. If your system has one of these CPUs,
+then installing The Xen packages listed in the "user action required"
+section above is *not* expected to mitigate the problem described in
+this bulletin. Nonetheless, we still recommend installing the updates
+anyway (once available), since they will not make the problem any worse,
+and there is a chance that they could help (e.g., if the mitigation
+eligibility criteria turn out to be overly conservative). Moreover,
+keeping up-to-date with all security updates is a general best practice,
+and future security updates may depend on this one.
 
 
 Further plans regarding PCI passthrough
 ----------------------------------------
 
-This is yet another issue affecting only VMs with access to PCI
-devices. As a protective measure, we will be changing how we treat
-those VMs in future Qubes OS versions. Specifically - they will be
-treated as more privileged VMs, that require additional protection.
-Specific protection mechanisms will be discussed in public outside of
-this security bulletin. 
+This is yet another issue affecting only VMs with access to PCI devices.
+As a defensive measure, we will be changing how we handle such VMs in
+future Qubes OS releases. Specifically, they will be treated as more
+privileged VMs that require additional protection. Specific protective
+measures will be discussed with the community following the publication
+of this bulletin.
+
 
 Credits
 --------

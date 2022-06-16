@@ -81,8 +81,8 @@ schemes for their CPUs, so the retail model numbers with which we are
 most familiar do not appear on this table. Instead, compare the
 numerical values in the "F-M-S/PI" column against `/proc/cpuinfo` or
 `lscpu`. "F-M-S/PI" stands for "Family-Model-Stepping/Platform ID," the
-last of which (PI) can be ignored. Note that `/proc/cpu` presents the
-values in decimal, while the table presents them in hexadecimal, so
+last of which (PI) can be ignored. Note that `/proc/cpuinfo` presents
+the values in decimal, while the table presents them in hexadecimal, so
 conversion is required. This is all described in further detail in
 Intel's README [6].
 

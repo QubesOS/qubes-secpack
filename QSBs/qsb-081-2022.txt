@@ -53,12 +53,12 @@ Data vulnerabilities" [3]:
 Impact
 -------
 
-An adversary who controls a VM with an assigned PCI device can use
-speculative execution to infer the memory content of other guests or Xen
-itself. This could allow the adversary to read information that should
-be accessible only to Xen or another VM and to use that information to
-launch further attacks. In the default Qubes OS configuration, only
-sys-net and sys-usb can be used to perform this attack.
+An adversary who controls a VM with an assigned PCI device can infer
+the memory content of other guests or Xen itself. This could allow the
+adversary to read information that should be accessible only to Xen or
+another VM and to use that information to launch further attacks. In
+the default Qubes OS configuration, only sys-net and sys-usb can be
+used to perform this attack.
 
 
 Affected hardware

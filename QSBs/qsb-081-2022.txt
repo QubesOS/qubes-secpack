@@ -76,7 +76,7 @@ microcode update released in May 2022 [5]. Since checking this manually
 can be a bit involved we wrote a little tool that does this for you.
 After installing updates from security-testing, you can execute
 'sudo cpu-microcode-info' in a terminal. It will list for all CPUs the
-format-modell-stepping/platform_id code that Intel uses in it's
+format-model-stepping/platform_id code that Intel uses in it's
 microcode documentation. Additional it will list if for your CPUs the May
 update is available and whether it's currently installed in the CPU.
 

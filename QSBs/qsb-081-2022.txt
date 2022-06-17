@@ -68,33 +68,17 @@ purpose. Unfortunately, however, we have found several inaccuracies in
 this table. Since we cannot rely on the table, we have had to devise an
 alternative method using other published Intel technical documents that
 appear to be more accurate. This has turned out to be quite confusing
-and difficult. We present the alternative method below, but be warned
-that it is quite complex and is likely to prove challenging for all but
-the most tech-savvy users.
+and difficult.
 
 Our best evidence indicates that mitigations are available for all and
 only those CPUs that are both eligible for and updated with the Intel
-microcode update released in May 2022. First, have a look at the
-"microcode-20220510" section of Intel's release notes [5] for the
-complete list of CPU models. Note that Intel uses three different naming
-schemes for their CPUs, so the retail model numbers with which we are
-most familiar do not appear on this table. Instead, compare the
-numerical values in the "F-M-S/PI" column against `/proc/cpuinfo` or
-`lscpu`. "F-M-S/PI" stands for "Family-Model-Stepping/Platform ID," the
-last of which (PI) can be ignored. Note that `/proc/cpuinfo` presents
-the values in decimal, while the table presents them in hexadecimal, so
-conversion is required. This is all described in further detail in
-Intel's README [6].
-
-Now, if your device's CPU is in this list and has the required
-microcode-20220510 update, then installing the Xen packages listed in
-the "user action required" section of this QSB will apply the
-aforementioned mitigations. To check whether your CPU has the required
-microcode update, you can compare the "microcode" field of
-`/proc/cpuinfo` against the aforementioned list. Alternatively, you can
-check whether you have `microcode_ctl-2.1-35.qubes1` installed, but keep
-in mind that this alone can't tell you whether the update actually
-applies to your CPU.
+microcode update released in May 2022 [5]. Since checking this manually
+can be a bit involved we wrote a little tool that does this for you.
+After installing updates from security-testing, you can execute
+'sudo cpu-microcode-info' in a terminal. It will list for all CPUs the
+format-modell-stepping/platform_id code that Intel uses in it's
+microcode documentation. Additional it will list if for your CPUs the May
+update is available and whether it's currently installed in the CPU.
 
 Unfortunately, all Intel CPU models that do *not* appear on the
 aforementioned list remain vulnerable, and there is *no* known
@@ -102,14 +86,12 @@ mitigation available for them. If your system has one of these CPUs,
 then installing The Xen packages listed in the "user action required"
 section above is *not* expected to mitigate the problem described in
 this bulletin. There is simply nothing we can do for these CPUs (in
-terms of patching) unless or until we receive a fix from Intel or Xen
-(or confirmation that the current fix actually does benefit them after
-all). Nonetheless, we still recommend installing the updates anyway
-(once available), since they will not make the problem any worse, and
-there is a chance that they could help (e.g., if the mitigation
-eligibility criteria turn out to be overly conservative). Moreover,
-keeping up-to-date with all security updates is a general best practice,
-and future updates will be based on the latest version.
+terms of patching) unless or until we receive a fix from Intel or we get
+new infromation about what's affectd. Nonetheless, we still recommend
+installing the updates anyway (once available), since they will not make
+the problem any worse, keeping up-to-date with all security updates is a
+general best practice, and future updates will be based on the latest
+version.
 
 However, hope is not entirely lost for users whose CPUs are not eligible
 for software mitigations. Since the vulnerability discussed in this

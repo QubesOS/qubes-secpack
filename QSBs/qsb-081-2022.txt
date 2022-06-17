@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 081 ]===---
 
-                             2022-06-16
+                             2022-06-17
 
             x86: MMIO Stale Data vulnerabilities (XSA-404)
 
@@ -49,11 +49,16 @@ Data vulnerabilities" [3]:
 | 
 |   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html
 
-A VM with an assigned PCI device can use speculative execution to infer
-the memory content of other guests or Xen itself. In the default Qubes
-OS configuration, only sys-net and sys-usb can perform this attack. The
-specific impact and possible mitigations depend on the device's CPU and
-installed microcode.
+
+Impact
+-------
+
+An adversary who controls a VM with an assigned PCI device can use
+speculative execution to infer the memory content of other guests or Xen
+itself. This could allow the adversary to read information that should
+be accessible only to Xen or another VM and to use that information to
+launch further attacks. In the default Qubes OS configuration, only
+sys-net and sys-usb can be used to perform this attack.
 
 
 Affected hardware
@@ -67,44 +72,64 @@ Indeed, Intel has published a table [4] that claims to serve this
 purpose. Unfortunately, however, we have found several inaccuracies in
 this table. Since we cannot rely on the table, we have had to devise an
 alternative method using other published Intel technical documents that
-appear to be more accurate. This has turned out to be quite confusing
-and difficult.
+appear to be more accurate. This has turned out to be quite complex.
 
 Our best evidence indicates that mitigations are available for all and
 only those CPUs that are both eligible for and updated with the Intel
-microcode update released in May 2022 [5]. Since checking this manually
-can be a bit involved we wrote a little tool that does this for you.
-After installing updates from security-testing, you can execute
-'sudo cpu-microcode-info' in a terminal. It will list for all CPUs the
-format-model-stepping/platform_id code that Intel uses in it's
-microcode documentation. Additional it will list if for your CPUs the May
-update is available and whether it's currently installed in the CPU.
+microcode update released in May 2022. [5] Since going through all the
+complicated technical steps of checking this manually would be
+excessively cumbersome for most users, we have written a tool that does
+it for you. Please note that this tool is entirely optional and is *not*
+required for any security updates to take effect. Rather, its intended
+purpose is to satisfy the curiosity of users who wish to know whether
+their own CPUs are eligible for mitigations and who would struggle to
+make that determination manually. This tool is included in the
+`qubes-core-dom0-linux-4.0.35` package for Qubes 4.0 and the
+`qubes-core-dom0-linux-4.1.23` package for Qubes 4.1. These packages
+will migrate from the security-testing repository to the current
+(stable) repository over the next two weeks after being tested by the
+community. [1] Once available, the packages are to be installed via the
+Qubes Update tool or its command-line equivalents. [2]
 
-Unfortunately, all Intel CPU models that do *not* appear on the
-aforementioned list remain vulnerable, and there is *no* known
-mitigation available for them. If your system has one of these CPUs,
-then installing The Xen packages listed in the "user action required"
-section above is *not* expected to mitigate the problem described in
-this bulletin. There is simply nothing we can do for these CPUs (in
-terms of patching) unless or until we receive a fix from Intel or we get
-new infromation about what's affectd. Nonetheless, we still recommend
-installing the updates anyway (once available), since they will not make
-the problem any worse, keeping up-to-date with all security updates is a
-general best practice, and future updates will be based on the latest
-version.
+After installing the required updates, you will be able to execute `sudo
+cpu-microcode-info` in a dom0 terminal. This will output a table of
+information about the logical CPUs (aka CPU "cores") in your system. The
+"F-M-S/PI" column lists the "Family-Model-Stepping/Platform ID" codes
+that Intel uses in its microcode documentation, [5] which is explained
+in further detail in Intel's README. [6] (The manual process of checking
+would involve extracting your CPU information, converting it to
+hexadecimal, and looking it up in the appropriate table in this
+document.) The "Loaded microcode version" column lists the microcode
+versions currently loaded for each CPU. The "20220510 update available"
+column lists whether the required May 2022 microcode update is
+*available* for each CPU. The "20220510 update installed" column lists
+whether the required May 2022 microcode update is *installed* in each
+CPU.
+
+In order for the updates associated with this bulletin to successfully
+mitigate XSA-404, a value of "yes" is required in both of these last two
+"20220510 update" columns. If the "available" column has a "yes" while
+the "installed" column has a "no," then the May 2022 microcode update
+must be installed first. If both columns have "no" values, then this CPU
+remains vulnerable, and there is no known mitigation available. If your
+system has such a CPU, then installing The Xen packages listed in the
+"user action required" section above is *not* expected to mitigate the
+problem described in this bulletin. Unfortunately, there is simply
+nothing we can do for these CPUs in terms of patching unless we receive
+a fix from Intel or receive new information about which CPUs are
+affected. Nonetheless, we still recommend installing the updates anyway
+(once available), since they will not make the problem any worse,
+keeping up-to-date with all security updates is a general best practice,
+and future updates will be based on the latest version.
 
 However, hope is not entirely lost for users whose CPUs are not eligible
 for software mitigations. Since the vulnerability discussed in this
 bulletin does not affect VMs without PCI passthrough devices, users
 still have the option of altering their habits to treat VMs like sys-usb
-and sys-net as more trusted. (Essentially, we must assume that an
-adversary with the ability to execute arbitrary code in a VM with an
-assigned PCI device can read information that should be accessible only
-to Xen or another VM and may use that information to launch further
-attacks.) While this can be especially challenging in the case of
-sys-net, it at least affords users *some* latitude in working around the
-problem by being mindful of when such VMs are running, how trusted their
-templates are, and similar considerations.
+and sys-net as more trusted. While this can be especially challenging in
+the case of sys-net, it at least affords users *some* latitude in
+working around the problem by being mindful of when such VMs are
+running, how trusted their templates are, and similar considerations.
 
 
 Further plans regarding PCI passthrough

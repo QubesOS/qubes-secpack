@@ -1,0 +1,101 @@
+
+             ---===[ Qubes Security Bulletin 082 ]===---
+
+                             2022-07-05
+
+                      PV frontend drivers leaks
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-42
+  - Linux kernel packages (kernel*-qubes-vm), versions 5.4.203, 5.8.9,
+    4.19.250
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.5-5
+  - Linux kernel packages (kernel*-qubes-vm), versions 5.15.52, 5.8.9,
+    5.10.128
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen and Linux binaries.
+
+
+Summary
+--------
+
+The following security advisories were published on 2022-07-05:
+
+XSA-403 [3] "Linux disk/nic frontends data leaks":
+
+| Linux Block and Network PV device frontends don't zero memory regions before
+| sharing them with the backend.  Additionally the granularity of the grant table
+| doesn't allow sharing less than a 4K page, leading to unrelated data residing
+| in the same 4K page as data shared with a backend being accessible by such
+| backend.
+| 
+| An untrusted backend can access data not intended to be shared.  If such
+| mappings are made with write permissions the backend could also cause
+| malfunctions and/or crashes to consumers of contiguous data in the shared
+| pages.
+
+
+XSA-405 [4] "The PV network backend may cause Linux netfront to use
+freed SKBs":
+
+| While adding logic to support XDP (eXpress Data Path), a code label was
+| moved in a way allowing for SKBs having references (pointers) retained
+| for further processing to nevertheless be freed.
+| 
+| A misbehaving or malicious backend may cause a Denial of Service (DoS)
+| in the guest.  Information leaks or privilege escalation cannot be
+| ruled out.
+
+
+Impact
+-------
+
+These vulnerabilities, if exploited, could allow malicious PV domain
+that serves as a network or a block backend, to leak data from its
+frontend. Gaining code execution in the frontend cannot be ruled out
+either.
+In default Qubes OS configuration, that means sys-net can attack
+sys-firewall, and sys-firewall can attack qubes connected to it.
+Furthermore, a qube that has assigned block device from another,
+untrusted qube can be attacked by that backend (for example sys-usb
+can attack qubes to which USB stick is attached as a block device).
+Qubes that do not have netvm set nor block devices assigned, are not
+affected.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-403.html
+[4] https://xenbits.xen.org/xsa/advisory-405.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

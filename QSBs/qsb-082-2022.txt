@@ -69,10 +69,9 @@ freed SKBs":
 Impact
 -------
 
-These vulnerabilities, if exploited, could allow a malicious PV domain
-that serves as a network or a block backend to leak data from its
-frontend. The ability to execute code in the frontend cannot be ruled
-out.
+These vulnerabilities, if exploited, could allow a malicious VM that
+serves as a network or a block backend to leak data from its frontend.
+The ability to execute code in the frontend cannot be ruled out.
 
 In the default Qubes OS configuration, this means that sys-net could
 attack sys-firewall, and sys-firewall could attack qubes connected to

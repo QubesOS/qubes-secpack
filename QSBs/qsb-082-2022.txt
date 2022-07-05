@@ -3,7 +3,7 @@
 
                              2022-07-05
 
-                      PV frontend drivers leaks
+           Memory management issues in PV frontend drivers
 
 
 User action required
@@ -42,24 +42,24 @@ The following security advisories were published on 2022-07-05:
 
 XSA-403 [3] "Linux disk/nic frontends data leaks":
 
-| Linux Block and Network PV device frontends don't zero memory regions before
-| sharing them with the backend.  Additionally the granularity of the grant table
-| doesn't allow sharing less than a 4K page, leading to unrelated data residing
-| in the same 4K page as data shared with a backend being accessible by such
-| backend.
+| Linux Block and Network PV device frontends don't zero memory regions
+| before sharing them with the backend.  Additionally the granularity of
+| the grant table doesn't allow sharing less than a 4K page, leading to
+| unrelated data residing in the same 4K page as data shared with a
+| backend being accessible by such backend.
 | 
-| An untrusted backend can access data not intended to be shared.  If such
-| mappings are made with write permissions the backend could also cause
-| malfunctions and/or crashes to consumers of contiguous data in the shared
-| pages.
+| An untrusted backend can access data not intended to be shared.  If
+| such mappings are made with write permissions the backend could also
+| cause malfunctions and/or crashes to consumers of contiguous data in
+| the shared pages.
 
 
 XSA-405 [4] "The PV network backend may cause Linux netfront to use
 freed SKBs":
 
-| While adding logic to support XDP (eXpress Data Path), a code label was
-| moved in a way allowing for SKBs having references (pointers) retained
-| for further processing to nevertheless be freed.
+| While adding logic to support XDP (eXpress Data Path), a code label
+| was moved in a way allowing for SKBs having references (pointers)
+| retained for further processing to nevertheless be freed.
 | 
 | A misbehaving or malicious backend may cause a Denial of Service (DoS)
 | in the guest.  Information leaks or privilege escalation cannot be
@@ -69,17 +69,18 @@ freed SKBs":
 Impact
 -------
 
-These vulnerabilities, if exploited, could allow malicious PV domain
-that serves as a network or a block backend, to leak data from its
-frontend. Gaining code execution in the frontend cannot be ruled out
-either.
-In default Qubes OS configuration, that means sys-net can attack
-sys-firewall, and sys-firewall can attack qubes connected to it.
-Furthermore, a qube that has assigned block device from another,
-untrusted qube can be attacked by that backend (for example sys-usb
-can attack qubes to which USB stick is attached as a block device).
-Qubes that do not have netvm set nor block devices assigned, are not
-affected.
+These vulnerabilities, if exploited, could allow a malicious PV domain
+that serves as a network or a block backend to leak data from its
+frontend. The ability to execute code in the frontend cannot be ruled
+out.
+
+In the default Qubes OS configuration, this means that sys-net could
+attack sys-firewall, and sys-firewall could attack qubes connected to
+it. Furthermore, a qube to which a block device is assigned from an
+untrusted backend qube can be attacked by that backend. (For example,
+sys-usb could attack qubes to which a USB drive is attached as a block
+device.) Qubes that do not have any NetVM set and to which no block
+devices are assigned are not affected.
 
 
 Credits

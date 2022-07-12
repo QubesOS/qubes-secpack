@@ -1,0 +1,101 @@
+
+             ---===[ Qubes Security Bulletin 083 ]===---
+
+                             2022-07-12
+
+Retbleed - arbitrary speculative code execution with return instructions (XSA-407)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.0, in dom0:
+  - Xen packages, version 4.8.5-43
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.5-6
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+On 2022-07-12, the Xen Project published XSA-407, "Retbleed -
+arbitrary speculative code execution with return instructions" [3]:
+
+| Researchers at ETH Zurich have discovered Retbleed, allowing for
+| arbitrary speculative execution in a victim context.
+| 
+| For more details, see:
+|   https://comsec.ethz.ch/retbleed
+| 
+| ETH Zurich have allocated CVE-2022-29900 for AMD and CVE-2022-29901 for
+| Intel.
+| 
+| Despite the similar preconditions, these are very different
+| microarchitectural behaviours between vendors.
+| 
+| On AMD CPUs, Retbleed is one specific instance of a more general
+| microarchitectural behaviour called Branch Type Confusion.  AMD have
+| assigned CVE-2022-23816 (Retbleed) and CVE-2022-23825 (Branch Type
+| Confusion).
+| 
+| For more details, see:
+|   https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1037
+| 
+| On Intel CPUs, Retbleed is not a new vulnerability; it is only
+| applicable to software which did not follow Intel's original Spectre-v2
+| guidance.  Intel are using the ETH Zurich allocated CVE-2022-29901.
+| 
+| For more details, see:
+|   https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00702.html
+|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/return-stack-buffer-underflow.html
+| 
+| ARM have indicated existing guidance on Spectre-v2 is sufficient.
+
+
+Impact
+-------
+
+This is yet another speculative execution issue, which allows an
+attacker to infer content of memory they shouldn't have access to.
+This includes one VM extracting secrets from another. Any VM can
+perform this attack on an affected hardware.
+
+AMD systems based on Zen1 - Zen2 microarchitectures are affected.
+Specifically those are AMD Ryzen processors with model names 1xxx -
+4xxx. Zen3 microarchitecture (AMD Ryzen 5xxx or newer) are not
+affected.
+Pre-existing Xen mitigations on Intel machines are effective to
+prevent this issue, so Intel systems are not affected.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-407.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

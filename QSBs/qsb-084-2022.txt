@@ -1,0 +1,73 @@
+
+             ---===[ Qubes Security Bulletin 084 ]===---
+
+                               TODO
+
+ split-gpg: GnuPG file descriptor confusion and file existence leak
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address the
+issues discussed in this bulletin:
+
+  For Qubes 4.0, in templates and standalones:
+  - qubes-gpg-split TODO
+
+  For Qubes 4.1, in templates and standalones:
+  - qubes-gpg-split TODO
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+
+Summary
+--------
+
+Split GPG [3] is designed to isolate private keys from the application using
+them in order to protect them from being extracted and to allow the user to
+retain control over when they are used. This isolation is implemented by
+forwarding calls to `gpg` into a backend qube that holds the private keys and
+allowing only specific `gpg` options. This option filtering mechanism rejects
+options like `--export-secret-keys` and others that might leak private keys to
+the frontend qube. Unfortunately, combination of some options allowed
+to leak extra information from the backend qube, and/or access GnuPG
+data in unintended ways.
+
+Two separate types of attacks were discovered:
+1. Interaction via --command-fd allows checking for arbitrary file
+existence in the backend qube.
+2. Using the same --*-fd option several times, allows redirecting
+GnuPG input or output to a wrong file descriptor. This can be used to
+corrupt files used by GnuPG (at least trustdb, others cannot be ruled
+out). This can be used also to send arbitrary commands to gpg-agent,
+but we didn't found a way to read the response from gpg-agent, so for
+example extracting a secret key shouldn't be possible.
+
+
+Impact
+-------
+
+An attacker controlling a frontend qube (where `qubes-gpg-client` is executed)
+can check if arbitrary file exists in the backend qube (including
+files not related to GnuPG). Furthermore, an attacker can corrupt
+trustdb and generate or remove secret keys.
+
+
+Credits
+--------
+
+This issue was discovered by Demi Marie Obenour.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://www.qubes-os.org/doc/split-gpg/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

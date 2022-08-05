@@ -50,10 +50,11 @@ Two separate types of attack were discovered:
    only in the case of `trustdb`, but other files cannot be ruled out.)
    This can also be used to issue arbitrary commands to `gpg-agent`,
    which can be used to perform actions like generating new secret keys
-   and deleting existing keys. However, we could not find a way to use
-   this exploit to read `gpg-agent`'s responses, which means that
-   certain actions, such as extracting secret keys, should not be
-   possible.
+   and deleting existing keys. It can be used also to set various
+   environment variables for pinentry process and attack it
+   indirectly. However, we could not find a way to use this exploit to
+   read `gpg-agent`'s responses, which means that certain actions,
+   such as extracting secret keys, should not be possible.
 
 
 Impact
@@ -64,7 +65,12 @@ existence of arbitrary files in a backend qube, corrupt the `trustdb`
 file in a backend qube, and issue arbitrary commands to `gpg-agent` in a
 backend qube. While this vulnerability can be exploited in order to
 generate and delete keys in the backend qube, it is unlikely that it can
-be used to exfiltrate private keys out of the backend qube.
+be used to exfiltrate private keys out of the backend qube. The
+vulnerability can be used also to send arbitrary commands to smart
+card daemon, which allows similar attack even if key is stored on a
+smart card. Additionally, when combined with vulnerability in
+gpg-agent, scdaemon, or pinentry (or some library it uses), arbitrary
+code execution cannot be ruled out.
 
 
 Credits

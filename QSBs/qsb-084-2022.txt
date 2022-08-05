@@ -46,15 +46,21 @@ Two separate types of attack were discovered:
 
 2. Using the same `--*-fd` option several times allows the frontend qube
    to redirect GnuPG input and output to the wrong file descriptor. This
-   can be used to corrupt files used by GnuPG. (We have confirmed this
-   only in the case of `trustdb`, but other files cannot be ruled out.)
-   This can also be used to issue arbitrary commands to `gpg-agent`,
-   which can be used to perform actions like generating new secret keys
-   and deleting existing keys. It can be used also to set various
-   environment variables for pinentry process and attack it
-   indirectly. However, we could not find a way to use this exploit to
-   read `gpg-agent`'s responses, which means that certain actions,
-   such as extracting secret keys, should not be possible.
+   can be used to:
+
+   - Corrupt files used by GnuPG. (We have confirmed this only in the
+     case of `trustdb`, but other files cannot be ruled out.)
+   - Issue arbitrary commands to `gpg-agent`, which can be used to
+     perform actions like generating new secret keys and deleting
+     existing keys.
+   - Set various environment variables for the `pinentry` process,
+     thereby providing an indirect avenue of attack against this
+     process.
+
+   However, our testing did not reveal any way to exploit this
+   vulnerability in order to read `gpg-agent`'s responses, which means
+   that certain actions, such as extracting secret keys, should not be
+   possible.
 
 
 Impact
@@ -62,15 +68,16 @@ Impact
 
 An attacker controlling a Split GPG frontend qube can check for the
 existence of arbitrary files in a backend qube, corrupt the `trustdb`
-file in a backend qube, and issue arbitrary commands to `gpg-agent` in a
+file in a backend qube, issue arbitrary commands to `gpg-agent` in a
+backend qube, and issue arbitrary commands to a smart card daemon in a
 backend qube. While this vulnerability can be exploited in order to
-generate and delete keys in the backend qube, it is unlikely that it can
-be used to exfiltrate private keys out of the backend qube. The
-vulnerability can be used also to send arbitrary commands to smart
-card daemon, which allows similar attack even if key is stored on a
-smart card. Additionally, when combined with vulnerability in
-gpg-agent, scdaemon, or pinentry (or some library it uses), arbitrary
-code execution cannot be ruled out.
+generate and delete keys in the backend qube (or on a smart card
+attached to the backend qube), it is unlikely that it can be used to
+exfiltrate private keys out of the backend qube (or off of a smart card
+attached to the backend qube). If this vulnerability were to be chained
+with a hypothetical vulnerability in `gpg-agent`, `scdaemon`, or
+`pinentry` (or in one of the libraries they use), then arbitrary code
+execution could be possible.
 
 
 Credits

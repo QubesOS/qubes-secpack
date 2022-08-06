@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 084 ]===---
 
-                               TODO
+                             2022-08-06
 
   Split GPG: GnuPG file descriptor confusion and file existence leak
 
@@ -11,11 +11,8 @@ User action required
 Users must install the following specific packages in order to address the
 issues discussed in this bulletin:
 
-  For Qubes 4.0, in templates and standalones:
-  - qubes-gpg-split TODO
-
   For Qubes 4.1, in templates and standalones:
-  - qubes-gpg-split TODO
+  - qubes-gpg-split 2.0.63
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

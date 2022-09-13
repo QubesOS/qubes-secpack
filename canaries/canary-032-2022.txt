@@ -29,7 +29,16 @@ state the following:
 Special announcements
 ----------------------
 
-None.
+We plan to create a new Release Signing Key (RSK) [3] for Qubes OS 4.2.
+Normally, we have only one RSK for each major release. However, for the
+4.2 release, we will be using Qubes Builder version 2, which is a
+complete rewrite of the Qubes Builder. Out of an abundance of caution,
+we would like to isolate the build processes of the current stable 4.1
+release and the upcoming 4.2 release from each other at the
+cryptographic level in order to minimize the risk of a vulnerability in
+one affecting the other. We are including this notice as a canary
+special announcement since introducing a new RSK for a minor release is
+an exception to our usual RSK management policy.
 
 
 Disclaimers and notes
@@ -98,6 +107,8 @@ corresponding qubes-secpack.git repo tags. [2]
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
+
+[3] https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys
 
 --
 The Qubes Security Team

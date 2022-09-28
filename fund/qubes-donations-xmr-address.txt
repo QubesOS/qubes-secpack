@@ -1,4 +1,4 @@
-The Qubes OS Project has one official Monero (XMR) donation address:
+The Qubes OS Project has one official monero (XMR) donation address:
 
 46PrVgXBdD4cps3SVkHoCDZvMfFdG5q4ej5DYKpuKpTnjiL7pv6KGv7dPh4DPijCGqTbxLDPqZJkobd9SttMiauoP1CQU4y
 

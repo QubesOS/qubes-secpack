@@ -1,4 +1,4 @@
-The Qubes OS Project has one official Ethereum (ETH) donation address:
+The Qubes OS Project has one official ether (ETH) donation address:
 
 0xDaa04647e8ecb616801F9bE89712771F6D291a0C
 

@@ -1,4 +1,4 @@
-The Qubes OS Project has one official Bitcoin (BTC) donation address:
+The Qubes OS Project has one official bitcoin (BTC) donation address:
 
 3GakuQQDUGyyUnV1p5Jc3zd6CpQDkDwmDq
 

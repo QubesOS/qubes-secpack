@@ -1,0 +1,21 @@
+The Qubes OS Project has one official Ethereum (ETH) donation address:
+
+0xDaa04647e8ecb616801F9bE89712771F6D291a0C
+
+This address is valid on Ethereum network only, it can _not_ receive
+funds on other blockchains.
+The wallet for this address is controlled by a core team member of the Qubes OS
+Project. 
+
+In order to allow for the authenticity and integrity of this message to be
+verified, this file is PGP-signed in two ways. First, this file is accompanied
+by detached PGP signatures from members of the Qubes Security Team. Second, this
+file is delivered via the Qubes Security Pack (qubes-secpack), which is a Git
+repository. The latest commit in this repository should always have a PGP-signed
+tag from a member of the Qubes Security Team. We strongly recommend verifying
+the authenticity and integrity of this message prior to making any donations to
+the above address.
+
+Any future updates to this file can always be found in the Qubes Security Pack.
+
+Last updated: 2022-09-28

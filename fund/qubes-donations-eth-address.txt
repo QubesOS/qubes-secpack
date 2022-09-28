@@ -2,8 +2,9 @@ The Qubes OS Project has one official Ethereum (ETH) donation address:
 
 0xDaa04647e8ecb616801F9bE89712771F6D291a0C
 
-This address is valid on Ethereum network only, it can _not_ receive
-funds on other blockchains.
+This address is valid on Ethereum network only, it can _not_ receive funds on
+other blockchains.
+
 The wallet for this address is controlled by a core team member of the Qubes OS
 Project. 
 

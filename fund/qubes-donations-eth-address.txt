@@ -23,4 +23,4 @@ the above address.
 
 Any future updates to this file can always be found in the Qubes Security Pack.
 
-Last updated: 2022-09-28
+Last updated: 2022-09-29

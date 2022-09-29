@@ -1,12 +1,16 @@
-The Qubes OS Project has one official ether (ETH) donation address:
+The Qubes OS Project has one official Ethereum Mainnet donation address:
 
 0xDaa04647e8ecb616801F9bE89712771F6D291a0C
 
-This address is valid only on the Ethereum network. It _cannot_ receive funds on
-other blockchains.
+WARNING: This Gnosis Safe address supports ether (ETH) and all assets that fully
+comply with the ERC-20 standard (e.g., USDT, USDC, and DAI), but ONLY on
+Ethereum Mainnet. Please DO NOT send assets on any other network to this
+address, or else your donation may be lost. For example, please DO NOT send
+assets on any Ethereum Layer 2 solution (e.g., Arbitrum, Optimism) or any
+sidechain (e.g., Polygon, xDai) to this address.
 
 The wallet for this address is controlled by a core team member of the Qubes OS
-Project. 
+Project.
 
 In order to allow for the authenticity and integrity of this message to be
 verified, this file is PGP-signed in two ways. First, this file is accompanied

@@ -34,28 +34,28 @@ Summary
 On 2022-11-01, the Xen Project published XSA-414, "Xenstore: Guests
 can crash xenstored" [3]:
 
-| Due to a bug in the fix of XSA-115 a malicious guest can cause xenstored
-| to use a wrong pointer during node creation in an error path, resulting
-| in a crash of xenstored or a memory corruption in xenstored causing
-| further damage.
-| 
-| Entering the error path can be controlled by the guest e.g. by exceeding
-| the quota value of maximum nodes per domain.
-| 
+| Due to a bug in the fix of XSA-115 a malicious guest can cause
+| xenstored to use a wrong pointer during node creation in an error
+| path, resulting in a crash of xenstored or a memory corruption in
+| xenstored causing further damage.
+|
+| Entering the error path can be controlled by the guest e.g. by
+| exceeding the quota value of maximum nodes per domain.
 
 
 Impact
 -------
 
-Xen Project described the impact as:
+The Xen Project's impact description also applies to Qubes OS:
 
-| A malicious guest can cause xenstored to crash, resulting in the inability
-| to create new guests or to change the configuration of running guests.
-| 
-| Memory corruption in xenstored or privilege escalation of a guest can't
-| be ruled out.
+| A malicious guest can cause xenstored to crash, resulting in the
+| inability to create new guests or to change the configuration of
+| running guests.
+|
+| Memory corruption in xenstored or privilege escalation of a guest
+| can't be ruled out.
 
-The description is accurate for Qubes OS case too.
+(Note: In Qubes terminology, a Xen guest is referred to as a "qube.")
 
 
 Credits

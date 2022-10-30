@@ -1,0 +1,76 @@
+
+             ---===[ Qubes Security Bulletin 085 ]===---
+
+                             2022-11-01
+
+           Xenstore: Guests can crash xenstored (XSA-414)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in TODO:
+  - Xen packages, version 4.14.5-12
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+On 2022-11-01, the Xen Project published XSA-414, "Xenstore: Guests
+can crash xenstored" [3]:
+
+| Due to a bug in the fix of XSA-115 a malicious guest can cause xenstored
+| to use a wrong pointer during node creation in an error path, resulting
+| in a crash of xenstored or a memory corruption in xenstored causing
+| further damage.
+| 
+| Entering the error path can be controlled by the guest e.g. by exceeding
+| the quota value of maximum nodes per domain.
+| 
+
+
+Impact
+-------
+
+Xen Project described the impact as:
+
+| A malicious guest can cause xenstored to crash, resulting in the inability
+| to create new guests or to change the configuration of running guests.
+| 
+| Memory corruption in xenstored or privilege escalation of a guest can't
+| be ruled out.
+
+The description is accurate for Qubes OS case too.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-414.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -12,7 +12,7 @@ User action required
 Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
-  For Qubes 4.1, in TODO:
+  For Qubes 4.1, in dom0:
   - Xen packages, version 4.14.5-12
 
 These packages will migrate from the security-testing repository to the

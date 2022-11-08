@@ -1,0 +1,78 @@
+
+             ---===[ Qubes Security Bulletin 086 ]===---
+
+                             2022-11-08
+
+           Speculative security issues on AMD CPUs (XSA-422)
+
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.5-13
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+
+Summary
+--------
+
+On 2022-11-08, the Xen Project published XSA-422, "x86: Multiple
+speculative security issues" [3]:
+
+| 1) Researchers have discovered that on some AMD CPUs, the
+|    implementation of IBPB (Indirect Branch Prediction Barrier) does
+|    not behave according to the specification.
+|
+|    Specifically, IBPB fails to properly flush the RAS (Return Address
+|    Stack, also RSB - Return Stack Buffer - in Intel terminology; one
+|    of the hardware prediction structures), allowing attacker
+|    controlled values to survive across a deliberate attempt to purge
+|    said values.
+|
+|    AMD have allocated CVE-2022-23824.
+
+(Issue 2 described in that XSA is belived to not affect Xen and
+therefore not relevant for Qubes)
+
+
+Impact
+-------
+
+On affected CPUs a VM might be able to infer the content of memory
+belonging to another running VM (including dom0).
+
+Only some AMD CPUs are affected, see AMDs advisory [4] for a list.
+
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-422.html
+[4] https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1040
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

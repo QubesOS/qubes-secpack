@@ -53,11 +53,17 @@ therefore not relevant for Qubes)
 Impact
 -------
 
-On affected CPUs a VM might be able to infer the content of memory
-belonging to another running VM (including dom0).
+On affected CPUs a VM running in PV mode might be able to infer the
+content of memory belonging to another running VM (including dom0). In
+the default configuration only the stubdomains for HVM VMs are in a
+position to attack other VMs (dom0 also runs in PV mode but it's fully
+trusted).
 
 Only some AMD CPUs are affected, see AMDs advisory [4] for a list.
 
+(The XSA lists Xen versions less than 4.16 as unaffected, but Qubes has
+backported a performance optimization [5] that assumes that IBPB works
+as previously specified and is therefore affected)
 
 Credits
 --------
@@ -72,6 +78,7 @@ References
 [2] https://www.qubes-os.org/doc/how-to-update/
 [3] https://xenbits.xen.org/xsa/advisory-422.html
 [4] https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1040
+[5] https://github.com/QubesOS/qubes-vmm-xen/blob/v4.14.5-12/patch-0001-x86-spec-ctrl-Skip-RSB-overwriting-when-safe-to-do-s.patch
 
 --
 The Qubes Security Team

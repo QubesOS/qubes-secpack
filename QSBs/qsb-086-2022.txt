@@ -34,36 +34,42 @@ Summary
 On 2022-11-08, the Xen Project published XSA-422, "x86: Multiple
 speculative security issues" [3]:
 
-| 1) Researchers have discovered that on some AMD CPUs, the
-|    implementation of IBPB (Indirect Branch Prediction Barrier) does
-|    not behave according to the specification.
+| Researchers have discovered that on some AMD CPUs, the
+| implementation of IBPB (Indirect Branch Prediction Barrier) does not
+| behave according to the specification.
 |
-|    Specifically, IBPB fails to properly flush the RAS (Return Address
-|    Stack, also RSB - Return Stack Buffer - in Intel terminology; one
-|    of the hardware prediction structures), allowing attacker
-|    controlled values to survive across a deliberate attempt to purge
-|    said values.
+| Specifically, IBPB fails to properly flush the RAS (Return Address
+| Stack, also RSB - Return Stack Buffer - in Intel terminology; one of
+| the hardware prediction structures), allowing attacker controlled
+| values to survive across a deliberate attempt to purge said values.
 |
-|    AMD have allocated CVE-2022-23824.
+| AMD have allocated CVE-2022-23824.
 
-(Issue 2 described in that XSA is belived to not affect Xen and
-therefore not relevant for Qubes)
+XSA-422 also describes a second AMD vulnerability. However, since it
+is believed not to affect Xen, and therefore not to affect Qubes OS,
+it is omitted here.
 
 
 Impact
 -------
 
-On affected CPUs a VM running in PV mode might be able to infer the
-content of memory belonging to another running VM (including dom0). In
-the default configuration only the stubdomains for HVM VMs are in a
-position to attack other VMs (dom0 also runs in PV mode but it's fully
-trusted).
+On Qubes OS installations with affected CPUs, a VM running in PV mode
+may be capable of inferring the memory contents of other running VMs,
+including dom0. In the default Qubes OS configuration, only the
+stubdomains for HVMs are in a position to exploit this vulnerability
+in order to attack other VMs. (Dom0 also runs in PV mode, but it is
+fully trusted.)
 
-Only some AMD CPUs are affected, see AMDs advisory [4] for a list.
+Only certain AMD CPUs are affected. Please see AMD-SB-1040 [4] for the
+official list of affected models.
 
-(The XSA lists Xen versions less than 4.16 as unaffected, but Qubes has
-backported a performance optimization [5] that assumes that IBPB works
-as previously specified and is therefore affected)
+(Note: XSA-422 states that Xen versions prior to 4.16 are not affected
+by this vulnerability. While Qubes OS uses a Xen version prior to
+4.16, we have backported a Xen performance optimization [5] that
+assumes that IBPB works as previously specified. Therefore, the
+version of Xen used in Qubes is affected by this vulnerability even
+though its version numbers is lower than 4.16.)
+
 
 Credits
 --------

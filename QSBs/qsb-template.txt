@@ -5,7 +5,6 @@
 
                                 TODO
 
-
 User action required
 ---------------------
 
@@ -32,24 +31,20 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
-
 Summary
 --------
 
 TODO
-
 
 Impact
 -------
 
 TODO
 
-
 Credits
 --------
 
 TODO
-
 
 References
 -----------

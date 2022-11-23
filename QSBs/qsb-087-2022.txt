@@ -1,0 +1,117 @@
+
+             ---===[ Qubes Security Bulletin 087 ]===---
+
+                             2022-11-23
+
+          Qrexec: Injection of unsanitized data into log output
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in templates, standalones and dom0:
+  - qrexec packages version 4.1.19
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Summary
+--------
+
+Due to a bug in qrexec [3], a malicious qube that is allowed to call a
+qrexec service inside of another qube can inject unsanitized data into
+the log output of a process that handles incoming qrexec calls in the
+receiving qube. This log output may end up in
+`/var/log/qubes/qrexec.*.log`, `~/.xsession-errors`, or systemd's
+journal.
+
+Impact
+-------
+
+An attacker could use this vulnerability in order to inject malicious
+data, such as terminal control codes, into log output in the hope that
+this data will be processed in a unsafe way, for example, by writing it
+directly to a potentially-vulnerable terminal emulator.
+
+In the default Qubes OS configuration, for example, there are qrexec
+services like `qubes.WindowIconUpdater` that any qube can call in dom0.
+An attacker who gains control of an untrusted qube could inject data
+containing malicious terminal control sequences into
+`/var/log/qubes/qrexec.*.log` in dom0. If the user views that log in a
+terminal emulator in a way that doesn't filter terminal escape codes (by
+simply using `cat` on the file, for example), the malicious data might
+then exploit a hypothetical bug in the terminal emulator.
+
+Note that this attack scenario, as described, has several layered
+requirements:
+
+1. The user must voluntarily open a log file containing malicious data
+   (or otherwise take action that causes the log file data to be
+   parsed).
+
+2. There must exist an independent vulnerability in the user's terminal
+   emulator or in whichever program parses the log. (In other words, the
+   attacker must chain independent vulnerabilities together.)
+
+3. If using a terminal emulator, a command-line tool that does not
+   filter control codes must be used. (`journalctl` prevents the display
+   of unsafe sequences by default, but many other tools do not.)
+
+To be clear, the scenario in which the attacker uses the
+`qubes.WindowIconUpdater` service in order to exploit a hypothetical bug
+in a terminal emulator is just one conceivable scenario for how an
+attacker might exploit the vulnerability described in this bulletin. It
+is not the only way in which this vulnerability could be exploited, and
+the requirements listed for this scenario may not necessarily apply to
+other scenarios featuring different types of attacks (for example, using
+other qrexec services and exploiting other software that handles log
+output). Rather, this example is merely intended as an aid for
+understanding the nature of the vulnerability.
+
+Discussion
+-----------
+
+Qubes OS features a framework known as "qrexec," which allows different
+qubes to communicate with each other in a controlled manner. [3][4]
+These interactions are restricted by the system's RPC policies. [5] In
+particular, qrexec can be used to allow less trusted qubes to
+communicate with more trusted qubes, including dom0.
+
+Normally, the calling side can send data to the remote services'
+standard input and receive its standard output, standard error, and exit
+code data. Since it handles untrusted data flows, qrexec is designed
+under the assumption that an adversary will use it in order to launch an
+attack against one qube from another qube. Therefore, qrexec treats
+incoming data as untrusted and carefully sanitizes it. For example, when
+qrexec output is connected to a terminal, `qrexec-client` and
+`qrexec-client-vm` remove terminal control sequences.
+
+However, due to a mistake in qrexec message type handling, the calling
+side can send data marked as "standard error" (`MSG_DATA_STDERR`), and
+the remote side will print it to the standard error of the process
+handling incoming qrexec connections. This data flow was not expected.
+Such messages should be rejected, as they are expected only in the other
+direction. Consequently, this data is not appropriately sanitized, and
+potentially-malicious data may end up in log output.
+
+Credits
+--------
+
+This issue was discovered by Demi Marie Obenour.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://www.qubes-os.org/doc/qrexec/
+[4] https://www.qubes-os.org/doc/qrexec-internals/
+[5] https://www.qubes-os.org/doc/rpc-policy/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

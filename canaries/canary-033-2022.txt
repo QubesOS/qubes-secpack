@@ -1,0 +1,104 @@
+
+                    ---===[ Qubes Canary 032 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is December 04, 2022.
+
+2. There have been 87 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of March 2023. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+
+Proof of freshness
+-------------------
+
+Sun, 04 Dec 2022 03:11:56 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Friends or Frenemies?: Significant Trans-Atlantic Divides Emerge in Global Chip War
+The Russian Mobilization: One Soldier's Effort to Avoid the War
+Tragedy in Mariupol: The Boy Who Lost His Family But Not His Hope
+A Year with Angela Merkel: "You're Done with Power Politics"
+Fears of Chinese Aggression Grow in Taiwan: "Where Are We Supposed to Go?"
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+He Returned a Dazed Soldier to the Russians. Ukraine Calls It Treason.
+Landslide Tragedy Turns Italy’s Focus to Illegal Construction
+Why Is Rahul Gandhi Walking 2,000 Miles Across India?
+How China’s Police Used Phones and Faces to Track Protesters
+Ukraine Calls for Evacuations From a Russian-Controlled Area
+
+Source: BBC News - World (https://feeds.bbci.co.uk/news/world/rss.xml)
+Cyril Ramaphosa: South Africa leader won't resign, says spokesman
+Ukraine war: Zelensky calls West's Russian oil cap 'weak'
+Ukraine war: New images show Russian army base built in occupied Mariupol
+Elnaz Rekabi: Family home of Iranian climber demolished
+Columbia peace talks with leftist ELN rebels make progress
+
+Source: Blockchain.info
+00000000000000000000955f2976b1fbff0d0c47c262ea3ae6410e43f8218fb7
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

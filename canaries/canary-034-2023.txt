@@ -20,8 +20,8 @@ state the following:
    Project (e.g. to hand out the private signing keys or to introduce
    backdoors).
 
-5. We plan to publish the next of these canary statements in the first
-   fourteen days of June 2023. Special note should be taken if no new
+5. We plan to publish the next of these canary statements in the last
+   fourteen days of May 2023. Special note should be taken if no new
    canary is published by that time or if the list of statements changes
    without plausible explanation.
 

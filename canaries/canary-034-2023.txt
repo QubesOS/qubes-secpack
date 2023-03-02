@@ -8,7 +8,7 @@ Statements
 The Qubes security team members who have digitally signed this file [1]
 state the following:
 
-1. The date of issue of this canary is March 01, 2023.
+1. The date of issue of this canary is March 02, 2023.
 
 2. There have been 87 Qubes security bulletins published so far.
 
@@ -60,7 +60,7 @@ the statements made here.
 Proof of freshness
 -------------------
 
-Wed, 01 Mar 2023 14:47:10 +0000
+Thu, 02 Mar 2023 09:45:31 +0000
 
 Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
 Dubious Alliance: How Present Is the Far Right in Germany's New Peace Movement?
@@ -70,21 +70,21 @@ The War in Ukraine: China Is Reportedly Negotiating with Russia To Supply Kamika
 Volodymyr Zelenskyy's Heroes: Ukraine's Best Respond to the Earthquake in Turkey
 
 Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
-Blinken Says He Sees No Sign That Putin Wants Peace
 How Russia Lost an Epic Tank Battle, Repeating Earlier Mistakes
-Live Updates: Bola Tinubu’s Victory Extends His Party’s Time in Power in Nigeria
+Kyiv Sends Reinforcements to Besieged Bakhmut
+Bola Tinubu Elected to Be Nigeria’s Next President
 Video: How an Israeli Raid on a Safe House Ended With Civilians Killed
-Greece Train Crash: At Least 36 Dead as Rescuers Search for Survivors
+Bola Tinubu’s Victory Extends His Party’s Time in Power in Nigeria
 
 Source: BBC News - World (https://feeds.bbci.co.uk/news/world/rss.xml)
-Greece train crash: Survivors describe 'nightmarish seconds'
-Bola Tinubu wins Nigeria's presidential election against Atiku Abubakar and Peter Obi
-Israel police crack down on protests against judicial reforms
-Iran nuclear: IAEA inspectors find uranium particles enriched to 83.7%
-Just Fontaine: Former France striker and World Cup record holder dies aged 89
+Greece train crash: Angry protests erupt after disaster
+India PM Modi urges G20 foreign ministers to overcome differences
+How fake copyright complaints are muzzling journalists
+Whiskey fungus lawsuit forces Jack Daniels to halt building project
+Indian guru's fictional country attended UN events
 
 Source: Blockchain.info
-0000000000000000000318ff864e5cd9bc1fe1883911695a6c9a295203732b4b
+000000000000000000037ab2816f3100fc37acee47a63571b5d3b7ca72145906
 
 
 Footnotes

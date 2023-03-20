@@ -5,7 +5,6 @@
 
      Two Xen issues affecting PV (stub-)domains (XSA-428, XSA-429)
 
-
 User action required
 ---------------------
 
@@ -27,7 +26,6 @@ If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
 Xen binaries.
 
-
 Summary
 --------
 
@@ -35,56 +33,66 @@ The following security advisories were published on 2023-03-21:
 
 XSA-428 [3] "x86/HVM pinned cache attributes mis-handling":
 
-| To allow cachability control for HVM guests with passed through devices,
-| an interface exists to explicitly override defaults which would
-| otherwise be put in place.  While not exposed to the affected guests
-| themselves, the interface specifically exists for domains controlling
-| such guests.  This interface may therefore be used by not fully
-| privileged entities, e.g. qemu running deprivileged in Dom0 or qemu
-| running in a so called stub-domain.  With this exposure it is an issue
-| that
+| To allow cachability control for HVM guests with passed through
+| devices, an interface exists to explicitly override defaults which
+| would otherwise be put in place.  While not exposed to the affected
+| guests themselves, the interface specifically exists for domains
+| controlling such guests.  This interface may therefore be used by not
+| fully privileged entities, e.g. qemu running deprivileged in Dom0 or
+| qemu running in a so called stub-domain.  With this exposure it is an
+| issue that
 |  - the number of the such controlled regions was unbounded
 |    (CVE-2022-42333),
-|  - installation and removal of such regions was not properly serialized
-|    (CVE-2022-42334).
+|  - installation and removal of such regions was not properly
+|    serialized (CVE-2022-42334).
 
 XSA-429 [4] "x86: speculative vulnerability in 32bit SYSCALL path":
 
-| Due to an oversight in the very original Spectre/Meltdown security work
-| (XSA-254), one entrypath performs its speculation-safety actions too
-| late.
+| Due to an oversight in the very original Spectre/Meltdown security
+| work (XSA-254), one entrypath performs its speculation-safety actions
+| too late.
 | 
 | In some configurations, there is an unprotected RET instruction which
 | can be attacked with a variety of speculative attacks.
 
-
 Impact
 -------
 
-The first issue (XSA-428) allows a malicious stub-domain (a VM
-accompanying a HVM qube, where qemu is isolated) to potentially
-crash the hypervisor (so, the whole system). Privilege escalation and
-information leaks cannot be ruled out.
+XSA-428 could allow a malicious stub-domain to crash the hypervisor (and
+hence the entire system). A stub-domain is a qube that accompanies a
+"fully-virtualized" (HVM) qube and in which qemu is isolated. Privilege
+escalation and information leaks cannot be ruled out.
 
-The second issue (XSA-429) allows a malicious PV domain to infer the
+XSA-429 allows a malicious paravirtualized (PV) qube to infer the
 contents of arbitrary host memory, including memory assigned to other
-guests. The issue affects only AMD processors supporting SMAP/SMEP -
-which is believed to be some Family 0x16 models, and all later CPUs.
-Systems running Intel processors are not affected by this issue.
+qubes. XSA-429 affects only AMD processors that support Supervisor Mode
+Execution Prevention (SMEP) or Supervisor Mode Access Prevention (SMAP),
+which likely includes certain family 0x16 models and all later models.
+XSA-429 does not affect Intel processors.
 
-Both issues, in default Qubes OS configuration apply only to
-stub-domains controlling HVM qubes (like sys-net or sys-usb). This
-means, the attacker first need to chain those issues with another
-issue to break into such stub-domain.
-While discouraged, user can create PV qube, which would be affected by
-the second issue (on affected hardware).
+Discussion
+-----------
 
+In the default Qubes OS configuration, the vulnerabilities reported in
+XSA-428 and XSA-429 apply only to stub-domains that control HVM qubes
+(e.g., sys-net and sys-usb). However, these vulnerabilities do not make
+such stub-domains *themselves* vulnerable. Rather, these vulnerabilities
+allow attacks to be launched *from* such stub-domains. Therefore, in
+order to exploit these vulnerabilities, an attacker would have to chain
+multiple independent vulnerabilities together by first compromising a
+suitable stub-domain by some independent means.
+
+For a variety of security reasons (including past PV vulnerabilities,
+Meltdown, and Spectre), we abandoned PV in favor of a combination of PVH
+and HVM in the default Qubes OS configuration beginning with Qubes 4.0.
+[5] While advanced users still have the ability to create PV qubes
+manually, this practice is discouraged. Nonetheless, if any PV qubes
+exist on affected hardware, they are affected by XSA-429.
 
 Credits
 --------
 
 See the original Xen Security Advisories.
-
 
 References
 -----------
@@ -93,6 +101,7 @@ References
 [2] https://www.qubes-os.org/doc/how-to-update/
 [3] https://xenbits.xen.org/xsa/advisory-428.html
 [4] https://xenbits.xen.org/xsa/advisory-429.html
+[5] https://www.qubes-os.org/doc/releases/4.0/release-notes/
 
 --
 The Qubes Security Team

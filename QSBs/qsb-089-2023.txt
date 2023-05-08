@@ -12,7 +12,7 @@ Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
   For Qubes 4.1, in dom0:
-  - qrexec packages version TODO
+  - qrexec packages, version TODO
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -22,19 +22,18 @@ via the Qubes Update tool or its command-line equivalents. [2]
 Summary
 --------
 
-Due to a bug in qrexec [3], a malicious qube can cause a memory
-corruption in a qrexec-daemon. The Qubes Security Team is not aware of
-any method to leverage it into any attack (including even just
-crashing the process), but also we cannot completely rule out such
-possibility.
+Due to a bug in qrexec [3], a malicious qube can cause memory corruption
+in the qrexec-daemon. The Qubes Security Team is not aware of any way to
+exploit this vulnerability in an attack (not even in a denial-of-service
+attack that only crashes the process). However, we cannot completely
+rule out such a possibility.
 
 Impact
 -------
 
-While we consider successful exploitation of the bug very unlikely,
-an attacker could potentially use this vulnerability to crash the
+While we consider the successful exploitation of this vulnerability to
+be very unlikely, an attacker could theoretically use it to crash the
 qrexec-daemon or execute arbitrary code in dom0.
-
 
 Discussion
 -----------
@@ -45,14 +44,13 @@ These interactions are restricted by the system's RPC policies. [5] In
 particular, qrexec can be used to allow less trusted qubes to
 communicate with more trusted qubes, including dom0.
 
-The incoming RPC calls are handled by the qrexec-daemon process.
-Qrexec in Qubes OS 4.1 introduced new message type
-`MSG_TRIGGER_SERVICE3` allowing much larger request (theoretically up
-to 65000 bytes, compared to 64 bytes in earlier versions). This
-message type uses dynamically allocated buffer for the message body,
-based on the request length. The code used to validate the request
-length has an off-by-one error that can cause a memory corruption
-described below.
+Incoming RPC calls are handled by the qrexec-daemon process. Qubes OS
+4.1 introduced a new qrexec message type, `MSG_TRIGGER_SERVICE3`, which
+allows much larger requests (theoretically up to 65000 bytes, compared
+to 64 bytes in earlier versions). This message type uses a
+dynamically-allocated buffer for the message body based on the request
+length. The code used to validate the request length has an off-by-one
+error that can cause memory corruption, as described below.
 
 First, the incoming message is validated in the
 `sanitize_message_from_agent()` function:
@@ -79,13 +77,12 @@ First, the incoming message is validated in the
     1206             break;
     ...
 
-The second condition, on line 1197, verifies if the message sent by
+The second condition, on line 1197, verifies that the message sent by
 the qrexec-agent (from a VM) is not shorter than the message header
-defined in `struct trigger_service_params3`. But it fails to account
-for a mandatory NUL character at the end of the message payload (the
-service name and its argument). Later on, the
-`handle_message_from_agent()` function processes the message as
-follows:
+defined in `struct trigger_service_params3`. However, it fails to
+account for a mandatory NUL character at the end of the message payload
+(the service name and its argument). Later on, the
+`handle_message_from_agent()` function processes the message as follows:
 
     1222 static void handle_message_from_agent(void)
     1223 {
@@ -131,19 +128,19 @@ follows:
     1285             /* sanitize end */
     ...
 
-The initial call to the `sanitize_message_from_agent()` is visible in
-line 1234. Then, the function calculates expected service name length in
-line 1263, allocates memory for it in line 1264 and receives both the
+The initial call to `sanitize_message_from_agent()` is visible in line
+1234. Then, the function calculates the expected service name length in
+line 1263, allocates memory for it in line 1264, and receives both the
 rest of the header and its payload in lines 1268-1273. Since
 `sanitize_message_from_agent()` allows the `hdr.len` to be equal to
-`sizeof(untrusted_params3)`, `service_name_len` may be zero. This
-means that adding terminating NUL character in line 1278 may write
-outside of the allocated buffer. Furthermore in such a case, the
-`untrusted_service_name` buffer is allocated with size of zero and the
-`sanitize_name()` call in line 1281 may write beyond that buffer too.
+`sizeof(untrusted_params3)`, `service_name_len` can be zero. This means
+that adding the terminating NUL character in line 1278 can write outside
+of the allocated buffer. Furthermore, in such a case, the
+`untrusted_service_name` buffer is allocated with a size of zero, and
+the `sanitize_name()` call in line 1281 can write beyond the buffer too.
 
-The `sanitize_name()` function, listed below, will replace not allowed
-characters with underscore (byte 0x5f), until it finds the terminating
+The `sanitize_name()` function, listed below, replaces disallowed
+characters with underscores (byte 0x5f) until it finds the terminating
 NUL character:
 
     759 static void sanitize_name(char * untrusted_s_signed, char *extra_allowed_chars)
@@ -166,55 +163,56 @@ NUL character:
     776     }
     777 }
 
-Given this code is running in dom0, that in Qubes OS 4.1 is based on
-Fedora 32 x86_64, the below analysis will consider behavior of the
-standard library used there - GNU libc 2.31. In this
-implementation[5], the `malloc()` call (line 1264) will always
-allocate at least 32 bytes, even if the requested size is 0. This
-means the returned pointer is not NULL in this case (which would be
-allowed by the specification for zero-sized allocation), so the error
-handling in line 1266 does not interrupt the processing. Then, the
-writing of NUL character in line 1278 hits part of the malloc
-metadata, specifically the most significant byte of the allocation
-size. Given the size is small (between 32 bytes - `MIN_CHUNK_SIZE` and
-1024 bytes - `MIN_LARGE_SIZE`), that byte is always zero already, so
-this write is harmless.
-Remaining concern is about the `sanitize_name()` function. For the bug
-to be harmful, it must overwrite something beyond the allocated buffer
-(at least 32 bytes). It means, there must be no zero byte in this
-area. Our analysis this is very unlikely to be possible due to the
-following factors:
+This code runs in dom0. In Qubes OS 4.1, dom0 is based on Fedora 32
+x86_64, which uses the GNU libc 2.31 library. In this implementation
+[5], the `malloc()` call (line 1264) always allocates at least 32 bytes,
+even if the requested size is 0. This means that the returned pointer is
+not NULL in this case (which would be allowed by the specification for
+zero-sized allocations), so the error handling in line 1266 does not
+interrupt the processing. Consequently, the NUL character written in
+line 1278 hits part of the malloc metadata, specifically the most
+significant byte of the allocation size. Given that the size is small
+(between the 32-byte `MIN_CHUNK_SIZE` and the 1024-byte
+`MIN_LARGE_SIZE`), that byte is always zero already, so this write is
+harmless.
 
-1. The malloc() call in handle_message_from_agent() is literally the
-only call that happens after startup and connection setup. No other
-malloc call happens in that process, not even indirect one (maybe with
-exception of handling error message just before exit(1) - but if
-attacker hasn't corrupted malloc metadata before, it won't have a chance
-to do that after this point either).
+The remaining concern is about the `sanitize_name()` function. For the
+bug to be harmful, it must overwrite something beyond the allocated
+buffer (at least 32 bytes). This means that there cannot be a zero byte
+in this area. In our analysis, this is very unlikely to occur, for the
+following reasons:
 
-2. qrexec-daemon handles only a single request at a time, at no point
-multiple buffers for service_name are allocated in the process at the
-same time. All remaining handling happens in separate process (which
-also handles only a single request).
+1. The `malloc()` call in `handle_message_from_agent()` is literally the
+   only call that happens after startup and connection setup. No other
+   malloc call happens in that process, not even an indirect one.
+   (Perhaps the only exception is handling an error message just before
+   exit(1), but if the attacker hasn't corrupted malloc metadata up to
+   this point, the attacker won't have a chance to do it after this
+   point either.)
 
-3. Due to how GNU libc's malloc works, if there is a small chunk available,
-it will be used. It won't be split out of a bigger chunk. And due to the
-point 2 above, if there was a small chunk initially, it will get
-used again.
+2. The qrexec-daemon handles only a single request at a time. At no
+   point are multiple buffers for `service_name` allocated in the
+   process at the same time. All remaining handling occurs in a separate
+   process (which also handles only a single request).
+
+3. Due to how GNU libc's malloc works, if there is a small chunk
+   available, it will be used. It won't be split out of a bigger chunk.
+   And, due to point 2 above, if there was a small chunk initially, it
+   will get used again.
 
 4. The allocations done during startup leave a few free small chunks
-that are interleaved with allocated areas (libvchan_t structure,
-something from libxengnttab, libxentoollog and few more). Those memory
-chunks can't be merged due to their layout.
+   that are interleaved with allocated areas (libvchan_t structure,
+   something from libxengnttab, libxentoollog and few more). Those
+   memory chunks can't be merged due to their layout.
 
-5. Every small allocation includes NUL byte somewhere in the payload
-before being freed. This applies to both those initial areas, and also
-buffers used for service_name.
+5. Every small allocation includes a NUL byte somewhere in the payload
+   before being freed. This applies to both initial areas as well as to
+   the buffers used for `service_name`.
 
-Given the above, using the issue to successfully perform an attack is
-very unlikely. But also, due to complexity of memory allocator, we
-cannot completely rule out such possibility.
-
+Given all of these considerations, successfully exploiting this
+vulnerability in an attack is very unlikely. However, due to the
+complexity of the memory allocator, we cannot completely rule out such a
+possibility.
 
 Credits
 --------

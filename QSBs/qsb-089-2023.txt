@@ -182,16 +182,15 @@ buffer (at least 32 bytes). This means that there cannot be a zero byte
 in this area. In our analysis, this is very unlikely to occur, for the
 following reasons:
 
-1. The `malloc()` call in `handle_message_from_agent()` is literally the
-   only call that happens outside of startup and connection setup. No
-   other malloc call happens in that process, not even an indirect one.
-   The connection setup allocations can be re-done when the
-   qrexec-agent disconnects and connects again, but the points below
-   apply to this reconnection sequence too.
-   (Perhaps the only exception is handling an error message just before
-   exit(1), but if the attacker hasn't corrupted malloc metadata up to
-   this point, the attacker won't have a chance to do it after this
-   point either.)
+1. The `malloc()` call in `handle_message_from_agent()` is the one and
+   only call that occurs outside of startup and connection setup. No
+   other malloc call occurs in that process, not even an indirect one.
+   The connection setup allocations can be redone when the qrexec-agent
+   disconnects and connects again, but the points below also apply to
+   this reconnection sequence. (Perhaps the only exception is handling
+   an error message just before exit(1), but if the attacker hasn't
+   corrupted malloc metadata up to this point, the attacker won't have a
+   chance to do it after this point either.)
 
 2. The qrexec-daemon handles only a single request at a time. At no
    point are multiple buffers for `service_name` allocated in the
@@ -203,10 +202,11 @@ following reasons:
    And, due to point 2 above, if there was a small chunk initially, it
    will get used again.
 
-4. The allocations done during startup or reconnection leave a few
-   free small chunks that are interleaved with allocated areas
-   (libvchan_t structure, something from libxengnttab, libxentoollog and
-   few more). Those memory chunks can't be merged due to their layout.
+4. The allocations done during startup and reconnection leave a few
+   small free chunks that are interleaved with allocated areas (the
+   libvchan_t structure, something from libxengnttab, libxentoollog, and
+   a few others). These memory chunks can't be merged due to their
+   layout.
 
 5. Every small allocation includes a NUL byte somewhere in the payload
    before being freed. This applies to both initial areas as well as to

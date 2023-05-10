@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 089 ]===---
 
-                             2023-05-TODO
+                             2023-05-11
 
        Qrexec: Memory corruption in service request handling
 
@@ -12,7 +12,7 @@ Users must install the following specific packages in order to address
 the issues discussed in this bulletin:
 
   For Qubes 4.1, in dom0:
-  - qrexec packages, version TODO
+  - qrexec packages, version 4.1.21
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -184,7 +184,7 @@ following reasons:
 
 1. The `malloc()` call in `handle_message_from_agent()` is literally the
    only call that happens outside of startup and connection setup. No
-   other malloc call happens in that process, not even an indirect one. 
+   other malloc call happens in that process, not even an indirect one.
    The connection setup allocations can be re-done when the
    qrexec-agent disconnects and connects again, but the points below
    apply to this reconnection sequence too.

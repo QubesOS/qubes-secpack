@@ -1,0 +1,104 @@
+
+                    ---===[ Qubes Canary 035 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is May 22, 2023.
+
+2. There have been 89 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of September 2023. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+
+Proof of freshness
+-------------------
+
+Mon, 22 May 2023 08:16:45 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Interview with NATO Secretary General Stoltenberg: "Two Percent Is the Minimum of What We Need"
+Interview with Jordanian Foreign Minister Safadi: "Russia in Syria Is a Stabilizing Factor Compared To the Alternative"
+Yevgeny Prigozhin's Meat Grinder: A Moment of Truth for Russia's Wagner Group in Bakhmut
+The Three Worlds of Xinjiang: A Trip Through China's Uyghur Region
+Operation Counterstrike: What Might the Approaching Ukrainian Offensive Achieve?
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Greece Elections: New Democracy on Track to Win Most Votes
+As Russia Claims Victory in Bakhmut, Ukraine Sees Opportunity Amid Ruins
+Biden Announces More Aid for Ukraine as G7 Powers Meet in Japan
+Sudan’s Warring Sides Agree to Weeklong Ceasefire
+Inside the Barbecue City That Is China’s Hottest Tourist Destination
+
+Source: BBC News - World (https://feeds.bbci.co.uk/news/world/rss.xml)
+Ukraine war: Bakhmut 'not occupied' by Russia, says defiant Zelensky
+Greek election: Centre-right Mitsotakis hails big win but wants majority
+Thousands mass for pro-EU rally in Moldovan capital, amid tensions with Russia
+US debt ceiling: Joe Biden urges Republicans to compromise as talks resume
+Watch: Green flash as meteor blazes across sky in Australia
+
+Source: Blockchain.info
+00000000000000000002fb9f59b4c425b487ade7bad8dd6862159ec3030f650f
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

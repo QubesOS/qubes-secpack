@@ -36,41 +36,42 @@ On 2023-07-24, the Xen Project published XSA-433, "x86/AMD: Zenbleed"
 [3]:
 | Researchers at Google have discovered Zenbleed, a hardware bug causing
 | corruption of the vector registers.
-| 
+|
 | When a VZEROUPPER instruction is discarded as part of a bad transient
 | execution path, its effect on internal tracking are not unwound
 | correctly.  This manifests as the wrong micro-architectural state
 | becoming architectural, and corrupting the vector registers.
-| 
+|
 | Note: While this malfunction is related to speculative execution, this
 |       is not a speculative sidechannel vulnerability.
-| 
+|
 | The corruption is not random.  It happens to be stale values from the
 | physical vector register file, a structure competitively shared between
 | sibling threads.  Therefore, an attacker can directly access data from
 | the sibling thread, or from a more privileged context.
-| 
+|
 | For more details, see:
 |   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7008.html
-|   
+|
 | https://github.com/google/security-research/security/advisories/GHSA-v6wh-rxpg-cmm8
 
 
 Impact
 -------
 
-This bug is specific to the AMD Zen2 microarchitecture.  AMD do not
-believe that other microarchitectures are affected.
+As explained in XSA-433, this vulnerability is specific to the AMD Zen 2
+microarchitecture, and AMD does not believe that other
+microarchitectures are affected. Exploiting this vulnerability would
+allow an attacker to read data from different contexts on the same core.
+Examples of such data include key material, ciphertext and plaintext
+from AES-NI operations, and the contents of REP-MOVS instructions, which
+are commonly used to implement `memcpy()`.
 
-An attacker can exploit this bug to read data from different contexts on
-the same core.  Examples of such data includes key material, cypher and
-plaintext from the AES-NI instructions, or the contents of REP-MOVS
-instructions, commonly used to implement memcpy().
-
-The code to reliably leak such data is publicly available, thus
-performing an attack is easy for an attacker that can execute some
-code in any qube (which includes executing javascript code in a
-browser).
+In order to exploit this vulnerability, an attacker must be capable of
+executing code at any privilege level in any qube, e.g., JavaScript in a
+web browser. Moreover, the code to reliably exploit this vulnerability
+is publicly available. Accordingly, there is a high risk of this
+vulnerability being exploited in practice.
 
 Credits
 --------

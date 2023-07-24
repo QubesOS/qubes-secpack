@@ -1,0 +1,89 @@
+
+             ---===[ Qubes Security Bulletin 090 ]===---
+
+                              2023-07-24
+
+                 Zenbleed (CVE-2023-20593, XSA-433)
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - linux-firmware 20230625-146
+
+  For Qubes 4.2, in dom0:
+  - linux-firmware 20230625-147
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+initramfs binaries.
+
+Summary
+--------
+
+On 2023-07-24, the Xen Project published XSA-433, "x86/AMD: Zenbleed"
+[3]:
+| Researchers at Google have discovered Zenbleed, a hardware bug causing
+| corruption of the vector registers.
+| 
+| When a VZEROUPPER instruction is discarded as part of a bad transient
+| execution path, its effect on internal tracking are not unwound
+| correctly.  This manifests as the wrong micro-architectural state
+| becoming architectural, and corrupting the vector registers.
+| 
+| Note: While this malfunction is related to speculative execution, this
+|       is not a speculative sidechannel vulnerability.
+| 
+| The corruption is not random.  It happens to be stale values from the
+| physical vector register file, a structure competitively shared between
+| sibling threads.  Therefore, an attacker can directly access data from
+| the sibling thread, or from a more privileged context.
+| 
+| For more details, see:
+|   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7008.html
+|   
+| https://github.com/google/security-research/security/advisories/GHSA-v6wh-rxpg-cmm8
+
+
+Impact
+-------
+
+This bug is specific to the AMD Zen2 microarchitecture.  AMD do not
+believe that other microarchitectures are affected.
+
+An attacker can exploit this bug to read data from different contexts on
+the same core.  Examples of such data includes key material, cypher and
+plaintext from the AES-NI instructions, or the contents of REP-MOVS
+instructions, commonly used to implement memcpy().
+
+The code to reliably leak such data is publicly available, thus
+performing an attack is easy for an attacker that can execute some
+code in any qube (which includes executing javascript code in a
+browser).
+
+Credits
+--------
+
+Tavis Ormandy of Google Project Zero.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-433.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

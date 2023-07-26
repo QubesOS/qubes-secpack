@@ -3,84 +3,83 @@
 
                                 TODO
 
-             Potentially compromised Windows PV drivers
+             Windows PV drivers potentially compromised
 
 User action required
 ---------------------
 
-At the time of this advisory, no user action is required, but users
-may wish to consider discontinuing the use of Qubes Windows Tools in
-security-sensitive Windows qubes until a fix is available.
-
+At the time of writing, no fix is available, so no user action is
+required. However, users may wish to consider discontinuing the use of
+Qubes Windows Tools (QWT) in security-sensitive Windows qubes until a
+fix is available. Users with especially high security requirements may
+wish to consider recreating existing Windows qubes without QWT or
+replacing existing Windows qubes with qubes running a different
+operating system.
 
 Summary
 --------
 
-On 2023-07-24, the Xen Project published Xen Security Notice 1
-"winpvdrvbuild.xenproject.org potentially compromised"[3]:
+On 2023-07-24, the Xen Project published "Xen Security Notice 1:
+winpvdrvbuild.xenproject.org potentially compromised" [1], which states:
 
 | Software running on the Xen Project hosted subdomain
 | winpvdrvbuild.xenproject.org is outdated and vulnerable to several
 | CVEs.  Some of the reported issues include remote code execution.  The
 | affected host was running the Jenkins build system for the Windows PV
 | Drivers subproject.
-| 
+
 | Since the list of CVEs reported include remote code execution we no
 | longer have confidence that binaries previously available at:
-| 
+|
 | https://xenbits.xen.org/pvdrivers/win/
-| 
+|
 | are trustworthy.  This includes binaries signed with Xen Project's EV
 | key that is cross-signed by Microsoft.
 
-Qubes Windows Tools includes those binaries, specifically Xen PV
-drivers version 8.2.2. 
-
+Qubes Windows Tools includes the Xen Project's Windows PV Drivers.
 
 Impact
 -------
 
-If the PV drivers binaries were compromised at build time, any Windows
-qube that have Qubes Windows Tools installed may be compromised too.
-If the drivers were not compromised at that time, there is no known
-vulnerability.
-Dom0 is not affected even though qubes-windows-tools package is
-installed in dom0, as dom0 (nor the dom0 package build process) does
-not interpret the driver files, it only makes them the available for
-select Windows qubes.
+If the Xen Project's Windows PV Drivers were compromised at build time,
+all Windows qubes that have Qubes Windows Tools (QWT) installed may also
+be compromised. If the drivers were not compromised at build time, then
+there is no known vulnerability.
 
+Dom0 is not affected, even though the `qubes-windows-tools` package is
+installed in dom0, since neither the dom0 package build process nor dom0
+itself interprets these driver files. Rather, the purpose of this
+package is merely to make the driver files available to the Windows
+qubes in which QWT are installed.
 
 Discussion
 -----------
 
-Qubes Windows Tools include official PV drivers binaries (version
-8.2.2, released in April 2019). It is done this way, instead of
-building them from source, because official binaries are signed with a
-key accepted by Windows by default. This way, it isn't necessary to
-enable "testsigning" to install the drivers. This approach is used by
-all versions of QWT released for Qubes OS 4.0 and 4.1. Initial QWT for
-Qubes OS 4.0 used version 8.2.1 of the PV drivers, released in May
-2017.
+We decided to use the Xen Project's official Windows PV Driver binaries
+in Qubes Windows Tools (QWT) (rather than building our own binaries from
+source) because the Xen Project's official binaries are signed by a
+special key that Windows accepts by default, which avoids the need to
+enable test-signing mode in Windows when installing the drivers. (We
+have no such key.) We used this approach for all versions of QWT
+released for Qubes 4.0 (driver version 8.2.1, May 2017), Qubes 4.1
+(driver version 8.2.2, April 2019), and Qubes 4.2 (same as Qubes 4.1).
 
-Qubes Security Team does not currently have definite knowledge if Xen
-PV drivers versions 8.2.2 or 8.2.1 indeed were compromised, but as
-explained in XSN-1, there is such possibility. 
-But, if hypothetical attacker did not compromise the drivers at the
-build time, they couldn't be tampered with later because they are
-stored on another system, and they are signed with a timestamped
-signature that proves they weren't modified after that date.
+While we have no way to know whether driver versions 8.2.1 or 8.2.2 have
+actually been compromised, it is worth noting that if the binaries were
+not compromised at build time, they could not have been tampered with
+after that time, since they were stored on another system and signed
+with a timestamped signature proving they were not modified afterward.
 
-Currently, Xen Project did not published replacement drivers signed
-with Microsoft-approved key. The process for doing this has changed[4]
-since previous PV drivers release, and there is no information if or
-when new signed PV drivers binaries will be available.
+At the time of writing, the Xen Project has not published replacement
+binaries signed by a Microsoft-approved key. The process for doing this
+has changed since the last version of Windows PV Drivers was released,
+and we have no information as to whether or when new signed binaries
+will be available. [2]
 
-Qubes Team is working on a permanent solution for signed PV drivers in
-QWT. When such solution will be available, it will be announced
-separately.
-
-Until that happens, the qubes-windows-tools package will be replaced
-with a dummy one, containing just a warning text.
+In order to avoid similar problems in the future, we are working on a
+more permanent solution regarding the need for signed PV drivers in QWT.
+In the meantime, we will replace the `qubes-windows-tools` package with
+a dummy package containing only warning text.
 
 Credits
 --------
@@ -90,10 +89,8 @@ See the original Xen Security Notice.
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/testing/
-[2] https://www.qubes-os.org/doc/how-to-update/
-[3] https://lists.xenproject.org/archives/html/xen-announce/2023-07/msg00000.html
-[4] https://learn.microsoft.com/en-us/windows-hardware/drivers/install/deprecation-of-software-publisher-certificates-and-commercial-release-certificates
+[1] https://lists.xenproject.org/archives/html/xen-announce/2023-07/msg00000.html
+[2] https://learn.microsoft.com/en-us/windows-hardware/drivers/install/deprecation-of-software-publisher-certificates-and-commercial-release-certificates
 
 --
 The Qubes Security Team

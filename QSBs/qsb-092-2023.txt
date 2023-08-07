@@ -1,0 +1,86 @@
+
+             ---===[ Qubes Security Bulletin 092 ]===---
+
+                             2023-08-08
+
+        Linux: buffer overrun in netback due to unusual packet
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Linux kernel packages (kernel*-qubes-vm), versions 6.1.43, 6.4.8,
+    5.15.124
+
+  For Qubes 4.2, in dom0:
+  - Linux kernel packages (kernel*-qubes-vm), versions 6.1.43, 6.4.8
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Network-providing qubes (like sys-net, sys-firewall) must be restarted
+afterward in order for the updates to take effect.
+
+If some network-providing qube is using in-qube kernel[3] (in default
+configuration this is not the case), the shipping the fix is up to the
+relevant distribution - when it will become available, installing
+updates in that qube (or its template) should be sufficient. Qubes
+Security Team has no control over timeline of this process, for the
+time being you may consider switching to dom0-provided kernel.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Linux binaries.
+
+Summary
+--------
+
+On 2023-08-08, the Xen Project published XSA-432, "Linux: buffer
+overrun in netback due to unusual packet" [4]:
+
+| The fix for XSA-423 added logic to Linux'es netback driver to deal with
+| a frontend splitting a packet in a way such that not all of the headers
+| would come in one piece.  Unfortunately the logic introduced there
+| didn't account for the extreme case of the entire packet being split
+| into as many pieces as permitted by the protocol, yet still being
+| smaller than the area that's specially dealt with to keep all (possible)
+| headers together.  Such an unusual packet would therefore trigger a
+| buffer overrun in the driver.
+| 
+| An unprivileged guest can cause Denial of Service (DoS) of the host by
+| sending network packets to the backend, causing the backend to crash.
+| 
+| Data corruption or privilege escalation seem unlikely but have not been
+| ruled out.
+
+
+Impact
+-------
+
+A malicious qube might try to attack its network-providing qube
+(usually sys-firewall). Such attack is unlikely to succeed, but if
+that happens, it can observe and modify network traffic of other
+qubes. Further impact depends on network traffic characteristics
+(especially, if authenticated protocols like HTTPS are used).
+
+Credits
+--------
+
+See the original Xen Security Advisory. 
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://www.qubes-os.org/doc/managing-vm-kernels/
+[4] https://xenbits.xen.org/xsa/advisory-432.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

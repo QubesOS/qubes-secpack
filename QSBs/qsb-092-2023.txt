@@ -27,11 +27,11 @@ Network-providing qubes (like sys-net, sys-firewall) must be restarted
 afterward in order for the updates to take effect.
 
 If some network-providing qube is using in-qube kernel[3] (in default
-configuration this is not the case), the shipping the fix is up to the
+configuration this is not the case), then shipping the fix is up to the
 relevant distribution - when it will become available, installing
 updates in that qube (or its template) should be sufficient. Qubes
-Security Team has no control over timeline of this process, for the
-time being you may consider switching to dom0-provided kernel.
+Security Team has no control over timeline of this process, for the time
+being you may consider switching to dom0-provided kernel.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
@@ -62,16 +62,19 @@ overrun in netback due to unusual packet" [4]:
 Impact
 -------
 
-A malicious qube might try to attack its network-providing qube
-(usually sys-firewall). Such attack is unlikely to succeed, but if
-that happens, it can observe and modify network traffic of other
-qubes. Further impact depends on network traffic characteristics
-(especially, if authenticated protocols like HTTPS are used).
+A malicious qube might try to attack its network-providing qube (usually
+sys-firewall). Such attack is unlikely to succeed, but if successful
+they can execute arbitrary code there. Therefore the attacker can bypass
+restrictions normally imposed by the network-providing qubes. For
+example observerving and modifying network traffic of other qubes or
+bypass firewall rules. Further impact depends on network traffic
+characteristics (especially, if authenticated protocols like HTTPS are
+used).
 
 Credits
 --------
 
-See the original Xen Security Advisory. 
+See the original Xen Security Advisory.
 
 References
 -----------

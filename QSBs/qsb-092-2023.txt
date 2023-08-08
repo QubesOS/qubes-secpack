@@ -66,21 +66,26 @@ overrun in netback due to unusual packet" [4]:
 Impact
 -------
 
-A malicious network-connected qube could attempt to exploit this
-vulnerability in order to attack the service qube that provides it with
-network access (such as sys-net, sys-firewall, sys-whonix, or a VPN
-qube). The Qubes security team believes that such an attack is unlikely
-to succeed and that this vulnerability is not likely to be exploitable
-beyond causing a crash. However, if such an attack were successful, it
-would allow for arbitrary code execution in the service qube,
+An attacker who manages to compromise a network-connected qube could
+attempt to exploit the vulnerability described in this bulletin in order
+to attack the service qube (such as sys-net, sys-firewall, sys-whonix,
+or a VPN qube) that provides network access to the compromised qube. The
+Qubes security team believes that such an attack is unlikely to succeed
+and that this vulnerability is not likely to be exploitable beyond
+causing a crash. However, if such an attack were successful, it would
+allow the attacker to execute arbitrary code in the service qube,
 potentially bypassing the restrictions that such service qubes normally
-impose. For example, by compromising sys-firewall an attacker could
-bypass the firewall rules imposed by it; access to sys-whonix allows
-them to bypass Tor, emit clearnet traffic, and learn its real public IP
-address; on a VPN qube they could observe and modify the network traffic
-of other qubes that are connected to it, which otherwise would be
-protected by the VPN; on sys-net they gain direct access to attached
-PCIe devices.
+impose. For example:
+
+- An attacker in control of sys-firewall could bypass the firewall rules
+  that sys-firewall normally enforces for the qubes connected to it.
+- An attacker in control of sys-whonix could bypass Tor, emit clearnet
+  traffic, and learn the machine's real public IP address.
+- An attacker in control of a VPN qube could observe and modify the
+  network traffic of other qubes that are connected to it -- traffic
+  that the VPN would normally protect.
+- An attacker in control of sys-net could gain direct access to attached
+  PCIe devices.
 
 Credits
 --------

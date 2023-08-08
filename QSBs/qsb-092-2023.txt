@@ -3,7 +3,7 @@
 
                              2023-08-08
 
-        Linux: buffer overrun in netback due to unusual packet
+           Buffer overrun in Linux netback driver (XSA-432)
 
 User action required
 ---------------------
@@ -23,15 +23,20 @@ current (stable) repository over the next two weeks after being tested
 by the community. [1] Once available, the packages are to be installed
 via the Qubes Update tool or its command-line equivalents. [2]
 
-Network-providing qubes (like sys-net, sys-firewall) must be restarted
-afterward in order for the updates to take effect.
+Service qubes that provide network access (such as sys-net,
+sys-firewall, sys-whonix, and VPN qubes) must be restarted afterward in
+order for the updates to take effect.
 
-If some network-providing qube is using in-qube kernel[3] (in default
-configuration this is not the case), then shipping the fix is up to the
-relevant distribution - when it will become available, installing
-updates in that qube (or its template) should be sufficient. Qubes
-Security Team has no control over timeline of this process, for the time
-being you may consider switching to dom0-provided kernel.
+By default, all qubes use a kernel provided by dom0. However, advanced
+users may opt to modify a given qube so that it uses an in-qube kernel
+instead. [3] In such cases, the fixes contained in the kernel packages
+listed above will not apply. Instead, any fix would have to come from
+the upstream organization responsible for the distribution running in
+that qube. If and when the relevant upstream organization makes such a
+fix available, a normal update [2] should be sufficient to apply it. The
+Qubes security team has no control over this process, as it concerns the
+operations of independent organizations. Those who use in-qube kernels
+may wish to consider temporarily switching to a dom0-provided kernel.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
@@ -43,33 +48,38 @@ Summary
 On 2023-08-08, the Xen Project published XSA-432, "Linux: buffer
 overrun in netback due to unusual packet" [4]:
 
-| The fix for XSA-423 added logic to Linux'es netback driver to deal with
-| a frontend splitting a packet in a way such that not all of the headers
-| would come in one piece.  Unfortunately the logic introduced there
-| didn't account for the extreme case of the entire packet being split
-| into as many pieces as permitted by the protocol, yet still being
-| smaller than the area that's specially dealt with to keep all (possible)
-| headers together.  Such an unusual packet would therefore trigger a
-| buffer overrun in the driver.
-| 
+| The fix for XSA-423 added logic to Linux'es netback driver to deal
+| with a frontend splitting a packet in a way such that not all of the
+| headers would come in one piece.  Unfortunately the logic introduced
+| there didn't account for the extreme case of the entire packet being
+| split into as many pieces as permitted by the protocol, yet still
+| being smaller than the area that's specially dealt with to keep all
+| (possible) headers together.  Such an unusual packet would therefore
+| trigger a buffer overrun in the driver.
+|
 | An unprivileged guest can cause Denial of Service (DoS) of the host by
 | sending network packets to the backend, causing the backend to crash.
-| 
-| Data corruption or privilege escalation seem unlikely but have not been
-| ruled out.
-
+|
+| Data corruption or privilege escalation seem unlikely but have not
+| been ruled out.
 
 Impact
 -------
 
-A malicious qube might try to attack its network-providing qube (usually
-sys-firewall). Such attack is unlikely to succeed, but if successful
-they can execute arbitrary code there. Therefore the attacker can bypass
-restrictions normally imposed by the network-providing qubes. For
-example observerving and modifying network traffic of other qubes or
-bypass firewall rules. Further impact depends on network traffic
-characteristics (especially, if authenticated protocols like HTTPS are
-used).
+A malicious network-connected qube could attempt to exploit this
+vulnerability in order to attack the service qube that provides it with
+network access (such as sys-net, sys-firewall, sys-whonix, or a VPN
+qube). The Qubes security team believes that such an attack is unlikely
+to succeed and that this vulnerability is not likely to be exploitable
+beyond causing a crash. However, if such an attack were successful, it
+would allow for arbitrary code execution in the service qube,
+potentially bypassing the restrictions that such service qubes normally
+impose. For example, sys-net could attempt to attack other qubes that
+have attached PCI devices; sys-firewall could bypass the firewall rules
+of qubes that are connected to it; sys-whonix could bypass Tor, emit
+clearnet traffic, and learn its real public IP address; and a VPN qube
+could observe and modify the network traffic of other qubes that are
+connected to it.
 
 Credits
 --------

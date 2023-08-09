@@ -14,11 +14,11 @@ the issues discussed in this bulletin:
 
   For Qubes 4.1, in dom0:
   - Xen packages, version 4.14.6-1
-  - microcode_ctl, version 2.1-54
+  - microcode_ctl, version 2.1-55
 
   For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.2-1
-  - microcode_ctl, version 2.1-54
+  - microcode_ctl, version 2.1-55
 
 Note on AMD Zen 1 and Zen 2 CPUs: The packages we previously released
 for QSB-086 [1] already contain mitigations that are sufficient to

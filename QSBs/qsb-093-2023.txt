@@ -3,8 +3,8 @@
 
                               2023-08-09
 
-              Speculative issues on AMD and Intel CPUs
-                   (CVE-2023-20569, CVE-2022-40982)
+      Transient execution vulnerabilities in AMD and Intel CPUs
+           (CVE-2023-20569/XSA-434, CVE-2022-40982/XSA-435)
 
 User action required
 ---------------------
@@ -14,20 +14,31 @@ the issues discussed in this bulletin:
 
   For Qubes 4.1, in dom0:
   - Xen packages, version 4.14.6-1
-  - microcode_ctl package version 2.1-54
+  - microcode_ctl, version 2.1-54
 
   For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.2-1
-  - microcode_ctl package version 2.1-54
+  - microcode_ctl, version 2.1-54
 
-At the time of publishing, microcode update for AMD Zen3 and Zen4
-families is not available yet and as such there is no fix on those
-platforms. Those updates on desktop and mobile AMD systems are shipped
-as part of system firmware - consult your OEM for more info.
+Note on AMD Zen 1 and Zen 2 CPUs: The packages we previously released
+for QSB-086 [1] already contain mitigations that are sufficient to
+protect these CPUs from CVE-2023-20569/XSA-434. Consequently,
+fully-updated [2] Qubes OS installations running on systems with these
+CPUs are not affected by the vulnerabilities discussed in this bulletin.
+
+Note on AMD Zen 3 and Zen 4 CPUs: AMD has stated that they plan to
+distribute microcode updates for these CPUs to original equipment
+manufacturers (OEMs), original design manufacturers (ODMs), and
+motherboard manufacturers (MB). [3] These microcode updates are shipped
+only as part of system firmware; loading them from the operating system
+is not supported. Therefore, until the relevant OEM, ODM, or MB provides
+a suitable BIOS or (U)EFI update for a system, the package updates
+listed above will not be sufficient to address CVE-2023-20569/XSA-434 on
+that system.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [1] Once available, the packages are to be installed
+by the community. [4] Once available, the packages are to be installed
 via the Qubes Update tool or its command-line equivalents. [2]
 
 Dom0 must be restarted afterward in order for the updates to take
@@ -40,57 +51,57 @@ Xen binaries.
 Summary
 --------
 
-The following security advisories were published on 2023-03-21:
+The Xen Project published the following security advisories on
+2023-08-08:
 
-XSA-434 [3] "x86/AMD: Speculative Return Stack Overflow" (CVE-2023-20569):
+XSA-434 [5] "x86/AMD: Speculative Return Stack Overflow"
+(CVE-2023-20569):
 
-| Researchers from ETH Zurich have extended their prior research (XSA-422,
-| Branch Type Confusion, a.k.a Retbleed) and have discovered INCEPTION,
-| also know as RAS (Return Address Stack) Poisoning, and Speculative
-| Return Stack Overflow.
-| 
-| The RAS is updated when a CALL instruction is predicted, rather than at
-| a later point in the pipeline.  However, the RAS is still fundamentally
-| a circular stack.
-| 
+| Researchers from ETH Zurich have extended their prior research
+| (XSA-422, Branch Type Confusion, a.k.a Retbleed) and have discovered
+| INCEPTION, also know as RAS (Return Address Stack) Poisoning, and
+| Speculative Return Stack Overflow.
+|
+| The RAS is updated when a CALL instruction is predicted, rather than
+| at a later point in the pipeline.  However, the RAS is still
+| fundamentally a circular stack.
+|
 | It is possible to poison the branch type and target predictions such
 | that, at a point of the attackers choosing, the branch predictor
 | predicts enough CALLs back-to-back to wrap around the entire RAS and
 | overwrite a correct return prediction with one of the attackers
 | choosing.
-| 
-| This allows the attacker to control RET speculation in a victim context,
-| and leak arbitrary data as a result.
-| 
+|
+| This allows the attacker to control RET speculation in a victim
+| context, and leak arbitrary data as a result.
+|
 | For more details, see:
 |   https://comsec.ethz.ch/inception
 |   https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-7005
 
+XSA-435 [6] "x86/Intel: Gather Data Sampling" (CVE-2022-40982):
 
-XSA-435 [4] "x86/Intel: Gather Data Sampling" (CVE-2022-40982):
-
-| A researcher has discovered Gather Data Sampling, a transient execution
-| side-channel whereby the AVX GATHER instructions can forward the content
-| of stale vector registers to dependent instructions.
-| 
+| A researcher has discovered Gather Data Sampling, a transient
+| execution side-channel whereby the AVX GATHER instructions can forward
+| the content of stale vector registers to dependent instructions.
+|
 | The physical register file is a structure competitively shared between
-| sibling threads.  Therefore an attacker can infer data from the sibling
-| thread, or from a more privileged context.
-| 
+| sibling threads.  Therefore an attacker can infer data from the
+| sibling thread, or from a more privileged context.
+|
 | For more details, see:
 |   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/gather-data-sampling.html
 
 Impact
 -------
 
-Both of those speculative issues allows a malicious qube to infer the
-contents of data belonging to other qubes. In case of AMD processors,
-this applies to arbitrary host memory, while on Intel it is limited to
-CPU context (most data being processed by applications).
-
-On AMD Zen1 and Zen2 families, the mitigations applied as part of
-QSB-086 are enough to protect against this vulnerability too, so a
-fully updated Qubes OS is not affected on those CPU models.
+An attacker who compromises one qube can attempt to exploit one of these
+vulnerabilities (the one corresponding to the system's CPU) in order to
+infer the contents of data belonging to other qubes. In systems with AMD
+CPUs, successfully exploiting CVE-2023-20569/XSA-434 would allow an
+attacker to infer the contents of arbitrary host memory. In systems with
+Intel CPUs, successfully exploiting CVE-2022-40982/XSA-435 would allow
+an attacker to infer data from different CPU contexts on the same core.
 
 Credits
 --------
@@ -100,10 +111,12 @@ See the original Xen Security Advisories.
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/testing/
+[1] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-086-2022.txt
 [2] https://www.qubes-os.org/doc/how-to-update/
-[3] https://xenbits.xen.org/xsa/advisory-434.html
-[4] https://xenbits.xen.org/xsa/advisory-435.html
+[3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7005.html
+[4] https://www.qubes-os.org/doc/testing/
+[5] https://xenbits.xen.org/xsa/advisory-434.html
+[6] https://xenbits.xen.org/xsa/advisory-435.html
 
 --
 The Qubes Security Team

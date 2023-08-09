@@ -1,0 +1,110 @@
+
+             ---===[ Qubes Security Bulletin 093 ]===---
+
+                              2023-08-09
+
+              Speculative issues on AMD and Intel CPUs
+                   (CVE-2023-20569, CVE-2022-40982)
+
+User action required
+---------------------
+
+Users must install the following specific packages in order to address
+the issues discussed in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.6-1
+  - microcode_ctl package version 2.1-54
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.2-1
+  - microcode_ctl package version 2.1-54
+
+At the time of publishing, microcode update for AMD Zen3 and Zen4
+families is not available yet and as such there is no fix on those
+platforms. Those updates on desktop and mobile AMD systems are shipped
+as part of system firmware - consult your OEM for more info.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [1] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [2]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Summary
+--------
+
+The following security advisories were published on 2023-03-21:
+
+XSA-434 [3] "x86/AMD: Speculative Return Stack Overflow" (CVE-2023-20569):
+
+| Researchers from ETH Zurich have extended their prior research (XSA-422,
+| Branch Type Confusion, a.k.a Retbleed) and have discovered INCEPTION,
+| also know as RAS (Return Address Stack) Poisoning, and Speculative
+| Return Stack Overflow.
+| 
+| The RAS is updated when a CALL instruction is predicted, rather than at
+| a later point in the pipeline.  However, the RAS is still fundamentally
+| a circular stack.
+| 
+| It is possible to poison the branch type and target predictions such
+| that, at a point of the attackers choosing, the branch predictor
+| predicts enough CALLs back-to-back to wrap around the entire RAS and
+| overwrite a correct return prediction with one of the attackers
+| choosing.
+| 
+| This allows the attacker to control RET speculation in a victim context,
+| and leak arbitrary data as a result.
+| 
+| For more details, see:
+|   https://comsec.ethz.ch/inception
+|   https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-7005
+
+
+XSA-435 [4] "x86/Intel: Gather Data Sampling" (CVE-2022-40982):
+
+| A researcher has discovered Gather Data Sampling, a transient execution
+| side-channel whereby the AVX GATHER instructions can forward the content
+| of stale vector registers to dependent instructions.
+| 
+| The physical register file is a structure competitively shared between
+| sibling threads.  Therefore an attacker can infer data from the sibling
+| thread, or from a more privileged context.
+| 
+| For more details, see:
+|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/gather-data-sampling.html
+
+Impact
+-------
+
+Both of those speculative issues allows a malicious qube to infer the
+contents of data belonging to other qubes. In case of AMD processors,
+this applies to arbitrary host memory, while on Intel it is limited to
+CPU context (most data being processed by applications).
+
+On AMD Zen1 and Zen2 families, the mitigations applied as part of
+QSB-086 are enough to protect against this vulnerability too, so a
+fully updated Qubes OS is not affected on those CPU models.
+
+Credits
+--------
+
+See the original Xen Security Advisories.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/testing/
+[2] https://www.qubes-os.org/doc/how-to-update/
+[3] https://xenbits.xen.org/xsa/advisory-434.html
+[4] https://xenbits.xen.org/xsa/advisory-435.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

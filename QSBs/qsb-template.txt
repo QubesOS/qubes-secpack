@@ -5,31 +5,13 @@
 
                                 TODO
 
-User action required
----------------------
-
-Users must install the following specific packages in order to address
-the issues discussed in this bulletin:
-
-  For Qubes 4.0, in TODO:
-  - TODO
-
-  For Qubes 4.1, in TODO:
-  - TODO
-
-These packages will migrate from the security-testing repository to the
-current (stable) repository over the next two weeks after being tested
-by the community. [1] Once available, the packages are to be installed
-via the Qubes Update tool or its command-line equivalents. [2]
+User action
+------------
 
 TODO:
-Dom0 must be restarted afterward in order for the updates to take
-effect.
-
-TODO:
-If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18+19 will change due to the new
-Xen binaries.
+No special user action is required. Continue to update normally [1] in
+order to receive the security updates described in the "Patching"
+section below.
 
 Summary
 --------
@@ -41,6 +23,37 @@ Impact
 
 TODO
 
+Affected systems
+-----------------
+
+TODO
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in TODO:
+  - TODO
+
+  For Qubes 4.2, in TODO:
+  - TODO
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+TODO:
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+TODO:
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
 Credits
 --------
 
@@ -49,8 +62,8 @@ TODO
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/testing/
-[2] https://www.qubes-os.org/doc/how-to-update/
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
 TODO
 
 --

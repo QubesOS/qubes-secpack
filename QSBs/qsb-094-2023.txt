@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 094 ]===---
 
-                             2023-09-25
+                             2023-09-26
 
             x86/AMD: Divide speculative information leak
 
@@ -30,25 +30,28 @@ Summary
 On 2023-09-25, the Xen Project published XSA-439, "x86/AMD: Divide
 speculative information leak" [3]:
 
-| In the Zen1 microarchitecure, there is one divider in the pipeline which
-| services uops from both threads.  In the case of #DE, the latched result
-| from the previous DIV to execute will be forwarded speculatively.
-| 
-| This is a covert channel that allows two threads to communicate without
-| any system calls.  In also allows userspace to obtain the result of the
-| most recent DIV instruction executed (even speculatively) in the core,
-| which can be from a higher privilege context.
-| 
-| For more information, see:
-|  * https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7007.html
+| In the Zen1 microarchitecure [sic], there is one divider in the
+| pipeline which services uops from both threads.  In the case of #DE,
+| the latched result from the previous DIV to execute will be forwarded
+| speculatively.
+|
+| This is a covert channel that allows two threads to communicate
+| without any system calls.  In also allows userspace to obtain the
+| result of the most recent DIV instruction executed (even
+| speculatively) in the core, which can be from a higher privilege
+| context.
+
+For more information, see:
+ * https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7007.html
 
 Impact
 -------
 
-An attacker might be able to infer data from a different execution
-context on the same CPU core. This includes data belonging to
-different qube scheduled on the same CPU core before, or Xen itself
-(which also may access data belonging to a different qube).
+An attacker who compromises one qube can attempt to exploit this
+vulnerability in order to infer the contents of data from a different
+execution context on the same CPU core. This includes data belonging to
+a different qube that was previously scheduled on that CPU core and Xen
+itself, which has access to all qube data.
 
 Credits
 --------

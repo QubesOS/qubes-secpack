@@ -47,11 +47,15 @@ For more information, see:
 Impact
 -------
 
-An attacker who compromises one qube can attempt to exploit this
-vulnerability in order to infer the contents of data from a different
-execution context on the same CPU core. This includes data belonging to
-a different qube that was previously scheduled on that CPU core and Xen
-itself, which has access to all qube data.
+On systems with an AMD Zen (first generation) CPU, an attacker who
+compromises a VM can attempt to exploit this vulnerability in order to
+infer the contents of data from a different execution context on the
+same CPU core. This includes data belonging to a different VM (which
+could be dom0) that was previously scheduled on that CPU core and Xen
+itself. The latter is relevant because some system operations require
+Xen to load data from a VM. This data may or may not be sensitive.
+However, the attacker has no control over the data that Xen loads (and,
+to some extent, no knowledge of what was loaded).
 
 Credits
 --------

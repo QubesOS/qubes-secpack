@@ -30,7 +30,7 @@ Summary
 On 2023-09-25, the Xen Project published XSA-439, "x86/AMD: Divide
 speculative information leak" [3]:
 
-| In the Zen1 microarchitecure [sic], there is one divider in the
+| In the Zen1 microarchitecture, there is one divider in the
 | pipeline which services uops from both threads.  In the case of #DE,
 | the latched result from the previous DIV to execute will be forwarded
 | speculatively.

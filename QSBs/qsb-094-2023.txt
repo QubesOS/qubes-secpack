@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 094 ]===---
 
-                             2023-09-26
+                             2023-09-27
 
             x86/AMD: Divide speculative information leak
 

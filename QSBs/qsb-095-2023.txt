@@ -1,0 +1,80 @@
+
+             ---===[ Qubes Security Bulletin 095 ]===---
+
+                              2023-10-10
+
+                 x86/AMD: missing IOMMU TLB flushing
+
+User action
+------------
+
+No special user action is required. Continue to update normally [1] in
+order to receive the security updates described in the "Patching"
+section below.
+
+Summary
+--------
+
+On 2023-10-10, the Xen Project published XSA-442, "x86/AMD: missing
+IOMMU TLB flushing" [3]:
+
+| The caching invalidation guidelines from the AMD-Vi specification (48882—Rev
+| 3.07-PUB—Oct 2022) is incorrect on some hardware, as devices will malfunction
+| (see stale DMA mappings) if some fields of the DTE are updated but the IOMMU
+| TLB is not flushed.
+| 
+| Such stale DMA mappings can point to memory ranges not owned by the guest, thus
+| allowing access to unindented memory regions.
+
+Impact
+-------
+
+Privilege escalation, Denial of Service (DoS) affecting the entire host,
+and information leaks.
+
+Affected systems
+-----------------
+
+Only x86 AMD systems with IOMMU hardware are vulnerable. Only qubes
+with access to PCI devices can leverage this vulnerability. In default
+Qubes OS configuration those are sys-net and sys-usb.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.6-3
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.2-3
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-442.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

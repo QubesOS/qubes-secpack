@@ -9,9 +9,9 @@ User action
 ------------
 
 TODO:
-No special user action is required. Continue to update normally [1] in
-order to receive the security updates described in the "Patching"
-section below.
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is required in
+response to this QSB.
 
 Summary
 --------

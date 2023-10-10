@@ -8,9 +8,8 @@
 User action
 ------------
 
-No special user action is required. Continue to update normally [1] in
-order to receive the security updates described in the "Patching"
-section below.
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below.
 
 Summary
 --------
@@ -29,15 +28,14 @@ IOMMU TLB flushing" [3]:
 Impact
 -------
 
-Privilege escalation, Denial of Service (DoS) affecting the entire host,
-and information leaks.
+Privilege escalation, Denial of Service (DoS) affecting the entire host, and
+information leaks. Only qubes with access to PCI devices can leverage this
+vulnerability. In default Qubes OS configuration those are sys-net and sys-usb.
 
 Affected systems
 -----------------
 
-Only x86 AMD systems with IOMMU hardware are vulnerable. Only qubes
-with access to PCI devices can leverage this vulnerability. In default
-Qubes OS configuration those are sys-net and sys-usb.
+Only x86 AMD systems with IOMMU hardware are vulnerable.
 
 Patching
 ---------

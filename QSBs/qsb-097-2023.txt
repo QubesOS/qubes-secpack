@@ -3,7 +3,8 @@
 
                               2023-11-14
 
-                  Intel CPU Redundant Prefix Issue
+            "Reptar" Intel redundant prefix vulnerability
+                   (CVE-2023-23583, INTEL-SA-00950)
 
 User action
 ------------
@@ -16,34 +17,44 @@ Summary
 --------
 
 On 2023-11-14, Intel published INTEL-SA-00950, "2023.4 IPU Out-of-Band
-(OOB) - Intel® Processor Advisory" [3][4]:
+(OOB) - Intel® Processor Advisory" [3] accompanied by advisory guidance
+[4] that states:
+
 | Under certain microarchitectural conditions, Intel has identified
 | cases where execution of an instruction (REP MOVSB) encoded with a
 | redundant REX prefix may result in unpredictable system behavior
 | resulting in a system crash/hang, or, in some limited scenarios, may
-| allow escalation of privilege (EoP) from CPL3 to CPL0
+| allow escalation of privilege (EoP) from CPL3 to CPL0.
+
+This vulnerability has been assigned CVE-2023-23583. [5]
 
 Impact
 -------
 
-On Qubes OS installations with affected CPUs, a VM running in PV mode
-may escalate their privileges to that of the host. Additionally, any
-VM may perform a denial-of-service (DoS) attack (host crash) against the
-host. In the default Qubes OS configuration, only the stubdomains for
-HVMs are in a position to exploit this vulnerability in order to
-attack other VMs. (Dom0 also runs in PV mode, but it is fully
+On affected systems, a qube running in PV mode can escalate its
+privileges to that of dom0. Additionally, any qube can perform a
+denial-of-service (DoS) attack against dom0, which may cause Qubes OS
+to crash. In the default Qubes OS configuration, only the stubdomains
+for HVMs are in a position to exploit this vulnerability in order to
+attack other qubes. (Dom0 also runs in PV mode, but it is fully
 trusted.)
 
-Some research suggests that disabling hyper-threading (which Qubes OS
-does by default) might reduce the impact to denial-of-service, but we
-cannot completely rule out possibility of privilege escalation even with
-hyper-threading disabled [5].
+Tavis Ormandy's research [6] suggests that disabling hyper-threading
+(which Qubes OS does by default) might reduce the impact to that of a
+denial-of-service attack, but we cannot completely rule out possibility
+of privilege escalation even with hyper-threading disabled.
 
 Affected systems
 -----------------
 
-Only systems with a 10th generation Intel Core CPU or newer are affected
-(and some Intel server CPU models, see [3]).
+Only systems with Intel processors are affected, specifically:
+
+- 10th generation Core and newer processors
+- Certain server processors
+
+According to Intel, some recent processor families already have
+mitigations. For details, see the tables of affected products in
+INTEL-SA-00950. [3]
 
 Patching
 ---------
@@ -72,7 +83,7 @@ initramfs binaries.
 Credits
 --------
 
-See the original Intel security advisory.
+See the Intel security advisory. [3]
 
 References
 -----------
@@ -81,7 +92,8 @@ References
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00950.html
 [4] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/redundant-prefix-issue.html
-[5] https://lock.cmpxchg8b.com/reptar.html
+[5] https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-23583
+[6] https://lock.cmpxchg8b.com/reptar.html
 
 --
 The Qubes Security Team

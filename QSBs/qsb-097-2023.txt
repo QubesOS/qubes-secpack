@@ -33,16 +33,17 @@ host. In the default Qubes OS configuration, only the stubdomains for
 HVMs are in a position to exploit this vulnerability in order to
 attack other VMs. (Dom0 also runs in PV mode, but it is fully
 trusted.)
+
 Some research suggests that disabling hyper-threading (which Qubes OS
-does by default) reduces the impact to denial-of-service, but we
-cannot completely rule out possibility of privilege escalation even
-with hyper-threading disabled.
+does by default) might reduce the impact to denial-of-service, but we
+cannot completely rule out possibility of privilege escalation even with
+hyper-threading disabled [5].
 
 Affected systems
 -----------------
 
-Only x86 Intel systems with CPU of 10th generation or newer are
-affected.
+Only systems with a 10th generation Intel Core CPU or newer are affected
+(and some Intel server CPU models, see [3]).
 
 Patching
 ---------
@@ -71,8 +72,7 @@ initramfs binaries.
 Credits
 --------
 
-See the original Intel security advisory
-TODO
+See the original Intel security advisory.
 
 References
 -----------
@@ -81,6 +81,7 @@ References
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00950.html
 [4] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/redundant-prefix-issue.html
+[5] https://lock.cmpxchg8b.com/reptar.html
 
 --
 The Qubes Security Team

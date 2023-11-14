@@ -1,0 +1,93 @@
+
+             ---===[ Qubes Security Bulletin 096 ]===---
+
+                              2023-11-14
+
+              x86: BTC/SRSO fixes not fully effective
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is required in
+response to this QSB.
+
+Summary
+--------
+
+On 2023-11-14, the Xen Project published XSA-446, "x86: BTC/SRSO fixes
+not fully effective" [3]:
+
+| The fixes for XSA-422 (Branch Type Confusion) and XSA-434 (Speculative
+| Return Stack Overflow) are not IRQ-safe.  It was believed that the
+| mitigations always operated in contexts with IRQs disabled.
+| 
+| However, the original XSA-254 fix for Meltdown (XPTI) deliberately left
+| interrupts enabled on two entry paths; one unconditionally, and one
+| conditionally on whether XPTI was active.
+| 
+| As BTC/SRSO and Meltdown affect different CPU vendors, the mitigations
+| are not active together by default.  Therefore, there is race condition
+| whereby a malicious PV guest can bypass BTC/SRSO protections and launch
+| a BTC/SRSO attack against Xen.
+
+
+Impact
+-------
+
+The impact is the same as of QSB-086:
+
+| On Qubes OS installations with affected CPUs, a VM running in PV mode
+| may be capable of inferring the memory contents of other running VMs,
+| including dom0. In the default Qubes OS configuration, only the
+| stubdomains for HVMs are in a position to exploit this vulnerability
+| in order to attack other VMs. (Dom0 also runs in PV mode, but it is
+| fully trusted.)
+| 
+| Only certain AMD CPUs are affected. Please see AMD-SB-1040 [4] for the
+| official list of affected models.
+
+Affected systems
+-----------------
+
+Only x86 AMD systems are vulnerable.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.6-4
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.2-5
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-446.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -9,8 +9,8 @@ User action
 ------------
 
 Continue to update normally [1] in order to receive the security updates
-described in the "Patching" section below. No other user action is required in
-response to this QSB.
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
 
 Summary
 --------
@@ -21,21 +21,20 @@ not fully effective" [3]:
 | The fixes for XSA-422 (Branch Type Confusion) and XSA-434 (Speculative
 | Return Stack Overflow) are not IRQ-safe.  It was believed that the
 | mitigations always operated in contexts with IRQs disabled.
-| 
-| However, the original XSA-254 fix for Meltdown (XPTI) deliberately left
-| interrupts enabled on two entry paths; one unconditionally, and one
-| conditionally on whether XPTI was active.
-| 
+|
+| However, the original XSA-254 fix for Meltdown (XPTI) deliberately
+| left interrupts enabled on two entry paths; one unconditionally, and
+| one conditionally on whether XPTI was active.
+|
 | As BTC/SRSO and Meltdown affect different CPU vendors, the mitigations
-| are not active together by default.  Therefore, there is race condition
-| whereby a malicious PV guest can bypass BTC/SRSO protections and launch
-| a BTC/SRSO attack against Xen.
-
+| are not active together by default.  Therefore, there is race
+| condition whereby a malicious PV guest can bypass BTC/SRSO protections
+| and launch a BTC/SRSO attack against Xen.
 
 Impact
 -------
 
-The impact is the same as of QSB-086:
+The impact is the same as it was in QSB-086 [4]:
 
 | On Qubes OS installations with affected CPUs, a VM running in PV mode
 | may be capable of inferring the memory contents of other running VMs,
@@ -84,6 +83,7 @@ References
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://xenbits.xen.org/xsa/advisory-446.html
+[4] https://www.qubes-os.org/news/2022/11/08/qsb-086/
 
 --
 The Qubes Security Team

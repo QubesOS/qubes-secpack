@@ -3,7 +3,7 @@
 
                               2023-11-14
 
-              x86: BTC/SRSO fixes not fully effective
+             BTC/SRSO fixes not fully effective (XSA-446)
 
 User action
 ------------

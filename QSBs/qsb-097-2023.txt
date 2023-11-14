@@ -31,18 +31,19 @@ This vulnerability has been assigned CVE-2023-23583. [5]
 Impact
 -------
 
-On affected systems, a qube running in PV mode can escalate its
-privileges to that of dom0. Additionally, any qube can perform a
-denial-of-service (DoS) attack against dom0, which may cause Qubes OS
-to crash. In the default Qubes OS configuration, only the stubdomains
-for HVMs are in a position to exploit this vulnerability in order to
-attack other qubes. (Dom0 also runs in PV mode, but it is fully
+On affected systems, a qube running in PV mode can attempt to exploit
+this vulnerability in order to escalate its privileges to those of dom0.
+In the default Qubes OS configuration, the stubdomains for sys-net and
+sys-usb run in PV mode. (Dom0 also runs in PV mode, but it is fully
 trusted.)
+
+In addition, any qube can attempt to exploit this vulnerability in order
+to crash the system, resulting in a denial of service (DoS).
 
 Tavis Ormandy's write-up [6] suggests that disabling hyper-threading
 (which Qubes OS does by default) might reduce the impact to that of a
-denial-of-service attack, but we cannot completely rule out possibility
-of privilege escalation even with hyper-threading disabled.
+denial-of-service attack, but we cannot completely rule out the
+possibility of privilege escalation even with hyper-threading disabled.
 
 Affected systems
 -----------------

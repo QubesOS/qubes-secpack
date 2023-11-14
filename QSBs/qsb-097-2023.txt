@@ -39,7 +39,7 @@ for HVMs are in a position to exploit this vulnerability in order to
 attack other qubes. (Dom0 also runs in PV mode, but it is fully
 trusted.)
 
-Tavis Ormandy's research [6] suggests that disabling hyper-threading
+Tavis Ormandy's write-up [6] suggests that disabling hyper-threading
 (which Qubes OS does by default) might reduce the impact to that of a
 denial-of-service attack, but we cannot completely rule out possibility
 of privilege escalation even with hyper-threading disabled.

@@ -1,0 +1,87 @@
+
+             ---===[ Qubes Security Bulletin 097 ]===---
+
+                              2023-11-14
+
+                  Intel CPU Redundant Prefix Issue
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2023-11-14, Intel published INTEL-SA-00950, "2023.4 IPU Out-of-Band
+(OOB) - Intel® Processor Advisory" [3][4]:
+| Under certain microarchitectural conditions, Intel has identified
+| cases where execution of an instruction (REP MOVSB) encoded with a
+| redundant REX prefix may result in unpredictable system behavior
+| resulting in a system crash/hang, or, in some limited scenarios, may
+| allow escalation of privilege (EoP) from CPL3 to CPL0
+
+Impact
+-------
+
+On Qubes OS installations with affected CPUs, a VM running in PV mode
+may escalate their privileges to that of the host. Additionally, any
+VM may perform a denial-of-service (DoS) attack (host crash) against the
+host. In the default Qubes OS configuration, only the stubdomains for
+HVMs are in a position to exploit this vulnerability in order to
+attack other VMs. (Dom0 also runs in PV mode, but it is fully
+trusted.)
+Some research suggests that disabling hyper-threading (which Qubes OS
+does by default) reduces the impact to denial-of-service, but we
+cannot completely rule out possibility of privilege escalation even
+with hyper-threading disabled.
+
+Affected systems
+-----------------
+
+Only x86 Intel systems with CPU of 10th generation or newer are
+affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - microcode_ctl, version 2.1-56.qubes1
+
+  For Qubes 4.2, in dom0:
+  - microcode_ctl, version 2.1-56.qubes1
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+initramfs binaries.
+
+Credits
+--------
+
+See the original Intel security advisory
+TODO
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00950.html
+[4] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/redundant-prefix-issue.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

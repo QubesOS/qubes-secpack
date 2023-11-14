@@ -43,14 +43,11 @@ The impact is the same as of QSB-086:
 | stubdomains for HVMs are in a position to exploit this vulnerability
 | in order to attack other VMs. (Dom0 also runs in PV mode, but it is
 | fully trusted.)
-| 
-| Only certain AMD CPUs are affected. Please see AMD-SB-1040 [4] for the
-| official list of affected models.
 
 Affected systems
 -----------------
 
-Only x86 AMD systems are vulnerable.
+Only x86 AMD and Hygon systems are vulnerable.
 
 Patching
 ---------

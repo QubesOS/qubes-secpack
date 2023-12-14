@@ -1,0 +1,82 @@
+
+             ---===[ Qubes Security Bulletin 098 ]===---
+
+                              2023-12-14
+
+  CPU microcode updates not included with Dom0 kernel version 6.6.x
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+Linux 6.6.0 removed separate options for loading Intel and AMD
+microcode (CONFIG_MICROCODE_INTEL and CONFIG_MICROCODE_AMD). Only
+generic CONFIG_MICROCODE option remained. Dracut, the tool used for
+generating initramfs in dom0, includes microcode updates only when it
+detects it support in the Linux kernel and checks that based on
+CONFIG_MICROCODE_INTEL or CONFIG_MICROCODE_AMD option. Since
+vendor-specific options were removed, it concluded microcode loading
+is not supported and did not include them.
+The fix makes dracut check for CONFIG_MICROCODE instead, as done in
+the upstream dracut (yet unreleased) version.
+
+Impact
+-------
+
+Affected systems may be vulnerable to some speculative attacks - see
+earlier Qubes Security Bulletins for details.
+
+Affected systems
+-----------------
+
+Only systems running kernel-latest version 6.6.0 or newer in dom0 are
+affected. Only systems needing microcode updates loaded by the
+operating system are affected - systems having up to date microcode
+version loaded by the firmware are not affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - dracut-050-62.git20200529
+
+  For Qubes 4.2, in dom0:
+  - dracut-059-4
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+initramfs binaries.
+
+Credits
+--------
+
+Discovered by Marek Marczykowski-Górecki while debugging an issue
+reported by Thierry Laurion [3].
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://github.com/QubesOS/qubes-issues/issues/8763
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

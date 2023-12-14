@@ -3,7 +3,7 @@
 
                               2023-12-14
 
-  CPU microcode updates not included with Dom0 kernel version 6.6.x
+    CPU microcode updates not loaded with Dom0 kernel version 6.6.x
 
 User action
 ------------
@@ -15,16 +15,17 @@ required in response to this QSB.
 Summary
 --------
 
-Linux 6.6.0 removed separate options for loading Intel and AMD
-microcode (CONFIG_MICROCODE_INTEL and CONFIG_MICROCODE_AMD). Only
-generic CONFIG_MICROCODE option remained. Dracut, the tool used for
-generating initramfs in dom0, includes microcode updates only when it
-detects it support in the Linux kernel and checks that based on
-CONFIG_MICROCODE_INTEL or CONFIG_MICROCODE_AMD option. Since
-vendor-specific options were removed, it concluded microcode loading
-is not supported and did not include them.
-The fix makes dracut check for CONFIG_MICROCODE instead, as done in
-the upstream dracut (yet unreleased) version.
+The Linux kernel version 6.6.0 removed the previosuly separate options for
+loading Intel and AMD microcode (CONFIG_MICROCODE_INTEL and
+CONFIG_MICROCODE_AMD). Only the generic CONFIG_MICROCODE option remains.
+Dracut, the tool used for generating initramfs' in dom0, includes microcode
+updates only when it detects support in the Linux kernel and checks that by
+checking for the presence of CONFIG_MICROCODE_INTEL or CONFIG_MICROCODE_AMD in
+the config of the used kernel. Since the vendor-specific options were removed
+from Linux, dracut concluded microcode loading is not supported and did not
+include them in the generated initramfs. The fix makes dracut check for
+CONFIG_MICROCODE instead, as done in the yet unreleased upstream dracut
+version.
 
 Impact
 -------

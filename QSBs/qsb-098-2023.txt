@@ -1,9 +1,9 @@
 
              ---===[ Qubes Security Bulletin 098 ]===---
 
-                              2023-12-14
+                              2023-12-15
 
-    CPU microcode updates not loaded with Dom0 kernel version 6.6.x
+    CPU microcode updates not loaded with dom0 kernel version 6.6.x
 
 User action
 ------------
@@ -15,31 +15,39 @@ required in response to this QSB.
 Summary
 --------
 
-The Linux kernel version 6.6.0 removed the previosuly separate options for
-loading Intel and AMD microcode (CONFIG_MICROCODE_INTEL and
-CONFIG_MICROCODE_AMD). Only the generic CONFIG_MICROCODE option remains.
-Dracut, the tool used for generating initramfs' in dom0, includes microcode
-updates only when it detects support in the Linux kernel and checks that by
-checking for the presence of CONFIG_MICROCODE_INTEL or CONFIG_MICROCODE_AMD in
-the config of the used kernel. Since the vendor-specific options were removed
-from Linux, dracut concluded microcode loading is not supported and did not
-include them in the generated initramfs. The fix makes dracut check for
-CONFIG_MICROCODE instead, as done in the yet unreleased upstream dracut
-version.
+Linux kernel version 6.6.0 removed the CONFIG_MICROCODE_INTEL and
+CONFIG_MICROCODE_AMD options for loading Intel and AMD CPU microcode
+updates, respectively, leaving only the generic CONFIG_MICROCODE option.
+Dracut is the tool responsible for generating dom0's initramfs. It
+determines whether the Linux kernel supports microcode loading by
+checking for the presence of CONFIG_MICROCODE_INTEL or
+CONFIG_MICROCODE_AMD in the kernel's config. If present, dracut includes
+the appropriate microcode updates in the initramfs. In kernel versions
+6.6.0 and later, where the CONFIG_MICROCODE_INTEL and
+CONFIG_MICROCODE_AMD options have been removed, dracut concludes that
+microcode loading is not supported and does not include microcode
+updates in the initramfs. With the security updates described in the
+"Patching" section below, dracut checks for the presence of
+CONFIG_MICROCODE, which is also the case in an upcoming upstream dracut
+version that has not yet been released.
 
 Impact
 -------
 
-Affected systems may be vulnerable to some speculative attacks - see
-earlier Qubes Security Bulletins for details.
+On affected systems, CPU microcode updates are not loaded. CPU microcode
+updates are sometimes necessary in order to address important security
+vulnerabilities. If CPU microcode updates are not properly loaded, these
+security vulnerabilities may remain exploitable.
 
 Affected systems
 -----------------
 
-Only systems running kernel-latest version 6.6.0 or newer in dom0 are
-affected. Only systems needing microcode updates loaded by the
-operating system are affected - systems having up to date microcode
-version loaded by the firmware are not affected.
+All and only systems that satisfy both of the following conditions are
+affected:
+
+1. The system is running Linux kernel version 6.6.0 or later in dom0.
+2. The system's microcode updates must be loaded by the operating system
+   (as opposed to the firmware).
 
 Patching
 ---------

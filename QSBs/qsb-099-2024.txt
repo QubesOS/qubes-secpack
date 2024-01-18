@@ -16,27 +16,28 @@ Summary
 --------
 
 The policy.RegisterArgument service prints the whole qrexec policy due
-to a leftover debug messages.
+to a leftover debug message.
 
 Impact
 -------
 
 A qube that is given permission to call the policy.RegisterArgument
-service, can learn the whole qrexec policy. The default qrexec policy
-does not contain any secrets, but user may customize it to include
-qube names, tag names, custom service names and service arguments
-(like key handles for U2F/CTAP proxy).
+service can learn the whole qrexec policy. The default qrexec policy
+does not contain any secrets, but users can customize it to include qube
+names, tag names, custom service names, and service arguments (like key
+handles for the U2F/CTAP proxy).
 
 Affected systems
 -----------------
 
-In default configuration configuration no qube is allowed to use the
-policy.RegisterArgument service, but the U2F/CTAP proxy encourages
-allowing it for sys-usb. The Qubes Global Config graphical tool in
-Qubes OS 4.2 has a checkbox for it ("Enable registering new keys with
-the U2F Proxy service").
+Only Qubes OS 4.2 systems in which at least one qube is allowed to use
+the policy.RegisterArgument service are affected. In the default
+configuration, no qube is allowed to use this service, but users who use
+the U2F/CTAP proxy may enable sys-usb to use it, e.g., with the Qubes
+Global Config tool's "Enable registering new keys with the U2F Proxy
+service" option.
 
-Only Qubes OS 4.2 is affected, Qubes OS 4.1 is not affected.
+Qubes OS 4.1 is not affected.
 
 Patching
 ---------

@@ -1,0 +1,68 @@
+
+             ---===[ Qubes Security Bulletin 099 ]===---
+
+                             2024-01-19
+
+        Qrexec policy leak via policy.RegisterArgument service
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+The policy.RegisterArgument service prints the whole qrexec policy due
+to a leftover debug messages.
+
+Impact
+-------
+
+A qube that is given permission to call the policy.RegisterArgument
+service, can learn the whole qrexec policy. The default qrexec policy
+does not contain any secrets, but user may customize it to include
+qube names, tag names, custom service names and service arguments
+(like key handles for U2F/CTAP proxy).
+
+Affected systems
+-----------------
+
+In default configuration configuration no qube is allowed to use the
+policy.RegisterArgument service, but the U2F/CTAP proxy encourages
+allowing it for sys-usb. The Qubes Global Config graphical tool in
+Qubes OS 4.2 has a checkbox for it ("Enable registering new keys with
+the U2F Proxy service").
+
+Only Qubes OS 4.2 is affected, Qubes OS 4.1 is not affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - qubes-core-qrexec-dom0 version 4.2.17
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Credits
+--------
+
+The issue was discovered by Ben Grande.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

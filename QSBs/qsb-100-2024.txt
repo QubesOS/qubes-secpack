@@ -3,7 +3,7 @@
 
                               2024-01-30
 
-     pci: phantom functions assigned to incorrect contexts (XSA-449)
+  Incorrect handling of PCI devices with "phantom functions" (XSA-449)
 
 User action
 ------------
@@ -38,18 +38,19 @@ The impact as described by the Xen Project:
 | with phantom functions may be able to access memory from a previous
 | owner of the device.
 
-In Qubes OS this means a PCI device that should be assigned to some
-qube (like sys-net or sys-usb) may retain access to dom0 memory. Then
-that happens, malicious sys-net or sys-usb can compromise the whole
-system. But, malicious qube cannot itself cause this condition, as it
-happens before it is running. For such attack to be feasible, it needs
-to be combined with some other method to cause PCI device assignment
-to fail.
+In Qubes OS this means a PCI device that should be assigned to some qube
+(like sys-net or sys-usb) may retain access to dom0 memory. When that
+happens, the qube to which that device was assigned can compromise the
+whole system. But, a malicious qube cannot itself cause this condition,
+as it happens before it is running. For such attack to be feasible, it
+needs to be combined with some other method to cause PCI device
+assignment to fail.
 
 Affected systems
 -----------------
 
-All Qubes OS versions and hardware configurations are affected.
+All Qubes OS versions are affected. Only systems on which at lest one
+passed-through PCI device has "phantom functions" are affected.
 
 Patching
 ---------

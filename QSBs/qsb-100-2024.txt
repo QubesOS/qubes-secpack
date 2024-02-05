@@ -5,6 +5,12 @@
 
    Incorrect handling of PCI devices with phantom functions (XSA-449)
 
+Changelog
+----------
+
+2024-01-30: Original QSB published
+2024-02-XX: Revise language
+
 User action
 ------------
 

@@ -9,7 +9,7 @@ Changelog
 ----------
 
 2024-01-30: Original QSB published
-2024-02-XX: Revise language
+2024-02-06: Revise language
 
 User action
 ------------

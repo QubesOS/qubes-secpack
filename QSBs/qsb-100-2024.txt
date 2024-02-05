@@ -22,7 +22,7 @@ functions assigned to incorrect contexts" [3]:
 | that when enabled allows the device to generate requests using the IDs
 | of functions that are otherwise unpopulated.  This allows a device to
 | extend the number of outstanding requests.
-| 
+|
 | Such phantom functions need an IOMMU context setup, but failure to
 | setup the context is not fatal when the device is assigned.  Not
 | failing device assignment when such failure happens can lead to the
@@ -38,19 +38,19 @@ The impact as described by the Xen Project:
 | with phantom functions may be able to access memory from a previous
 | owner of the device.
 
-In Qubes OS this means a PCI device that should be assigned to some qube
-(like sys-net or sys-usb) may retain access to dom0 memory. When that
-happens, the qube to which that device is assigned can compromise the
-whole system. But, a malicious qube cannot itself cause this condition,
-as it happens before it is running. For such attack to be feasible, it
-needs to be combined with some other method to cause PCI device
-assignment to fail.
+In Qubes OS, this means that a PCI device assigned to some qube (like
+sys-net or sys-usb) can retain access to dom0 memory. When this happens,
+the qube to which the device is assigned can compromise the whole
+system. However, a malicious qube cannot itself cause this condition, as
+it occurs before the malicious qube starts running. For such an attack
+to be feasible, it would have to be combined with some other method for
+causing PCI device assignment to fail.
 
 Affected systems
 -----------------
 
-All Qubes OS versions are affected. Only systems on which at lest one
-passed-through PCI device has phantom functions are affected.
+Every Qubes OS system that has at least one passthrough PCI device with
+phantom functions is affected.
 
 Patching
 ---------

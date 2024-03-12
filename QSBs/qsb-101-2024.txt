@@ -1,0 +1,91 @@
+
+             ---===[ Qubes Security Bulletin 101 ]===---
+
+                              2024-03-12
+
+              x86: Register File Data Sampling (XSA-452)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2024-03-12, the Xen Project published XSA-452, "x86: Register File
+Data Sampling" [3]:
+| Intel have disclosed RFDS, Register File Data Sampling, affecting some
+| Atom cores.
+| 
+| This came from internal validation work.  There is no information
+| provided about how an attacker might go about inferring data from the
+| register files.
+
+For more details, see:
+* https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/register-file-data-sampling.html
+
+Impact
+-------
+
+An attacker might be able to infer the contents of data held previously
+in floating point, vector and/or integer register files on the same
+logical processor, including data from a more privileged context.
+
+Note: None of the vulnerable processors support HyperThreading, so there
+      is no instantaneous exposure of data from other threads.
+
+Affected systems
+-----------------
+
+RFDS is only known to affect certain Atom processors from Intel.  Other
+Intel CPUs, and CPUs from other hardware vendors are not known to be
+affected.
+
+RFDS affects Atom processors between the Goldmont and Gracemont
+microarchitectures.  This includes Alder Lake and Raptor Lake hybrid
+client systems which have a mix of Gracemont and other types of cores.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages version 4.16.6-7
+  - microcode_ctl 2.1-58.qubes1
+
+  For Qubes 4.2, in dom0:
+  - Xen packages version 4.17.3-4
+  - microcode_ctl 2.1-58.qubes1
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-452.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -3,7 +3,7 @@
 
                               2024-03-12
 
-              x86: Register File Data Sampling (XSA-452)
+                 Register File Data Sampling (XSA-452)
 
 User action
 ------------
@@ -24,27 +24,22 @@ Data Sampling" [3]:
 | provided about how an attacker might go about inferring data from the
 | register files.
 
-For more details, see:
-* https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/register-file-data-sampling.html
+For more details, see [4].
 
 Impact
 -------
 
 An attacker might be able to infer the contents of data held previously
 in floating point, vector and/or integer register files on the same
-logical processor, including data from a more privileged context.
-
-Note: None of the vulnerable processors support HyperThreading, so there
-      is no instantaneous exposure of data from other threads.
+core, including data from a more privileged context.
 
 Affected systems
 -----------------
 
-RFDS is only known to affect certain Atom processors from Intel.  Other
-Intel CPUs, and CPUs from other hardware vendors are not known to be
-affected.
+RFDS is only known to affect certain Atom cores from Intel.  Other Intel
+CPUs, and CPUs from other hardware vendors are not known to be affected.
 
-RFDS affects Atom processors between the Goldmont and Gracemont
+RFDS affects Atom cores between the Goldmont and Gracemont
 microarchitectures.  This includes Alder Lake and Raptor Lake hybrid
 client systems which have a mix of Gracemont and other types of cores.
 
@@ -85,6 +80,7 @@ References
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://xenbits.xen.org/xsa/advisory-452.html
+[4] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/register-file-data-sampling.html
 
 --
 The Qubes Security Team

@@ -50,12 +50,12 @@ The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
   For Qubes 4.1, in dom0:
-  - Xen packages version 4.16.6-7
-  - microcode_ctl 2.1-58.qubes1
+  - Xen packages version 4.14.6-7
+  - microcode_ctl 2.1-57.qubes1
 
   For Qubes 4.2, in dom0:
   - Xen packages version 4.17.3-4
-  - microcode_ctl 2.1-58.qubes1
+  - microcode_ctl 2.1-57.qubes1
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

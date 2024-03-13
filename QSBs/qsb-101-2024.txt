@@ -19,7 +19,7 @@ On 2024-03-12, the Xen Project published XSA-452, "x86: Register File
 Data Sampling" [3]:
 | Intel have disclosed RFDS, Register File Data Sampling, affecting some
 | Atom cores.
-| 
+|
 | This came from internal validation work.  There is no information
 | provided about how an attacker might go about inferring data from the
 | register files.
@@ -30,18 +30,19 @@ Impact
 -------
 
 An attacker might be able to infer the contents of data held previously
-in floating point, vector and/or integer register files on the same
+in floating point, vector, and/or integer register files on the same
 core, including data from a more privileged context.
 
 Affected systems
 -----------------
 
-RFDS is only known to affect certain Atom cores from Intel.  Other Intel
-CPUs, and CPUs from other hardware vendors are not known to be affected.
+At present, RFDS is known to affect only certain Atom cores from Intel.
+Other Intel CPUs and CPUs from other hardware vendors are not known to
+be affected.
 
 RFDS affects Atom cores between the Goldmont and Gracemont
-microarchitectures.  This includes Alder Lake and Raptor Lake hybrid
-client systems which have a mix of Gracemont and other types of cores.
+microarchitectures. This includes Alder Lake and Raptor Lake hybrid
+client systems that have a mix of Gracemont and other types of cores.
 
 Patching
 ---------

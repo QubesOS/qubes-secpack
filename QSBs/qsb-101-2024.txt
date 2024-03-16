@@ -3,13 +3,14 @@
 
                               2024-03-12
 
-                 Register File Data Sampling (XSA-452)
+              Register File Data Sampling (XSA-452) and
+     Intel Processor Return Predictions Advisory (INTEL-SA-00982)
 
 Changelog
 ----------
 
 2024-03-12: Original QSB
-2024-03-15: Add notes about INTEL-SA-00982
+2024-03-15: Add information about INTEL-SA-00982
 
 User action
 ------------
@@ -31,49 +32,44 @@ Data Sampling" [3]:
 | provided about how an attacker might go about inferring data from the
 | register files.
 
-For more details, see [4].
+For more information, see Intel's security advisory. [4]
 
-The set of microcode updates released on 2024-03-12 [5] by Intel that,
-together with changes in Xen (see the patching section), addresses the
-above issue also contains other fixes. Among them there's another issue
-that's likely in scope for QSBs. It's related to the return prediction
-of affected processors, refered to as INTEL-SA-00982/CVE-2023-38575 [6]:
+In addition, Intel published INTEL-SA-00982/CVE-2023-38575 [6] on the
+same day:
 
 | Non-transparent sharing of return predictor targets between contexts
 | in some Intel® Processors may allow an authorized user to potentially
 | enable information disclosure via local access.
 
-Unfortunately the available information about the second issue is very
-sparse.
+Information about this vulnerability is very sparse.
 
 Impact
 -------
 
-On systems affected by RFDS, an attacker might be able to infer the
-contents of data held previously in floating point, vector, and/or
-integer register files on the same core, including data from a more
-privileged context.
+On systems affected by Register File Data Sampling (RFDS), an attacker
+might be able to infer the contents of data previously held in floating
+point, vector, and/or integer register files on the same core, including
+data from a more privileged context.
 
-The exact impact on systems affected by INTEL-SA-00982 is not clear. An
-attacker might be able to leak information from other security contexts.
+On systems affected by INTEL-SA-00982, an attacker might be able to leak
+information from other security contexts, but the precise impact is
+unclear.
 
 Affected systems
 -----------------
 
-At present, RFDS is known to affect only certain Atom cores from Intel.
-Other Intel CPUs and CPUs from other hardware vendors are not known to
-be affected.
+At present, Register File Data Sampling (RFDS) is known to affect only
+certain Atom cores from Intel. Other Intel CPUs and CPUs from other
+hardware vendors are not known to be affected. RFDS affects Atom cores
+between the Goldmont and Gracemont microarchitectures. This includes
+Alder Lake and Raptor Lake hybrid client systems that have a mix of
+Gracemont and other types of cores.
 
-RFDS affects Atom cores between the Goldmont and Gracemont
-microarchitectures. This includes Alder Lake and Raptor Lake hybrid
-client systems that have a mix of Gracemont and other types of cores.
-
-Which systems are affected by INTEL-SA-00982 is currently not clear. At
-the time of writing the list [7] linked by Intel in it's advisory
-doesn't actually contain information for this issue. If you have a
-system that still receives microcode updates from Intel [8] and it got
-an update as part of the release on 2024-03-12 [5] it might be affected
-even if it is not affected by RFDS.
+At the time of this writing, Intel has not published information about
+which systems INTEL-SA-00982 affects. Systems that are still receiving
+microcode updates from Intel [7] and that received a microcode update as
+part of the microcode release on 2024-03-12 [5] may be affected, even if
+they are not affected by RFDS.
 
 Patching
 ---------
@@ -115,8 +111,7 @@ References
 [4] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/register-file-data-sampling.html
 [5] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20240312
 [6] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00982.html
-[7] https://www.intel.com/content/www/us/en/developer/topic-technology/software-security-guidance/processors-affected-consolidated-product-cpu-model.html
-[8] https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
+[7] https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
 
 --
 The Qubes Security Team

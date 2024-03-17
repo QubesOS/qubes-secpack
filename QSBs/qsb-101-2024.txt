@@ -10,7 +10,7 @@ Changelog
 ----------
 
 2024-03-12: Original QSB
-2024-03-15: Add information about INTEL-SA-00982
+2024-03-17: Add information about INTEL-SA-00982
 
 User action
 ------------

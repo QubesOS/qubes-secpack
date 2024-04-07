@@ -1,0 +1,121 @@
+
+             ---===[ Qubes Security Bulletin 102 ]===---
+
+                             2024-04-09
+
+ Speculative execution issues: Spectre-BHB, BTC/SRSO (XSA-455, XSA-456)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+
+The Xen Project published the following security advisories on
+2024-04-09:
+
+XSA-455 [3] "x86: Incorrect logic for BTC/SRSO mitigations":
+
+| Because of a logical error in XSA-422 (Branch Type Confusion), the
+| mitigation is not applied properly when it is intended to be used.
+| XSA-434 (Speculative Return Stack Overflow) uses the same
+| infrastructure, so is equally impacted.
+| 
+| For more details, see:
+|   https://xenbits.xen.org/xsa/advisory-422.html
+|   https://xenbits.xen.org/xsa/advisory-434.html
+
+XSA-456 [4] "x86: Native Branch History Injection":
+
+| In August 2022, researchers at VU Amsterdam disclosed Spectre-BHB.
+| 
+| Spectre-BHB was discussed in XSA-398.  At the time, the susceptibility
+| of Xen to Spectre-BHB was uncertain so no specific action was taken in
+| XSA-398.  However, various changes were made thereafter in upstream Xen
+| as a consequence; more on these later.
+| 
+| VU Amsterdam have subsequently adjusted the attack to be pulled off
+| entirely from userspace, without the aid of a managed runtime in the
+| victim context.
+| 
+| For more details, see:
+|   https://vusec.net/projects/ XXX - TBC
+|   https://vusec.net/projects/bhi-spectre-bhb
+|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
+|   https://xenbits.xen.org/xsa/advisory-398.html
+
+TODO: fill in the link above
+
+Impact
+-------
+
+On affected systems, an attacker might be able to infer the contents
+of arbitrary host memory, including memory assigned to other guests.
+More details can be read in QSB related to referenced issues:
+- QSB-077 [5] for XSA-389
+- QSB-086 [6] for XSA-422
+- QSB-093 [7] for XSA-434
+
+Affected systems
+-----------------
+
+For XSA-455, the affected systems are the same as in QSB-086 [6] and
+QSB-093 [7].
+For XSA-456, only Intel CPUs including eIBRS feature, available in
+CPUs from 2019 onwards. Presence of eIBRS feature can be checked by
+looking for `eibrs` in the "Dynamic Sets" section of the `xen-cpuid
+-v` command output. For example using this command:
+
+    xen-cpuid -v | sed -n '/^Dynamic/,$ { /eibrs/p }'
+
+Empty output means the CPU is not vulnerable to XSA-456 (but might
+still be vulnerable to XSA-455).
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - TODO
+
+  For Qubes 4.2, in dom0:
+  - TODO
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-398.html
+[4] https://xenbits.xen.org/xsa/advisory-398.html
+[5] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-077-2022.txt
+[6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-086-2022.txt
+[7] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-093-2023.txt
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

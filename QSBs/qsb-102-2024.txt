@@ -3,7 +3,8 @@
 
                              2024-04-09
 
- Speculative execution issues: Spectre-BHB, BTC/SRSO (XSA-455, XSA-456)
+           Multiple speculative-execution vulnerabilities:
+              Spectre-BHB, BTC/SRSO (XSA-455, XSA-456)
 
 User action
 ------------
@@ -14,7 +15,6 @@ required in response to this QSB.
 
 Summary
 --------
-
 
 The Xen Project published the following security advisories on
 2024-04-09:
@@ -36,8 +36,8 @@ XSA-456 [4] "x86: Native Branch History Injection":
 | 
 | Spectre-BHB was discussed in XSA-398.  At the time, the susceptibility
 | of Xen to Spectre-BHB was uncertain so no specific action was taken in
-| XSA-398.  However, various changes were made thereafter in upstream Xen
-| as a consequence; more on these later.
+| XSA-398.  However, various changes were made thereafter in upstream
+| Xen as a consequence; more on these later.
 | 
 | VU Amsterdam have subsequently adjusted the attack to be pulled off
 | entirely from userspace, without the aid of a managed runtime in the
@@ -54,27 +54,31 @@ TODO: fill in the link above
 Impact
 -------
 
-On affected systems, an attacker might be able to infer the contents
-of arbitrary host memory, including memory assigned to other guests.
-More details can be read in QSB related to referenced issues:
-- QSB-077 [5] for XSA-389
-- QSB-086 [6] for XSA-422
-- QSB-093 [7] for XSA-434
+On affected systems, an attacker who manages to compromise a qube may be
+able to use it to infer the contents of arbitrary system memory,
+including memory assigned to other qubes. For more information, see:
+
+ - QSB-077 [5] for XSA-389
+ - QSB-086 [6] for XSA-422
+ - QSB-093 [7] for XSA-434
 
 Affected systems
 -----------------
 
 For XSA-455, the affected systems are the same as in QSB-086 [6] and
 QSB-093 [7].
-For XSA-456, only Intel CPUs including eIBRS feature, available in
-CPUs from 2019 onwards. Presence of eIBRS feature can be checked by
-looking for `eibrs` in the "Dynamic Sets" section of the `xen-cpuid
--v` command output. For example using this command:
+
+For XSA-456, only Intel CPUs with the eIBRS feature (available since
+2019) are affected. You can check for the presence of the eIBRS feature
+by looking for "eibrs" in the "Dynamic Sets" section of the `xen-cpuid
+-v` command output. For example, you can execute the following command
+in dom0:
 
     xen-cpuid -v | sed -n '/^Dynamic/,$ { /eibrs/p }'
 
-Empty output means the CPU is not vulnerable to XSA-456 (but might
-still be vulnerable to XSA-455).
+Empty output means that the CPU is not vulnerable to XSA-456.
+
+TODO: What about non-empty output?
 
 Patching
 ---------
@@ -110,8 +114,8 @@ References
 
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
-[3] https://xenbits.xen.org/xsa/advisory-398.html
-[4] https://xenbits.xen.org/xsa/advisory-398.html
+[3] https://xenbits.xen.org/xsa/advisory-455.html
+[4] https://xenbits.xen.org/xsa/advisory-456.html
 [5] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-077-2022.txt
 [6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-086-2022.txt
 [7] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-093-2023.txt

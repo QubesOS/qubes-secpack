@@ -21,7 +21,7 @@ The Xen Project published the following security advisories on
 
 XSA-455 [3] "x86: Incorrect logic for BTC/SRSO mitigations":
 
-| Because of a logical error in XSA-422 (Branch Type Confusion), the
+| Because of a logical error in XSA-407 (Branch Type Confusion), the
 | mitigation is not applied properly when it is intended to be used.
 | XSA-434 (Speculative Return Stack Overflow) uses the same
 | infrastructure, so is equally impacted.
@@ -44,12 +44,10 @@ XSA-456 [4] "x86: Native Branch History Injection":
 | victim context.
 | 
 | For more details, see:
-|   https://vusec.net/projects/ XXX - TBC
+|   https://vusec.net/projects/native-bhi
 |   https://vusec.net/projects/bhi-spectre-bhb
 |   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
 |   https://xenbits.xen.org/xsa/advisory-398.html
-
-TODO: fill in the link above
 
 Impact
 -------
@@ -59,13 +57,13 @@ able to use it to infer the contents of arbitrary system memory,
 including memory assigned to other qubes. For more information, see:
 
  - QSB-077 [5] for XSA-389
- - QSB-086 [6] for XSA-422
+ - QSB-083 [6] for XSA-407
  - QSB-093 [7] for XSA-434
 
 Affected systems
 -----------------
 
-For XSA-455, the affected systems are the same as in QSB-086 [6] and
+For XSA-455, the affected systems are the same as in QSB-083 [6] and
 QSB-093 [7].
 
 For XSA-456, only Intel CPUs with the eIBRS feature (available since
@@ -116,7 +114,7 @@ References
 [3] https://xenbits.xen.org/xsa/advisory-455.html
 [4] https://xenbits.xen.org/xsa/advisory-456.html
 [5] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-077-2022.txt
-[6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-086-2022.txt
+[6] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-083-2022.txt
 [7] https://github.com/QubesOS/qubes-secpack/blob/master/QSBs/qsb-093-2023.txt
 
 --

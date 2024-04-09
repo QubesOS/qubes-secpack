@@ -76,9 +76,8 @@ in dom0:
 
     xen-cpuid -v | sed -n '/^Dynamic/,$ { /eibrs/p }'
 
-Empty output means that the CPU is not vulnerable to XSA-456.
-
-TODO: What about non-empty output?
+Empty output means that XSA-456 does not affect the CPU, while non-empty
+output means that XSA-456 does affect the CPU.
 
 Patching
 ---------

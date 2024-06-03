@@ -8,7 +8,7 @@ Statements
 The Qubes security team members who have digitally signed this file [1]
 state the following:
 
-1. The date of issue of this canary is June 03, 2024.
+1. The date of issue of this canary is June TODO, 2024.
 
 2. There have been 102 Qubes security bulletins published so far.
 
@@ -29,7 +29,9 @@ state the following:
 Special announcements
 ----------------------
 
-None.
+We created a new Release Signing Key (RSK) [3] for Qubes OS 4.3. Going forward
+we plan to create a new RSK for each new release, not only for releases with a
+increased major version number.
 
 
 Disclaimers and notes
@@ -60,31 +62,7 @@ the statements made here.
 Proof of freshness
 -------------------
 
-Mon, 03 Jun 2024 10:51:05 +0000
-
-Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
-Rwanda Classified: Europe's Deals with an Autocrat
-New Hatred for Politicians: Why Are Attacks and Incitement on the Rise in Germany?
-Fish Farming in Iceland: Invasion of the Zombie Salmon
-The Landgrab in Ukraine: Russia Moves to Expropriate Homes in Occupied Regions
-Alternative for Germany (AfD): How the far-right party became the Long Arm of Russia and China
-
-Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
-Middle East Crisis: Israel’s Offensive in Southern Gaza Strains Ties With Egypt
-Netanyahu May Face a Choice Between a Truce and His Government’s Survival
-Mexico Elects Claudia Sheinbaum as First Woman to Lead Country
-E.U. Elections Could Leave Hard Right Stumbling Over Its Own Decisions
-In Former Soviet States, a Tug of War Between East and West
-
-Source: BBC News (https://feeds.bbci.co.uk/news/world/rss.xml)
-Mexico elects Claudia Sheinbaum as first woman president
-Nigeria strike: ‘My monthly pay won't buy a bag of rice’
-US expects Israel will accept Gaza ceasefire plan if Hamas does
-Heat kills more than 50 people in India in three days
-Missing Cryptoqueen’s murky links to Bulgarian underworld
-
-Source: Blockchain.info
-000000000000000000004c800b82da2657793d378d33f25896068433ac01b74f
+TODO
 
 
 Footnotes
@@ -98,6 +76,8 @@ corresponding qubes-secpack.git repo tags. [2]
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
+
+[3] https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys
 
 --
 The Qubes Security Team

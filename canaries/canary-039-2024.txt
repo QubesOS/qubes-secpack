@@ -1,0 +1,104 @@
+
+                    ---===[ Qubes Canary 039 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is June 03, 2024.
+
+2. There have been 102 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of September 2024. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+
+Proof of freshness
+-------------------
+
+Mon, 03 Jun 2024 10:51:05 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Rwanda Classified: Europe's Deals with an Autocrat
+New Hatred for Politicians: Why Are Attacks and Incitement on the Rise in Germany?
+Fish Farming in Iceland: Invasion of the Zombie Salmon
+The Landgrab in Ukraine: Russia Moves to Expropriate Homes in Occupied Regions
+Alternative for Germany (AfD): How the far-right party became the Long Arm of Russia and China
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Middle East Crisis: Israel’s Offensive in Southern Gaza Strains Ties With Egypt
+Netanyahu May Face a Choice Between a Truce and His Government’s Survival
+Mexico Elects Claudia Sheinbaum as First Woman to Lead Country
+E.U. Elections Could Leave Hard Right Stumbling Over Its Own Decisions
+In Former Soviet States, a Tug of War Between East and West
+
+Source: BBC News (https://feeds.bbci.co.uk/news/world/rss.xml)
+Mexico elects Claudia Sheinbaum as first woman president
+Nigeria strike: ‘My monthly pay won't buy a bag of rice’
+US expects Israel will accept Gaza ceasefire plan if Hamas does
+Heat kills more than 50 people in India in three days
+Missing Cryptoqueen’s murky links to Bulgarian underworld
+
+Source: Blockchain.info
+000000000000000000004c800b82da2657793d378d33f25896068433ac01b74f
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

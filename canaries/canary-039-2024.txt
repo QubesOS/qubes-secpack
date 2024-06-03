@@ -29,10 +29,14 @@ state the following:
 Special announcements
 ----------------------
 
-We created a new Release Signing Key (RSK) [3] for Qubes OS 4.3. Going forward
-we plan to create a new RSK for each new release, not only for releases with a
-increased major version number.
-
+Beginning with Qubes OS 4.3, there will be a new release signing key
+(RSK) [3] for every new Qubes OS release. Previously, our policy was to
+have one RSK for every major release (e.g., a single RSK for the entire
+Qubes OS 4 release series, beginning with Qubes OS 4.0.0). [4] Under the
+new policy, we will create a new RSK not only for every major release
+but also for every minor release (e.g., "4.3") and patch release (e.g.,
+"4.3.1"). We are including this notice as a canary special announcement
+since it constitutes a change in our RSK management policy.
 
 Disclaimers and notes
 ----------------------
@@ -78,6 +82,11 @@ digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
 
 [3] https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys
+
+[4] As explained in the special announcement in Qubes Canary 032
+(https://www.qubes-os.org/news/2022/09/14/canary-032/), the creation
+of a new RSK for Qubes OS 4.2 was an exception to the RSK policy at
+the time.
 
 --
 The Qubes Security Team

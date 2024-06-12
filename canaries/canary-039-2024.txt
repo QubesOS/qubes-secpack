@@ -38,6 +38,13 @@ release but also for every minor release (e.g., "4.3"). We are including
 this notice as a canary special announcement since it constitutes a
 change in our RSK management policy.
 
+The motivation behind this change is that it reduces the scope and usage
+duration of a RSK, which is in general good practice. Switching to a new
+RSK for each new release branch is technically and organizational easy
+to implement, unlike, for example, a time based scheme, which might
+require rotation of keys mid release.
+
+
 Disclaimers and notes
 ----------------------
 

@@ -30,13 +30,13 @@ Special announcements
 ----------------------
 
 Beginning with Qubes OS 4.3, there will be a new release signing key
-(RSK) [3] for every new Qubes OS release. Previously, our policy was to
-have one RSK for every major release (e.g., a single RSK for the entire
-Qubes OS 4 release series, beginning with Qubes OS 4.0.0). [4] Under the
-new policy, we will create a new RSK not only for every major release
-but also for every minor release (e.g., "4.3") and patch release (e.g.,
-"4.3.1"). We are including this notice as a canary special announcement
-since it constitutes a change in our RSK management policy.
+(RSK) [3] for every new Qubes OS release branch. Previously, our policy
+was to have one RSK for every major release (e.g., a single RSK for the
+entire Qubes OS 4 release series, beginning with Qubes OS 4.0). [4]
+Under the new policy, we will create a new RSK not only for every major
+release but also for every minor release (e.g., "4.3"). We are including
+this notice as a canary special announcement since it constitutes a
+change in our RSK management policy.
 
 Disclaimers and notes
 ----------------------

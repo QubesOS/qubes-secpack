@@ -2,7 +2,7 @@ This repository contains various PGP keys used throughout the Qubes OS Project.
 
 - `master-key/` contains the [Qubes Master Signing Key (QMSK)](https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-the-qubes-master-signing-key), which is used to sign certain other security-critical keys.
 
-- `release-keys/` contains [release signing keys (RSKs)](https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys), which are used to sign Qubes OS installation images and dom0 packages.
+- `release-keys/` contains [release signing keys (RSKs)](https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys), which are used to sign Qubes OS installation images (ISOs) and dom0 packages.
 
 - `core-devs/` contains keys belonging to Qubes core developers. These keys are used to sign Git version and release tags in source code repositories.
 

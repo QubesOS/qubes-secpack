@@ -30,19 +30,23 @@ Special announcements
 ----------------------
 
 Beginning with Qubes OS 4.3, there will be a new release signing key
-(RSK) [3] for every new Qubes OS release branch. Previously, our policy
-was to have one RSK for every major release (e.g., a single RSK for the
-entire Qubes OS 4 release series, beginning with Qubes OS 4.0). [4]
-Under the new policy, we will create a new RSK not only for every major
-release but also for every minor release (e.g., "4.3"). We are including
-this notice as a canary special announcement since it constitutes a
-change in our RSK management policy.
+(RSK) [3] for every new major and minor Qubes OS release. [4] Until now,
+our policy has been to have one RSK for every major release (e.g., a
+single RSK for the entire Qubes OS 4 release series, beginning with
+Qubes OS 4.0). [5] Under the new policy, in addition to creating a new
+RSK for every major release (e.g., 4.0), we will also create a new RSK
+for every minor release (e.g., 4.3). Patch releases (e.g., 4.0.4 and
+4.3.1) will use the same RSKs as their respective major and minor
+releases. (For example, 4.0.4 would use the 4.0 RSK, while 4.3.1 would
+use the 4.3 RSK.)
 
-The motivation behind this change is that it reduces the scope and usage
-duration of a RSK, which is in general good practice. Switching to a new
-RSK for each new release branch is technically and organizational easy
-to implement, unlike, for example, a time based scheme, which might
-require rotation of keys mid release.
+We are including this notice as a canary special announcement since it
+constitutes a change in our RSK management policy. The goal of this
+change is to reduce the scope and duration for which RSKs are used,
+which is a good key management practice in general. Creating a new RSK
+for each new major and minor release is technically and organizationally
+easy to implement, unlike, for example, a time-based scheme, which could
+require rotating keys mid-release.
 
 
 Disclaimers and notes
@@ -88,9 +92,13 @@ corresponding qubes-secpack.git repo tags. [2]
 digital signatures! Instructions for doing so are documented here:
 https://www.qubes-os.org/security/pack/
 
-[3] https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys
+[3] For a guide to release signing keys (RSKs), see:
+https://www.qubes-os.org/security/verifying-signatures/#how-to-import-and-authenticate-release-signing-keys
 
-[4] As explained in the special announcement in Qubes Canary 032
+[4] For an explanation of Qubes OS release versioning, see:
+https://www.qubes-os.org/doc/version-scheme/
+
+[5] As explained in the special announcement in Qubes Canary 032
 (https://www.qubes-os.org/news/2022/09/14/canary-032/), the creation
 of a new RSK for Qubes OS 4.2 was an exception to the RSK policy at
 the time.

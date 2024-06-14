@@ -8,7 +8,7 @@ Statements
 The Qubes security team members who have digitally signed this file [1]
 state the following:
 
-1. The date of issue of this canary is June TODO, 2024.
+1. The date of issue of this canary is June 14, 2024.
 
 2. There have been 102 Qubes security bulletins published so far.
 
@@ -77,7 +77,31 @@ the statements made here.
 Proof of freshness
 -------------------
 
-TODO
+Fri, 14 Jun 2024 00:34:33 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+My Jewish Family History: The Optimists Ended Up in Auschwitz
+Fortress Europe: Migrants Abandoned on the Edge of the Sahara
+Israel-Gaza-War: Why the Founder of Human Rights Watch Accuses Israel of Genocide
+Populist Push: Europe's Right Wing Eyes a Post-Election Alliance
+Rwanda Classified: Europe's Deals with an Autocrat
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Middle East Crisis: Hezbollah Again Fires Rockets Into Northern Israel as Border Clashes Intensify
+G7 Leaders Agree on Plan for $50 Billion Loan to Ukraine
+Blinken Calls Hamas Changes to Gaza Cease-Fire Proposal Unworkable
+What We Know About the U.N. Report on Israeli and Palestinian War Crimes
+G7 Leaders Gather in Italy to Discuss an Unruly World
+
+Source: BBC News (https://feeds.bbci.co.uk/news/world/rss.xml)
+Tesla investors back record-breaking Musk pay deal
+G7 agrees $50bn loan for Ukraine from Russian assets
+Supreme Court rejects challenge to restrict abortion drug access
+Trump visits Capitol Hill for first time since Jan 6 riot
+S Africa's ANC edging closer to forming unity government
+
+Source: Blockchain.info
+000000000000000000020b40ab12d314b072eff36605e539ebb09c7c57f89242
 
 
 Footnotes

@@ -1,0 +1,105 @@
+
+             ---===[ Qubes Security Bulletin 103 ]===---
+
+                             2024-07-16
+
+          Double unlock in x86 guest IRQ handling (XSA-458)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2024-07-16, the Xen Project published XSA-458, "double unlock in
+x86 guest IRQ handling" [3]:
+| An optional feature of PCI MSI called "Multiple Message" allows a
+| device to use multiple consecutive interrupt vectors.  Unlike for MSI-X,
+| the setting up of these consecutive vectors needs to happen all in one
+| go.  In this handling an error path could be taken in different
+| situations, with or without a particular lock held.  This error path
+| wrongly releases the lock even when it is not currently held.
+
+
+Impact
+-------
+
+A qube with PCI device with multi-vector MSI capability may be able to
+compromise the whole host. In default Qubes OS configuration that
+applies to sys-net and/or sys-usb.
+
+
+Affected systems
+-----------------
+
+Both Qubes OS 4.1 and 4.2 versions are affected.
+
+Only systems with multi-vector MSI capable PCI devices that are
+assigned to some qube are vulnerable. Network cards with multi-vector
+MSI are not common, but USB controllers with this capability are.
+
+This can be checked using `lspci` utility on a specific device. For
+example, to check USB controller assigned to sys-usb:
+
+    $ qvm-pci ls sys-usb
+    BACKEND:DEVID  DESCRIPTION                            USED BY
+    dom0:00_14.0   USB controller: Intel Corporation ...  sys-usb (no-strict-reset=True)
+    
+Replace "_" with ":" in the DEVID field and use `lspci -vvs` on it:
+
+    $ sudo lspci -vvs 00:14.0
+    00:14.0 USB controller: Intel Corporation ...
+    ...
+        Capabilities: [80] MSI: Enable+ Count=1/8 Maskable- 64bit+
+            Address: 00000000fee01078  Data: 0000
+
+The important part is "MSI" capability line - `Count=1/8` means it
+supports 8 vector, so it is a multi-vector capable device. If there is
+`Count=1/1`, or no "MSI" capability at all, this device does not allow
+performing the attack. Note the issue applies only to "MSI", and not
+"MSI-X".
+
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.1, in dom0:
+  - Xen packages, version 4.14.6-10
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.4-4
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-458.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

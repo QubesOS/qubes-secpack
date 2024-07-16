@@ -37,35 +37,6 @@ Affected systems
 
 Both Qubes OS 4.1 and 4.2 are affected.
 
-Only systems with multi-vector-MSI-capable PCI devices that are assigned
-to some qube are vulnerable. Network cards with multi-vector MSI are not
-common, but USB controllers with this capability are.
-
-You can check for this capability by using the `lspci` utility on a
-specific device. For example, to check the USB controller assigned to
-sys-usb, begin by finding the device ID:
-
-    $ qvm-pci ls sys-usb
-    BACKEND:DEVID  DESCRIPTION                            USED BY
-    dom0:00_14.0   USB controller: Intel Corporation ...  sys-usb (no-strict-reset=True)
-    
-Next, replace "_" with ":" in the "DEVID" value and use `lspci -vvs` on
-it:
-
-    $ sudo lspci -vvs 00:14.0
-    00:14.0 USB controller: Intel Corporation ...
-    ...
-        Capabilities: [80] MSI: Enable+ Count=1/8 Maskable- 64bit+
-            Address: 00000000fee01078  Data: 0000
-
-The important part is the "MSI" capability line. "Count=1/8" means that
-it supports 8 vectors, so it's a multi-vector-capable device. If the
-output is "Count=1/1" or if there's no "MSI" capability at all, then the
-device is not vulnerable.
-
-Note: The vulnerability discussed in this QSB applies only to "MSI," not
-"MSI-X."
-
 Patching
 ---------
 

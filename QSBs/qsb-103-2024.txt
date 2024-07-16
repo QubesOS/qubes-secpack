@@ -15,41 +15,42 @@ required in response to this QSB.
 Summary
 --------
 
-On 2024-07-16, the Xen Project published XSA-458, "double unlock in
-x86 guest IRQ handling" [3]:
+On 2024-07-16, the Xen Project published XSA-458, "double unlock in x86
+guest IRQ handling" [3]:
 | An optional feature of PCI MSI called "Multiple Message" allows a
-| device to use multiple consecutive interrupt vectors.  Unlike for MSI-X,
-| the setting up of these consecutive vectors needs to happen all in one
-| go.  In this handling an error path could be taken in different
+| device to use multiple consecutive interrupt vectors.  Unlike for
+| MSI-X, the setting up of these consecutive vectors needs to happen all
+| in one go.  In this handling an error path could be taken in different
 | situations, with or without a particular lock held.  This error path
 | wrongly releases the lock even when it is not currently held.
-
 
 Impact
 -------
 
-A qube with PCI device with multi-vector MSI capability may be able to
-compromise the whole host. In default Qubes OS configuration that
-applies to sys-net and/or sys-usb.
-
+An attacker who compromises a qube with an attached PCI device that has
+multi-vector MSI capability (e.g., sys-net or sys-usb in the default
+Qubes OS configuration) can attempt to exploit this vulnerability in
+order to compromise Qubes OS.
 
 Affected systems
 -----------------
 
-Both Qubes OS 4.1 and 4.2 versions are affected.
+Both Qubes OS 4.1 and 4.2 are affected.
 
-Only systems with multi-vector MSI capable PCI devices that are
-assigned to some qube are vulnerable. Network cards with multi-vector
-MSI are not common, but USB controllers with this capability are.
+Only systems with multi-vector-MSI-capable PCI devices that are assigned
+to some qube are vulnerable. Network cards with multi-vector MSI are not
+common, but USB controllers with this capability are.
 
-This can be checked using `lspci` utility on a specific device. For
-example, to check USB controller assigned to sys-usb:
+You can check for this capability by using the `lspci` utility on a
+specific device. For example, to check the USB controller assigned to
+sys-usb, begin by finding the device ID:
 
     $ qvm-pci ls sys-usb
     BACKEND:DEVID  DESCRIPTION                            USED BY
     dom0:00_14.0   USB controller: Intel Corporation ...  sys-usb (no-strict-reset=True)
     
-Replace "_" with ":" in the DEVID field and use `lspci -vvs` on it:
+Next, replace "_" with ":" in the "DEVID" value and use `lspci -vvs` on
+it:
 
     $ sudo lspci -vvs 00:14.0
     00:14.0 USB controller: Intel Corporation ...
@@ -57,12 +58,13 @@ Replace "_" with ":" in the DEVID field and use `lspci -vvs` on it:
         Capabilities: [80] MSI: Enable+ Count=1/8 Maskable- 64bit+
             Address: 00000000fee01078  Data: 0000
 
-The important part is "MSI" capability line - `Count=1/8` means it
-supports 8 vector, so it is a multi-vector capable device. If there is
-`Count=1/1`, or no "MSI" capability at all, this device does not allow
-performing the attack. Note the issue applies only to "MSI", and not
-"MSI-X".
+The important part is the "MSI" capability line. "Count=1/8" means that
+it supports 8 vectors, so it's a multi-vector-capable device. If the
+output is "Count=1/1" or if there's no "MSI" capability at all, then the
+device is not vulnerable.
 
+Note: The vulnerability discussed in this QSB applies only to "MSI," not
+"MSI-X."
 
 Patching
 ---------

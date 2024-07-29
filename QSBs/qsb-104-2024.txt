@@ -3,7 +3,7 @@
 
                               2024-07-29
 
-           Keyboard autorepeat and icon color in Xfce issues
+                      GUI-related security bugs
 
 User action
 ------------
@@ -15,86 +15,105 @@ required in response to this QSB.
 Summary
 --------
 
-There were two GUI-related issues reported:
+This QSB concerns two separate GUI-related bugs with potential security
+implications:
 
-1. Keyboard auto-repeat feature may cause opening a file that user
-meant to copy to another qube. Selecting "copy to another qube" option
-in a file manager using enter key (instead of clicking), may cause the
-selected file to be opened in the source qube too.
+1. If the keyboard auto-repeat feature is enabled both in dom0 and in an
+   app qube, and the user attempts to select either the "Copy to other
+   qube..." or "Move to other qube..." context menu option on a file in
+   that app qube's graphical file manager using the Enter key (rather
+   than clicking on it with the mouse cursor), the keyboard auto-repeat
+   feature can cause the selected file to be opened in the source qube.
 
-2. Taskbar in Xfce incorrectly handles application icons, resulting in
-wrong colors. A malicious qube can set an icon that will appear as a
-different color in the taskbar. Window decorations (frames and icon in
-the window) as well as icon in application switcher (alt+tab) are not
-affected.
+2. The Xfce taskbar in dom0 incorrectly handles application icons, which
+   can result in some application icons being the wrong color.
 
 Impact
 -------
 
-For the first issue, depending on user habits, a malicious file may be
-opened in a wrong qube, potentially compromising it. For example if
-user receives a file via email, saves it in the email qube and then
-attempt to copy it to another qube, the file may be opened still in
-the email qube.
+The impact of the first bug depends on the user's habits. If the user
+intends to copy a file to another qube before opening it, this bug could
+result in that file being opened in the wrong qube, potentially
+compromising it. For example, if the user receives a file via email,
+saves it in the email qube, then attempts to copy it to another qube,
+this bug could result in the file being opened in the email qube.
 
-For the second issue, a malicious application may attempt to disguise
-itself as belonging to another qube. But note only the icon on the
-taskbar is affected, application borders, title bar and icon in the
-application switcher will still have the correct color.
+An attacker who manages to compromise a qube or an application running
+inside of a qube could attempt to exploit the second bug in order to
+make an application icon from that qube appear in dom0's Xfce taskbar
+with a color different from that qube's true color label. For example,
+an attacker who controls an application in a qube with the yellow color
+label could cause that application's icon to have the color green in the
+taskbar in an attempt to deceive or confuse the user. This bug affects
+only application icon colors in dom0's Xfce taskbar. It does not affect
+other window decorations (i.e., window borders, title bars, or icons in
+title bars), nor does it affect icons that appear when switching between
+windows with Alt + Tab.
 
 Affected systems
 -----------------
 
-The first issue affects all supported versions of Qubes OS (4.1 and
-4.2).
+The first bug affects both Qubes OS 4.1 and Qubes OS 4.2.
 
-The second issue affects only Qubes OS 4.2 and only Xfce environment.
+The second bug affects only Qubes OS 4.2 when using the Xfce desktop
+environment, which is the default desktop environment.
 
-Details
--------
+Discussion
+-----------
 
-The first issue, regarding keyboard auto-repeat happens because app
-qube has key auto-repeat enabled, in addition to having it enabled in
-dom0. App qube (intentionally) do not see all keyboard events, but
-only those sent focused applications from that qube. This means, if a
-focus is switched when some key is pressed, it may appear pressed much
-longer (until that qube regains focus, and key is released) than it
-really was. This makes the auto-repeat generating much more events
-than it should. In this particular case, when user selects "copy to
-another qube" option, focus is switched to the qrexec prompt and that
-enter key may appear to be pressed the whole time while user interacts
-with the qrexec prompt. Due to the auto-repeat feature, this may
-generate further "key press" events that later are interpreted by the
-file manager as a request to open the file normally.
-What should happen is the qube see just one "key press" even and
-(possibly much later) one "key release" event. And this is exactly
-what happens when the in-qube key auto-repeat is disabled.
-Note: one might consider sending synthetic "key release" event for any
-key that is still pressed when an application looses focus, but that
-will also cause extra keys being delivered when the applications gains
-focus again (for example when some key is pressed when user clicks on
-different applications).
+The first bug can occur if, and only if, the keyboard auto-repeat
+feature is enabled in both dom0 and an app qube. By design, app qubes do
+not "see" all keyboard events. Instead, they see only the keyboard
+events that are sent when a window belonging to that qube is in focus.
+Therefore, if focus switches from one qube's window to another's while a
+key is being pressed, it may appear to the former qube that the key was
+pressed for much longer than it actually was. In particular, the former
+qube may "believe" that the key is being pressed until a window
+belonging to that qube regains focus and the key is released.
+Consequently, the auto-repeat feature generates far more events than it
+should.
 
-The second issue is caused by wrong interpretation of the icon by the
-libwnck3 library (that is used by Xfce's "Window Buttons" widget).
-Window icon is stored in a `_NET_WM_ICON` window property in an ARGB
-format. The upstream version of the library correctly converts ARGB
-format into RGBA and then loads it into `GdkPixbuf` object that is later
-used by the taskbar. But the package in Fedora has extra patches that
-adds support for HiDPI scaling and changes `GdkPixbuf` to
-`cairo_surface_t`. The latter has native support for
-`CAIRO_FORMAT_ARGB32` format so the manual conversion is removed. The
-issue is that `ARGB` and `CAIRO_FORMAT_ARGB32` have subtle difference
-related to transparency - the latter assumes color channels are
-pre-multiplied by the alpha channel[3], but they aren't in the former.
-Malicious application can use this issue to influence color channels
-after the icon has been colored to the qube color, completely changing
-the color in some cases. Specifically, by adjusting alpha channel, it
-may wrap high color values into low ones - for example pixel with
-R=255, G=250, B=0, A=254 should appear as yellow, but red channel will
-be wrapped to 0 (as the valid range with A=254 in cairo format is
-0-254), resulting in a green pixel. The issue is present in Fedora's
-libwnck3 package since Fedora 34[4].
+In this particular case, when the user selects either the "Copy to other
+qube..." or "Move to other qube..." option, focus switches to the qrexec
+prompt in dom0, and the Enter key may appear to the app qube to be
+pressed the whole time while the user interacts with the qrexec prompt.
+Due to the auto-repeat feature, this may generate further "key press"
+events that are later interpreted by the file manager as requests to
+open the file normally.
+
+What should happen instead is that the qube should see just one "key
+press" event and (possibly much later) one "key release" event, and this
+is exactly what happens when the auto-repeat feature is disabled in the
+qube. (Note: One might consider sending a synthetic "key release" event
+for any key that is still being pressed when an application loses focus,
+but that would cause extra key presses to be delivered when the
+application regains focus.)
+
+The second bug is caused by the libwnck3 library (which is used by
+Xfce's "Window Buttons" widget) interpreting icons incorrectly. Each
+window icon is stored in a `_NET_WM_ICON` window property in an ARGB
+format. The upstream version of the library correctly converts this ARGB
+format into RGBA, then loads it into a `GdkPixbuf` object, which is
+later used by the taskbar. However, the Fedora package has extra patches
+that add support for HiDPI scaling, which changes `GdkPixbuf` to
+`cairo_surface_t`. The latter has native support for the
+`CAIRO_FORMAT_ARGB32` format, so the manual conversion was removed.
+
+The problem is that `ARGB` and `CAIRO_FORMAT_ARGB32` have subtle
+differences related to transparency. The latter assumes that color
+channels are pre-multiplied by the alpha channel, [3] but this isn't the
+case in `ARGB`. An attacker could attempt to exploit this vulnerability
+in order to manipulate color channels after the icon has been colored in
+accordance with the qube's color label, completely changing the icon's
+color in some cases. Specifically, by adjusting the alpha channel, it
+may be possible to wrap high color values into low ones. For example, a
+pixel with the values R=255, G=250, B=0, and A=254 should appear as
+yellow. However, due to the pre-multiplied format, the alpha channel
+determines the valid range for color channels. In this case, setting
+A=254 results in a valid range of 0-254 for the R, G, and B color
+channels. Since R=255 is outside of this range, the red channel would
+wrap to zero, resulting in a green pixel. This bug has been present in
+Fedora's libwnck3 package since Fedora 34. [4]
 
 Patching
 ---------
@@ -117,13 +136,12 @@ via the Qubes Update tool or its command-line equivalents. [1]
 User session and all qubes must be restarted afterward in order for
 the updates to take effect.
 
-
 Credits
 --------
 
-The first issue was reported by Maurice Kayser.
+The first bug was reported by Maurice Kayser.
 
-The second issue was reported by Kamil Aronowski.
+The second bug was reported by Kamil Aronowski.
 
 References
 -----------

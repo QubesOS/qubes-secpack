@@ -122,11 +122,11 @@ The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
   For Qubes 4.1, in templates:
-  - qubes-gui-agent version TODO
+  - qubes-gui-agent version 4.1.34
 
   For Qubes 4.2, in dom0 and templates:
-  - qubes-gui-agent version TODO (all templates)
-  - libwnck3 version TODO (Fedora templates and dom0)
+  - qubes-gui-agent version 4.2.17 (all templates)
+  - libwnck3 version 43.0-9 (Fedora templates and dom0)
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

@@ -18,14 +18,14 @@ Summary
 This QSB concerns two separate GUI-related bugs with potential security
 implications:
 
-1. If the keyboard auto-repeat is enabled in an qube, which due to an
-   erro is the case for the default templates, unexpected key presses
-   can be generated. In particular if the use attempts to select either
-   the "Copy to other qube..." or "Move to other qube..." context menu
-   option on a file in that app qube's graphical file manager using the
-   Enter key (rather than clicking on it with the mouse cursor), the
-   keyboard auto-repeat feature can cause the selected file to be opened
-   in the source qube.
+1. If the keyboard auto-repeat feature is enabled in a qube, as it is in
+   the default templates (due to an error), it can generate unexpected
+   key presses. In particular, if the user attempts to select either the
+   "Copy to other qube..." or "Move to other qube..." context menu
+   option on a file in the qube's graphical file manager using the Enter
+   key (rather than clicking on it with the mouse cursor), the keyboard
+   auto-repeat feature can cause the selected file to be opened in that
+   qube.
 
 2. The Xfce taskbar in dom0 incorrectly handles application icons, which
    can result in some application icons being the wrong color.
@@ -55,10 +55,12 @@ windows with Alt + Tab.
 Affected systems
 -----------------
 
-The first bug affects both Qubes OS 4.1 and Qubes OS 4.2. Only qubes in
-which the auto-repeat feature gets enabled by some programm are
-affected. The default templates automatically start xfsettingsd, which
-then enables auto-repeat by default.
+The first bug affects both Qubes OS 4.1 and 4.2. The only qubes that are
+affected are those in which some program enables the keyboard
+auto-repeat feature. The default templates automatically start the
+program xfsettingsd, which in turn enables the keyboard auto-repeat
+feature. Templates that do not have such a program installed (such as
+minimal templates, by default) are not affected.
 
 The second bug affects only Qubes OS 4.2 when using the Xfce desktop
 environment, which is the default desktop environment.
@@ -67,46 +69,47 @@ Discussion
 -----------
 
 The first bug can occur if, and only if, the keyboard auto-repeat
-feature is enabled in an qube. gui-agent disables auto-repeat when it
-starts, but it can get renabled by other programms. In the default
-template xfsettings does so by default. By design, qubes do not "see"
-all keyboard events. Instead, they see only the keyboard events that are
-sent when a window belonging to that qube is in focus. Therefore, if
-focus switches from one qube's window to another's while a key is being
-pressed, it may appear to the former qube that the key was pressed for
-much longer than it actually was. In particular, the former qube may
-"believe" that the key is being pressed until a window belonging to that
-qube regains focus and the key is released. Consequently, the
-auto-repeat feature starts generating repeat key events after the
-initial auto-repeat delay has passed. While unfocused those events are
-normally ignored since the windows in the qube are not focused when the
-focus is switched to another qube. But if the qube regains focus and the
-key is in the pressed state in that moment the auto-repeat feature in
-the qube will continue generating repeated key press events without
-waiting the inital auto-repeat delay, since from its point of view the
-key was pressed the whole time.
+feature is enabled in a qube. (When gui-agent starts, it disables
+auto-repeat, but other programs, such as xfsettings in the default
+templates, can re-enable it.) By design, qubes do not "see" all keyboard
+events. Instead, each qube sees only the keyboard events that are sent
+when a window belonging to that qube is in focus. Therefore, if all of a
+qube's windows lose focus while a key is being pressed, it may appear to
+the qube that the key was pressed for much longer than it actually was.
+In particular, the qube may "believe" that the key is being pressed
+until a window belonging to that qube regains focus and the key is
+released.
+
+Normally, the auto-repeat feature starts generating repeated key press
+events after the initial auto-repeat delay has passed. While none of the
+qube's windows are in focus, such events are ignored. However, if one of
+the qube's windows regains focus while a key is in the pressed state,
+the auto-repeat feature in that qube will continue generating repeated
+key press events without waiting for the initial auto-repeat delay,
+since from its point of view the key was being pressed the whole time.
 
 In this particular case, when the user selects either the "Copy to other
 qube..." or "Move to other qube..." option, focus switches to the qrexec
 prompt in dom0, and the Enter key may appear to the qube to be pressed
-the whole time while the user interacts with the qrexec prompt. Due to
-the auto-repeat feature being enable in the qube, this may generate an
-"key press" events very shortly after that qubes regains focus after the
-prompt has been closed. This "key press" triggers the file manager to
-open the file normally.
+the whole time while the user interacts with the qrexec prompt. When the
+dom0 prompt window closes, focus returns to the qube's file manager
+window. At this point, the qube believes that the Enter key has been
+pressed for a long time, so the auto-repeat feature generates repeated
+Enter key press events, which in turn cause the file manager to open the
+file normally.
 
-What should happen instead is that only dom0 generates key repeat
-events. dom0 knowns how long the key has been actually pressed and can
-route the repeat events to the currently focused qube. The qube that
-should see just one "key press" event and (possibly much later) one "key
-release" event, and this is exactly what happens when the auto-repeat
-feature is disabled in the qube. (Note: In the above scenario the qube
-will still see a long key press while not having focus. But it will not
-generate repeat events and on regaining focus it will also get the
-current key state. One might consider sending a synthetic "key release"
-event for any key that is still being pressed when an application loses
-focus, but that would cause extra key presses to be delivered when the
-application regains focus.)
+What ought to happen instead is that only dom0 should generate key
+repeat events, because only dom0 knows how long a key has actually been
+pressed. Meanwhile, the qube should see just one key press event and
+(possibly much later) one key release event, and this is exactly what
+happens when the auto-repeat feature is disabled in the qube. The qube
+would still perceive a long key press while none of its windows have
+focus. However, when one of the qube's windows regains focus, there
+would not be any repeated key press events, and the qube would get the
+current key state. (Note: One might consider sending a synthetic "key
+release" event for any key that is still being pressed when an
+application loses focus, but that would cause extra key presses to be
+delivered when the application regains focus.)
 
 The second bug is caused by the libwnck3 library (which is used by
 Xfce's "Window Buttons" widget) interpreting icons incorrectly. Each
@@ -124,15 +127,17 @@ channels are pre-multiplied by the alpha channel, [3] but this isn't the
 case in `ARGB`. An attacker could attempt to exploit this vulnerability
 in order to manipulate color channels after the icon has been colored in
 accordance with the qube's color label, completely changing the icon's
-color in some cases. Specifically, by adjusting the alpha channel, it
-may be possible to wrap high color values into low ones. For example, a
-pixel with the values R=255, G=250, B=0, and A=254 should appear as
-yellow. However, due to the pre-multiplied format, the alpha channel
-determines the valid range for color channels. In this case, setting
-A=254 results in a valid range of 0-254 for the R, G, and B color
-channels. Since R=255 is outside of this range, the red channel would
-wrap to zero, resulting in a green pixel. This bug has been present in
-Fedora's libwnck3 package since Fedora 34. [4]
+color in some cases.
+
+Specifically, by adjusting the alpha channel, it may be possible to wrap
+high color values into low ones. For example, a pixel with the values
+R=255, G=250, B=0, and A=254 should appear as yellow. However, due to
+the pre-multiplied format, the alpha channel determines the valid range
+for color channels. In this case, setting A=254 results in a valid range
+of 0-254 for the R, G, and B color channels. Since R=255 is outside of
+this range, the red channel would wrap to zero, resulting in a green
+pixel. This bug has been present in Fedora's libwnck3 package since
+Fedora 34. [4]
 
 Patching
 ---------

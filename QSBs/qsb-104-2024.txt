@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 104 ]===---
 
-                              2024-07-29
+                              2024-07-30
 
                       GUI-related security bugs
 
@@ -18,12 +18,14 @@ Summary
 This QSB concerns two separate GUI-related bugs with potential security
 implications:
 
-1. If the keyboard auto-repeat feature is enabled both in dom0 and in an
-   app qube, and the user attempts to select either the "Copy to other
-   qube..." or "Move to other qube..." context menu option on a file in
-   that app qube's graphical file manager using the Enter key (rather
-   than clicking on it with the mouse cursor), the keyboard auto-repeat
-   feature can cause the selected file to be opened in the source qube.
+1. If the keyboard auto-repeat is enabled in an qube, which due to an
+   erro is the case for the default templates, unexpected key presses
+   can be generated. In particular if the use attempts to select either
+   the "Copy to other qube..." or "Move to other qube..." context menu
+   option on a file in that app qube's graphical file manager using the
+   Enter key (rather than clicking on it with the mouse cursor), the
+   keyboard auto-repeat feature can cause the selected file to be opened
+   in the source qube.
 
 2. The Xfce taskbar in dom0 incorrectly handles application icons, which
    can result in some application icons being the wrong color.
@@ -53,7 +55,10 @@ windows with Alt + Tab.
 Affected systems
 -----------------
 
-The first bug affects both Qubes OS 4.1 and Qubes OS 4.2.
+The first bug affects both Qubes OS 4.1 and Qubes OS 4.2. Only qubes in
+which the auto-repeat feature gets enabled by some programm are
+affected. The default templates automatically start xfsettingsd, which
+then enables auto-repeat by default.
 
 The second bug affects only Qubes OS 4.2 when using the Xfce desktop
 environment, which is the default desktop environment.
@@ -62,31 +67,45 @@ Discussion
 -----------
 
 The first bug can occur if, and only if, the keyboard auto-repeat
-feature is enabled in both dom0 and an app qube. By design, app qubes do
-not "see" all keyboard events. Instead, they see only the keyboard
-events that are sent when a window belonging to that qube is in focus.
-Therefore, if focus switches from one qube's window to another's while a
-key is being pressed, it may appear to the former qube that the key was
-pressed for much longer than it actually was. In particular, the former
-qube may "believe" that the key is being pressed until a window
-belonging to that qube regains focus and the key is released.
-Consequently, the auto-repeat feature generates far more events than it
-should.
+feature is enabled in an qube. gui-agent disables auto-repeat when it
+starts, but it can get renabled by other programms. In the default
+template xfsettings does so by default. By design, qubes do not "see"
+all keyboard events. Instead, they see only the keyboard events that are
+sent when a window belonging to that qube is in focus. Therefore, if
+focus switches from one qube's window to another's while a key is being
+pressed, it may appear to the former qube that the key was pressed for
+much longer than it actually was. In particular, the former qube may
+"believe" that the key is being pressed until a window belonging to that
+qube regains focus and the key is released. Consequently, the
+auto-repeat feature starts generating repeat key events after the
+initial auto-repeat delay has passed. While unfocused those events are
+normally ignored since the windows in the qube are not focused when the
+focus is switched to another qube. But if the qube regains focus and the
+key is in the pressed state in that moment the auto-repeat feature in
+the qube will continue generating repeated key press events without
+waiting the inital auto-repeat delay, since from its point of view the
+key was pressed the whole time.
 
 In this particular case, when the user selects either the "Copy to other
 qube..." or "Move to other qube..." option, focus switches to the qrexec
-prompt in dom0, and the Enter key may appear to the app qube to be
-pressed the whole time while the user interacts with the qrexec prompt.
-Due to the auto-repeat feature, this may generate further "key press"
-events that are later interpreted by the file manager as requests to
+prompt in dom0, and the Enter key may appear to the qube to be pressed
+the whole time while the user interacts with the qrexec prompt. Due to
+the auto-repeat feature being enable in the qube, this may generate an
+"key press" events very shortly after that qubes regains focus after the
+prompt has been closed. This "key press" triggers the file manager to
 open the file normally.
 
-What should happen instead is that the qube should see just one "key
-press" event and (possibly much later) one "key release" event, and this
-is exactly what happens when the auto-repeat feature is disabled in the
-qube. (Note: One might consider sending a synthetic "key release" event
-for any key that is still being pressed when an application loses focus,
-but that would cause extra key presses to be delivered when the
+What should happen instead is that only dom0 generates key repeat
+events. dom0 knowns how long the key has been actually pressed and can
+route the repeat events to the currently focused qube. The qube that
+should see just one "key press" event and (possibly much later) one "key
+release" event, and this is exactly what happens when the auto-repeat
+feature is disabled in the qube. (Note: In the above scenario the qube
+will still see a long key press while not having focus. But it will not
+generate repeat events and on regaining focus it will also get the
+current key state. One might consider sending a synthetic "key release"
+event for any key that is still being pressed when an application loses
+focus, but that would cause extra key presses to be delivered when the
 application regains focus.)
 
 The second bug is caused by the libwnck3 library (which is used by
@@ -126,7 +145,7 @@ vulnerabilities described in this bulletin:
 
   For Qubes 4.2, in dom0 and templates:
   - qubes-gui-agent version 4.2.17 (all templates)
-  - libwnck3 version 43.0-9 (Fedora templates and dom0)
+  - libwnck3 version 43.0-9 (dom0)
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

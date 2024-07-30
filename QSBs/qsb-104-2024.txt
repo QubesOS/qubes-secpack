@@ -150,7 +150,7 @@ vulnerabilities described in this bulletin:
 
   For Qubes 4.2, in dom0 and templates:
   - qubes-gui-agent version 4.2.17 (all templates)
-  - libwnck3 version 43.0-9 (dom0)
+  - libwnck3 version 43.0-9 (Fedora templates and dom0)
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

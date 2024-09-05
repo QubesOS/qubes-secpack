@@ -53,9 +53,8 @@ def date():
     Print date in RFC 5322 format.
     """
 
-    # "+0000" as a constant, since it's always expected to be UTC.
-    fmt = "%a, %d %b %Y %T +0000"
-    print(datetime.datetime.utcnow().strftime(fmt))
+    fmt = "%a, %d %b %Y %T %z"
+    print(datetime.datetime.now(datetime.UTC).strftime(fmt))
     print()
 
 if __name__ == "__main__":

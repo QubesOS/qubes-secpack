@@ -15,55 +15,67 @@ required in response to this QSB.
 Summary
 --------
 
-Qubes OS enforces a decoration of displayed windows, such that the user
-can recognize which window is controlled by which qube. This applies
-both to normal windows with a titlebar as well as other windows (those
-are usually used for things like a menu, which behind the scene is a
-separate window). For normal windows the titlebar and border of the
-window that is drawn by the window manager is colored in the qube's
-color label and the title is prefixed with the qube's name in brackets.
-Windows without a titlebar get a colored border.
+Qubes OS enforces the drawing of specific window decorations (e.g.,
+colored borders around windows) in order to assist the user in
+recognizing which window belongs to which qube. This applies both to
+normal windows with title bars as well as other windows like menus
+(which, behind the scenes, are separate windows). The window manager in
+dom0 is responsible for drawing both the title bar and the window
+border. For normal windows, the color of the title bar and border
+matches the qube's color label, and the text in the title bar is
+prefixed with the qube's name in brackets. Windows without title bars
+have only colored borders.
 
-Qubes running in HVM mode can optionally use an emulated display instead
-of the seamless Qubes GUI integration. This emulation is done by QEMU
-running in a so-called stubdomain, a little helper VM running beside the
-actual VM.
+A qube running in HVM mode may optionally use an emulated display
+instead of the seamless Qubes GUI integration. This emulation is done by
+QEMU running in a so-called stubdomain, which is a little helper VM
+running alongside the main VM. There is also a GUI daemon that is
+responsible for handling the GUI requests that come from the stubdomain.
 
-Due to an error, when running under KDE, the GUI daemon process
-responsible for handling the GUI requests comming from the stubdomain
-wasn't instructed to set the window properties as required by KDE to
-display the title prefix and colored window decoration.
+Due to an error, when running under KDE, this GUI daemon is not being
+instructed to set the window properties (as required by KDE) necessary
+to display the correct title prefix and colored border.
 
 Impact
 -------
 
-An attacker that is able to compromise an HVM qube's stubdomain by
-exploiting another bug can create windows that get the same decoration
-as normal windows from an application running in dom0. This includes
-setting a window title without an enforced prefix. This might be used to
-fool the user to think the window belongs to dom0 or another qube (by
-prefixing it with that qubes's name).
+An attacker who manages to compromise an HVM qube's stubdomain (which
+would require discovering and exploiting an independent vulnerability)
+can create windows that are missing the usual enforced decorations. Such
+windows would instead have the same title bar and borders as normal dom0
+windows. An attacker could attempt to use such a window to deceive or
+confuse the user into thinking that the window belongs to dom0.
 
-The attacker can't control the decoration color of those windows, they
-will always use the default of the theme of the window manager in dom0.
-The windows' icon (by default displayed on the titlebar and in the task
-switcher) will still be correctly colored in the qube's color label. Any
-window without a titlebar will also get a correctly colored border.
+An attacker could also attempt to make such a window appear to belong to
+another qube by prefixing the text in the title bar with that qube's
+name. However, since the attacker cannot control the windows' border
+color, the border will not match that qube's color label. Instead, the
+borders of such windows will always use the default color set by the
+window manager theme in dom0.
+
+Moreover, every window has an icon that is displayed, by default, in the
+title bar, the taskbar, and the task switcher. These icons are still
+correctly colored in accordance with their respective qubes' color
+labels. In addition, all windows without title bars still have their
+correct border colors.
 
 Affected systems
 -----------------
 
-Only users that use KDE as window manager are affected (the default is
-Xfce).
+Only systems using KDE as the desktop environment in dom0 are affected.
+The default desktop environment in Qubes OS is Xfce, and KDE is not
+installed by default. This means that users must manually install KDE in
+dom0 and opt to use it as their desktop environment in order for their
+systems to be affected by this vulnerability.
 
-Only qube's running in HVM mode are affected. In default configuration
-that are sys-net and sys-usb.
+Only qubes running in HVM mode are affected. In the default Qubes OS
+configuration, only sys-net and sys-usb run in HVM mode.
 
-There's one uncommon exception: an HVM qube that has the 'gui-emulated'
-feature set to '' (the empty string, not to be confused with an unset
-feature) and for which the 'debug' property is false is not affected,
-since it can not get a GUI daemon started for it's stubdomain (unless
-the users manuall requests that).
+If an HVM qube has the `gui-emulated` feature set to '' (i.e., the empty
+string, not to be confused with an unset feature) and the `debug`
+property set to "false," then that HVM qube is not affected by this
+vulnerability, since there will be no running GUI daemon for its
+stubdomain unless manually requested by the user.
 
 Patching
 ---------
@@ -79,9 +91,9 @@ current (stable) repository over the next two weeks after being tested
 by the community. [2] Once available, the packages are to be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
-In order for the update to take effect the graphical user session in
-dom0 needs to be restarted for, either by logging out and in again or by
-a full restart of the system.
+In order for the update to take effect, the graphical user session in
+dom0 must be restarted. This can be accomplished either by logging out
+and back in again or by a full restart of the system.
 
 Credits
 --------

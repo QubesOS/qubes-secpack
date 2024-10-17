@@ -84,7 +84,7 @@ The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
   For Qubes 4.2, in dom0:
-  - python3-qubesadmin version 4.2.15? TODO
+  - python3-qubesadmin version 4.2.15
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

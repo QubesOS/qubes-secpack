@@ -19,12 +19,11 @@ Qubes OS enforces the drawing of specific window decorations (e.g.,
 colored borders around windows) in order to assist the user in
 recognizing which window belongs to which qube. This applies both to
 normal windows with title bars as well as other windows like menus
-(which, behind the scenes, are separate windows). The window manager in
-dom0 is responsible for drawing both the title bar and the window
-border. For normal windows, the color of the title bar and border
-matches the qube's color label, and the text in the title bar is
-prefixed with the qube's name in brackets. Windows without title bars
-have only colored borders.
+(which, behind the scenes, are separate windows). For normal windows,
+the color of the title bar and border matches the qube's color
+label, and the text in the title bar is prefixed with the qube's
+name in brackets. Windows without title bars have only colored
+borders.
 
 A qube running in HVM mode may optionally use an emulated display
 instead of the seamless Qubes GUI integration. This emulation is done by

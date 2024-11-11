@@ -1,0 +1,127 @@
+
+             ---===[ Qubes Security Bulletin 106 ]===---
+
+                              2024-11-12
+
+     Information disclosure through uninitialized memory in libxl
+                               (XSA-464)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2024-11-12, the Xen Project published XSA-464, "libxl leaks data to PVH
+guests via ACPI tables" (CVE-2024-45819) [3]:
+| PVH guests have their ACPI tables constructed by the toolstack.  The
+| construction involves building the tables in local memory, which are
+| then copied into guest memory.  While actually used parts of the local
+| memory are filled in correctly, excess space that is being allocated is
+| left with its prior contents.
+
+Qubes calls libxl via libvirtd. The memory that is not fully initialized
+is allocated via malloc. So the prior content that is leaked to a PVH
+qube might be anything that has been previously allocated and then freed
+in the libvirtd process.
+
+Impact
+-------
+
+The leaked memory usually doesn't contain important secrets [4] but can
+reveal various information about other qubes and the host system that is
+otherwise not available to a malicious qube. In particular the following
+information might be present in libvirtd's memory:
+
+about other qubes:
+ - Name
+ - UUID
+ - kernel version
+ - kernel cmdline
+ - IP/MAC addresses of virtual network devices (but not from physical
+   devices) [5]
+ - Assigned PCI devices
+
+about the host system:
+ - Total system memory
+ - Available PCI devices
+ - DMI/SYSBIOS information (serial number as reported by firmware, RAM
+   DIMM product number, etc.)
+
+(The list not complete (for example doesn't list less interesting qube
+settings like assigned audio qube), but should cover all important
+categories.)
+
+Note that a malicious qube has very little control about what
+information gets leaked in the uninitialized memory that is exposed to
+it [6]. Additionally the leak happens only once per start of a qube. So
+for a decent change of being leaked interesting information a malicious
+qube has to wait a long time for a significant number of normal starts.
+Alternatively it can also try to provoke starts of disposable qubes it
+can control (for example via qubes.VMShell) or shut itself down and hope
+for it being started again by the user or a qrexec call (both methods
+easily noticed by a user as unusual activity).
+
+Affected systems
+-----------------
+
+All supported version of Qubes are affected.
+
+Only qubes in PVH virt mode are affected (in default setup, every qube
+except sys-net and sys-usb).
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.5-4 TODO
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+
+[2] https://www.qubes-os.org/doc/testing/
+
+[3] https://xenbits.xen.org/xsa/advisory-464.html
+
+[4] The leaked memory could reveal the ASLR secret of the libvirtd
+    process. But this is only useful when the attacker has knowledge of
+    a memory vulnerability in libvirtd/libxl that is reachable in Qubes
+    OS. Additionally in a unusual setup a user could have included a
+    secret in some of the leaked information of other qubes, for example
+    the kernel cmdlines.
+
+[5] Unless the user actively configures something else for a qube, it's
+    IP addresses are based on it's qid/dispid (number from 0 .. 10000)
+    and the MAC addresses is the same for all qubes.
+
+[6] When starting a disposable qube via qrexec it could try to time the
+    start to it's favor.
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

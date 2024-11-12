@@ -81,7 +81,7 @@ The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
   For Qubes 4.2, in dom0:
-  - Xen packages, version 4.17.5-4 TODO
+  - Xen packages, version 4.17.5-4
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

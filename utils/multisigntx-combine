@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from sys import stderr
 
 parser = argparse.ArgumentParser(
     description=('Combine signatures of independently signed multi-signature transactions. '
@@ -35,7 +36,7 @@ def main():
     counter = 1
     first_tx = input.readline()
     if not args.quiet:
-        print >>sys.stderr, "Loading transaction no {}".format(counter)
+        print(f"Loading transaction no {counter}", file=sys.stderr)
     tx = electrum.transaction.Transaction(first_tx.strip())
     counter += 1
 
@@ -45,7 +46,7 @@ def main():
         if not input_tx or input_tx.startswith('#'):
             continue
         if not args.quiet:
-            print >>sys.stderr, "Loading transaction no {}".format(counter)
+            print(f"Loading transaction no {counter}", file=sys.stderr)
         tx.update_signatures(input_tx)
         counter += 1
     output.write(tx.raw + '\n')

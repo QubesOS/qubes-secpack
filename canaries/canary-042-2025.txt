@@ -1,0 +1,104 @@
+
+                    ---===[ Qubes Canary 042 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is March 08, 2025.
+
+2. There have been 106 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of June 2025. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+
+Proof of freshness
+-------------------
+
+Sat, 08 Mar 2025 00:05:15 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Europe on the Sidelines: Trump Steers America Away from Allies and Towards Autocracies
+Military Funding: Iran Seeks to Access Billions in Frozen Hard Currency
+A "Little Coalition" for Germany: Friedrich Merz Faces an Uphill Battle as negotiations in Berlin Heat Up
+Three Years after the Invasion: The Churchill of Ukraine Seeks a New Role
+Pankaj Mishra on the War in Gaza: Germany's Reputation Has Been Badly Tainted by its One-Sided Support for the Israeli Government"
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+More Than 140 Killed in Clashes Between Syrian Forces and Assad Loyalists
+Russia Hits Ukrainian Power and Gas Facilities in Widespread Attack
+How Trump’s ‘51st State’ Canada Talk Came to Be Seen as Deadly Serious
+Panama Will Release Migrants From Detention Camp, Challenging Trump’s Deportation Efforts
+Unexploded World War II Bomb Found at Gare du Nord in Paris Halts Trains
+
+Source: BBC News (https://feeds.bbci.co.uk/news/world/rss.xml)
+Actor Gene Hackman and wife Betsy Arakawa died of natural causes one week apart
+Syrian security forces accused of executing dozens of Alawites
+Trump 'strongly considering' large-scale sanctions and tariffs on Russia
+Poland announces military training plan for all men
+'We're gutted' - Make-A-Wish trip cancelled after Eurostar bomb disruption
+
+Source: Blockchain.info
+00000000000000000002100e0b05177637c086916be9c8f9f5307436c25b80de
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

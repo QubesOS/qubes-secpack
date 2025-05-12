@@ -1,0 +1,82 @@
+
+             ---===[ Qubes Security Bulletin 107 ]===---
+
+                              2025-05-12
+
+             x86: Indirect Target Selection (XSA-469)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2025-05-12, the Xen Project published XSA-469, "x86: Indirect
+Target Selection" (CVE-2024-28956) [3]:
+| Researchers at VU Amsterdam have released Training Solo, detailing
+| several speculative attacks which bypass current protections.
+| 
+| One issue, which Intel have named Indirect Target Selection, is a bug in
+| the hardware support for prediction-domain isolation.  The mitigation
+| for this involves both microcode and software changes in Xen.
+| 
+| For more details, see:
+|   https://vusec.net/projects/training-solo
+|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/indirect-target-selection.html
+
+Impact
+-------
+
+On affected systems, an attacker who manages to compromise a qube may be
+able to use it to infer the contents of arbitrary system memory,
+including memory assigned to other qubes. For more information, see:
+
+Affected systems
+-----------------
+
+Only Intel systems between Whiskey Lake (8th generation Intel Core)
+and Tiger Lake (11th generation Intel Core) are affected. See Intel
+advisory[4] for the full list of the affected CPUs.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - Xen packages, version 4.17.5-7
+  - microcode_ctl version 2.1.20250512
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages are to be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+Xen binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-469.html
+[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

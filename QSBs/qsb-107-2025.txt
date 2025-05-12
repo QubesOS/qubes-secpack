@@ -39,8 +39,10 @@ Affected systems
 -----------------
 
 Only Intel systems between Whiskey Lake (8th generation Intel Core) and
-Tiger Lake (11th generation Intel Core) are affected. See Intel's
-advisory [4] for the full list of the affected CPUs.
+Tiger Lake (11th generation Intel Core) are affected. Intel Arrow Lake
+(Core Ultra Series 2) models are affected by a similar issue, fixed in
+the same microcode update. See Intel's advisory [4][5] for the full
+list of the affected CPUs.
 
 Patching
 ---------
@@ -76,6 +78,7 @@ References
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://xenbits.xen.org/xsa/advisory-469.html
 [4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
+[5] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01322.html
 
 --
 The Qubes Security Team

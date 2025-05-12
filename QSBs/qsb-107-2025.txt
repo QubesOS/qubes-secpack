@@ -3,7 +3,7 @@
 
                               2025-05-12
 
-             x86: Indirect Target Selection (XSA-469)
+                  Indirect Target Selection (XSA-469)
 
 User action
 ------------
@@ -33,14 +33,14 @@ Impact
 
 On affected systems, an attacker who manages to compromise a qube may be
 able to use it to infer the contents of arbitrary system memory,
-including memory assigned to other qubes. For more information, see:
+including memory assigned to other qubes.
 
 Affected systems
 -----------------
 
-Only Intel systems between Whiskey Lake (8th generation Intel Core)
-and Tiger Lake (11th generation Intel Core) are affected. See Intel
-advisory[4] for the full list of the affected CPUs.
+Only Intel systems between Whiskey Lake (8th generation Intel Core) and
+Tiger Lake (11th generation Intel Core) are affected. See Intel's
+advisory [4] for the full list of the affected CPUs.
 
 Patching
 ---------
@@ -48,7 +48,7 @@ Patching
 The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
-  For Qubes 4.3, in dom0:
+  For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.5-7
   - microcode_ctl version 2.1.20250512
 

@@ -74,16 +74,16 @@ Ultra Series 2) models. [9]
 The BPRC issue affect most Intel CPUs since 8th generation Intel Core
 (but see caveat below). [10]
 
-CVE-2025-20623 affects some 10th generation Intel Core CPUs.
+CVE-2025-20623 affects some 10th generation Intel Core CPUs. [10]
 
-CVE-2024-43420 affects some Intel Atom CPUs
+CVE-2024-43420 affects some Intel Atom CPUs. [10]
 
 For a detailed and full list of affected CPUs see the linked advisories.
 
 Note that the above is based on Intel's security advisories. Intel seems
-to only asses whether a CPU models is affected if it still receive
-microcode updates. For the BPRC the researchers write that they could
-observe the problem also on 7th generation Intel Core models [5].
+to only asses whether a CPU model is affected if it still receives
+microcode updates. For the BPRC issue the researchers write that they
+could observe the problem also on 7th generation Intel Core models [5].
 
 To determine if your CPU still receives microcode updates check [11]
 and/or it's product page for the "end of servicing updates" (ESU) date.

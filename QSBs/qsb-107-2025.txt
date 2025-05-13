@@ -3,7 +3,8 @@
 
                               2025-05-12
 
-                  Indirect Target Selection (XSA-469)
+                Indirect Target Selection (XSA-469) and
+                  Lion Cove BPU issue (CVE-2025-24495)
 
 User action
 ------------
@@ -28,6 +29,10 @@ Target Selection" (CVE-2024-28956) [3]:
 |   https://vusec.net/projects/training-solo
 |   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/indirect-target-selection.html
 
+Another similar issue that the researchers described affects the branch
+prediction unit (BPU) in Lion Cove cores (CVE-2025-24495). This is fixed
+in the same microcode update.
+
 Impact
 -------
 
@@ -39,10 +44,10 @@ Affected systems
 -----------------
 
 Only Intel systems between Whiskey Lake (8th generation Intel Core) and
-Tiger Lake (11th generation Intel Core) are affected. Intel Arrow Lake
-(Core Ultra Series 2) models are affected by a similar issue, fixed in
-the same microcode update. See Intel's advisory [4][5] for the full
-list of the affected CPUs.
+Tiger Lake (11th generation Intel Core) are affected by the first issue.
+Intel Lunar Lake and Arrow Lake (Core Ultra Series 2) models are
+affected by the second issue. See Intel's advisories [4][5] for the full
+list of affected CPUs.
 
 Patching
 ---------

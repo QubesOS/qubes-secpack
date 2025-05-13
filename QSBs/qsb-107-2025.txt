@@ -3,8 +3,7 @@
 
                               2025-05-12
 
-                Indirect Target Selection (XSA-469) and
-                  Lion Cove BPU issue (CVE-2025-24495)
+                 Multiple CPU brach prediction issues
 
 User action
 ------------
@@ -16,22 +15,42 @@ required in response to this QSB.
 Summary
 --------
 
-On 2025-05-12, the Xen Project published XSA-469, "x86: Indirect
-Target Selection" (CVE-2024-28956) [3]:
-| Researchers at VU Amsterdam have released Training Solo, detailing
-| several speculative attacks which bypass current protections.
-| 
-| One issue, which Intel have named Indirect Target Selection, is a bug in
-| the hardware support for prediction-domain isolation.  The mitigation
-| for this involves both microcode and software changes in Xen.
-| 
-| For more details, see:
-|   https://vusec.net/projects/training-solo
-|   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/indirect-target-selection.html
+Several issues has been published that affect CPU's branch prediction
+behavior. Those have in common that they allow an attacker to manipulate
+the branch prediction of the CPU to mount a speculative execution attack
+(like the original Spectre v2 attack) despite existing mitigation being
+enabled.
 
-Another similar issue that the researchers described affects the branch
-prediction unit (BPU) in Lion Cove cores (CVE-2025-24495). This is fixed
-in the same microcode update.
+Researchers from VUSec (Systems and Network Security Group at VU
+Amsterdam) published on 2025-05-12 [3]:
+
+ - Indirect Target Selection (ITS, CVE-2024-28956, XSA-469 [6], part of
+   INTEL-SA-01153 [8])
+
+ - Lion Cove BPU issue (CVE-2025-24495, part of INTEL-SA-01322 [9])
+
+ - IP-based attacks
+   Believed to be sufficiently mitigated by the mitigations against ITS.
+   [4]
+
+ - History-based attacks
+   Xen believed to be unaffected. [6]
+
+Researchers from COMSEC (computer security group at ETH Zürich)
+published on 2025-05-13 [5]:
+
+ - Branch Privilege Injection: Exploiting Branch Predictor Race
+   Conditions (BPRC, CVE-2024-45332, XSN-3 [7], part of INTEL-SA-01247
+   [10])
+
+In addition to the coordinated disclosure of the above issues Intel
+published internally found issues:
+
+ - CVE-2025-20623 (part of INTEL-SA-01247 [10])
+
+ - CVE-2024-43420 (part of INTEL-SA-01247 [10])
+
+For more details see the linked publications.
 
 Impact
 -------
@@ -43,17 +62,41 @@ including memory assigned to other qubes.
 Affected systems
 -----------------
 
-Only Intel systems between Whiskey Lake (8th generation Intel Core) and
-Tiger Lake (11th generation Intel Core) are affected by the first issue.
-Intel Lunar Lake and Arrow Lake (Core Ultra Series 2) models are
-affected by the second issue. See Intel's advisories [4][5] for the full
-list of affected CPUs.
+Only systems with Intel CPUs are believed to be affected. According to
+Intel's description:
+
+The ITS issue affects Intel CPUs between Whiskey Lake (8th generation
+Intel Core) and Tiger Lake (11th generation Intel Core). [8]
+
+The Lion Cove BPU issue affects Intel Lunar Lake and Arrow Lake (Core
+Ultra Series 2) models. [9]
+
+The BPRC issue affect most Intel CPUs since 8th generation Intel Core
+(but see caveat below). [10]
+
+CVE-2025-20623 affects some 10th generation Intel Core CPUs.
+
+CVE-2024-43420 affects some Intel Atom CPUs
+
+For a detailed and full list of affected CPUs see the linked advisories.
+
+Note that the above is based on Intel's security advisories. Intel seems
+to only asses whether a CPU models is affected if it still receive
+microcode updates. For the BPRC the researchers write that they could
+observe the problem also on 7th generation Intel Core models [5].
+
+To determine if your CPU still receives microcode updates check [11]
+and/or it's product page for the "end of servicing updates" (ESU) date.
+Note that only models that have or soon will be reaching their ESU date
+are listed. Newer, still fully supported, models have no ESU date
+listed.
 
 Patching
 ---------
 
 The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+vulnerabilities described in this bulletin (for CPUs still supported by
+Intel):
 
   For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.5-7
@@ -81,9 +124,15 @@ References
 
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
-[3] https://xenbits.xen.org/xsa/advisory-469.html
-[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
-[5] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01322.html
+[3] https://vusec.net/projects/training-solo
+[4] https://download.vusec.net/papers/trainingsolo_sp25.pdf section 11
+[5] https://comsec.ethz.ch/research/microarch/branch-privilege-injection/
+[6] https://xenbits.xen.org/xsa/advisory-469.html
+[7] https://lists.xenproject.org/archives/html/xen-devel/2025-05/msg00632.html
+[8] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
+[9] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01322.html
+[10] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01247.html
+[11] https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
 
 --
 The Qubes Security Team

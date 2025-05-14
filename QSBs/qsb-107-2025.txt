@@ -26,10 +26,10 @@ On 2025-05-12, researchers from the Systems and Network Security Group
 at Vrije Universiteit Amsterdam (VUSec) published "Training Solo," [3]
 which includes the following:
 
- - Indirect Target Selection (ITS; CVE-2024-28956, XSA-469 [6], part of
-   INTEL-SA-01153 [8])
+ - Indirect Target Selection (ITS; CVE-2024-28956, XSA-469 [5], part of
+   INTEL-SA-01153 [7])
 
- - Lion Cove BPU issue (CVE-2025-24495, part of INTEL-SA-01322 [9])
+ - Lion Cove BPU issue (CVE-2025-24495, part of INTEL-SA-01322 [8])
 
  - IP-based attacks
 
@@ -37,25 +37,22 @@ which includes the following:
 
 On 2025-05-13, researchers from the computer security group at ETH
 Zürich (COMSEC) published "Branch Privilege Injection: Exploiting Branch
-Predictor Race Conditions" [5] (BPRC; CVE-2024-45332, XSN-3 [7], part of
-INTEL-SA-01247 [10])
+Predictor Race Conditions" [4] (BPRC; CVE-2024-45332, XSN-3 [6], part of
+INTEL-SA-01247 [9])
 
 In addition to the coordinated disclosures above, Intel also reported
 internally discovering the following:
 
- - CVE-2025-20623 (part of INTEL-SA-01247 [10])
+ - CVE-2025-20623 (part of INTEL-SA-01247 [9])
 
- - CVE-2024-43420 (part of INTEL-SA-01247 [10])
+ - CVE-2024-43420 (part of INTEL-SA-01247 [9])
 
 See the linked publications for further details.
 
 Impact
 -------
 
-IP-based attacks are believed to be sufficiently mitigated by the
-mitigations against ITS. [4]
-
-History-based attacks are believed not to affect Xen. [6]
+History-based attacks are believed not to affect Xen. [5]
 
 For all other vulnerabilities mentioned, on affected systems, an
 attacker who manages to compromise a qube may be able to use it to infer
@@ -69,17 +66,17 @@ Only systems with Intel CPUs are believed to be affected. According to
 Intel's descriptions:
 
  - ITS affects Intel CPUs from Whiskey Lake (8th Generation Intel Core)
-   to Tiger Lake (11th Generation Intel Core). [8]
+   to Tiger Lake (11th Generation Intel Core). [7]
 
  - The Lion Cove BPU issue affects Intel Lunar Lake and Arrow Lake (Core
-   Ultra Series 2) models. [9]
+   Ultra Series 2) models. [8]
 
  - BPRC affects most Intel CPUs since 8th Generation Intel Core (but see
-   the caveat below). [10]
+   the caveat below). [9]
 
- - CVE-2025-20623 affects some 10th Generation Intel Core CPUs. [10]
+ - CVE-2025-20623 affects some 10th Generation Intel Core CPUs. [9]
 
- - CVE-2024-43420 affects some Intel Atom CPUs. [10]
+ - CVE-2024-43420 affects some Intel Atom CPUs. [9]
 
 See the linked Intel security advisories for more complete and detailed
 lists of affected CPU models.
@@ -90,11 +87,11 @@ model only if that model still receives microcode updates. Therefore, if
 a given CPU model no longer receives microcode updates, one should not
 infer that a vulnerability does not affect that model merely because
 Intel does not report it as affected. In particular, COMSEC observed
-that BPRC affects CPUs as far back as 7th Generation Intel Core. [5]
+that BPRC affects CPUs as far back as 7th Generation Intel Core. [4]
 
 To determine whether your CPU still receives microcode updates, see
 "Changes in Customer Support and Servicing Updates for Select Intel
-Processors," [11] or check your model's official Intel product page for
+Processors," [10] or check your model's official Intel product page for
 an "End of Servicing Updates" (ESU) date. Note that only models that
 have reached or will soon reach their ESU date have an ESU date listed.
 Newer models that are still fully supported typically have no ESU date
@@ -134,14 +131,13 @@ References
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
 [3] https://vusec.net/projects/training-solo
-[4] https://download.vusec.net/papers/trainingsolo_sp25.pdf (Section 11)
-[5] https://comsec.ethz.ch/research/microarch/branch-privilege-injection/
-[6] https://xenbits.xen.org/xsa/advisory-469.html
-[7] https://lists.xenproject.org/archives/html/xen-devel/2025-05/msg00632.html
-[8] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
-[9] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01322.html
-[10] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01247.html
-[11] https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
+[4] https://comsec.ethz.ch/research/microarch/branch-privilege-injection/
+[5] https://xenbits.xen.org/xsa/advisory-469.html
+[6] https://lists.xenproject.org/archives/html/xen-devel/2025-05/msg00632.html
+[7] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01153.html
+[8] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01322.html
+[9] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01247.html
+[10] https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
 
 --
 The Qubes Security Team

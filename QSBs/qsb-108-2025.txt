@@ -50,12 +50,22 @@ Only AMD CPUs with Zen 3 or Zen 4 cores are belived to be affected
 Patching
 ---------
 
-The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+Except for server CPUs, the following packages contain security updates
+that address the vulnerabilities described in this bulletin:
 
   For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.5-10
   - amd-ucode-firmware version 20250708-1
+
+For server CPUs AMD has not yet published microcode updates via the
+linux-firmware repository [7]. When this happens we will provide an
+updated amd-ucode-firmware package. You might be able to get the
+microcode update already via a mainboard firmware ("BIOS") update. [4]
+page 5 lists the required minimum microcode version depending on the
+CPUID family/model/stepping (not to be confused with the
+amd-ucode-firmware package version). You can compare this with the
+family/model/stepping and currently loaded microcode version that is
+listed in /proc/cpuinfo.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
@@ -83,6 +93,7 @@ References
 [4] https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
 [5] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7029.html
 [6] https://www.microsoft.com/en-us/research/publication/enter-exit-page-fault-leak-testing-isolation-boundaries-for-microarchitectural-leaks/
+[7] https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/amd-ucode/README
 
 --
 The Qubes Security Team

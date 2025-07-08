@@ -34,15 +34,12 @@ Patching
 The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
-  For Qubes 4.1, in TODO:
-  - TODO
-
   For Qubes 4.2, in TODO:
   - TODO
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages are to be installed
+by the community. [2] Once available, the packages should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
 TODO:
@@ -51,8 +48,8 @@ effect.
 
 TODO:
 If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18+19 will change due to the new
-Xen binaries.
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
 
 Credits
 --------

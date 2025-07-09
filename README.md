@@ -26,5 +26,5 @@ Security Pack it would contain a falsified master key as well.
 
 For more information about the Qubes Security Pack, including its history and
 rationale, and for detailed instructions for verifying its contents, please see
-its [documentation page](https://www.qubes-os.org/doc/security-pack/).
+its [documentation page](https://www.qubes-os.org/security/pack/).
 

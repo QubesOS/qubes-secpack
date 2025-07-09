@@ -1,10 +1,15 @@
 
              ---===[ Qubes Security Bulletin 108 ]===---
 
-                              2025-07-10
+                              2025-07-08
 
                 Transitive Scheduler Attacks (XSA-471)
 
+Changelog
+----------
+
+2025-07-08: Original QSB
+2025-07-10: Revise language
 
 User action
 ------------
@@ -47,7 +52,7 @@ Affected systems
 -----------------
 
 Only AMD CPUs with Zen 3 or Zen 4 cores are believed to be affected
-(CPUID Family 0x19). For a more detailed list, see [5].
+(CPUID family 0x19). For a more detailed list, see [5].
 
 Patching
 ---------
@@ -61,8 +66,8 @@ firmware (BIOS/UEFI) update, but this depends on the motherboard vendor
 making such an update available. The appendix of [4] (page 5) contains a
 table showing the minimum microcode version required for mitigating
 transient scheduler attacks for different CPUs. The required microcode
-version depends on the CPUID family/model/stepping (not to be confused
-with the amd-ucode-firmware package version). Users can compare the
+version (not to be confused with the amd-ucode-firmware package version)
+depends on the CPUID family/model/stepping. Users can compare the
 values from the table with their own system's family/model/stepping and
 current microcode version, which can be viewed by executing the command
 `cat /proc/cpuinfo` in a dom0 terminal.

@@ -9,7 +9,7 @@ Changelog
 ----------
 
 2025-07-08: Original QSB
-2025-07-10: Revise language
+2025-07-11: Revise language
 
 User action
 ------------
@@ -46,7 +46,7 @@ including memory assigned to other qubes.
 As noted in XSA-471, the paper [6] also describes two Rogue System
 Register Read (sometimes called Spectre-v3a) attacks, namely
 CVE-2024-36348 and CVE-2045-36349. However, these are not believed to
-affect Xen and are therefore not believed to affect Qubes OS.
+affect the security of Qubes OS.
 
 Affected systems
 -----------------

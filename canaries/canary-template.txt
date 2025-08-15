@@ -73,8 +73,8 @@ corresponding qubes-secpack.git repo tags. [2]
 
 [2] Don't just trust the contents of this file blindly! Verify the
 digital signatures! Instructions for doing so are documented here:
-https://www.qubes-os.org/security/pack/
+https://doc.qubes-os.org/en/latest/project-security/security-pack.html
 
 --
 The Qubes Security Team
-https://www.qubes-os.org/security/
+https://doc.qubes-os.org/en/latest/project-security/security.html

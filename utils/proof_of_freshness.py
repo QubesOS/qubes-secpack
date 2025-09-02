@@ -29,8 +29,6 @@ def news():
         for j in range(count):
             print(feed["items"][j]["title"])
 
-        print()
-
 def bitcoin():
     """
     Recent bitcoin block hash.
@@ -55,7 +53,6 @@ def date():
 
     fmt = "%a, %d %b %Y %T %z"
     print(datetime.datetime.now(datetime.UTC).strftime(fmt))
-    print()
 
 if __name__ == "__main__":
     date()

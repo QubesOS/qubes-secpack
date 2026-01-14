@@ -1,0 +1,104 @@
+
+                    ---===[ Qubes Canary 043 ]===---
+
+
+Statements
+-----------
+
+The Qubes security team members who have digitally signed this file [1]
+state the following:
+
+1. The date of issue of this canary is June 03, 2025.
+
+2. There have been 107 Qubes security bulletins published so far.
+
+3. The Qubes Master Signing Key fingerprint is:
+
+       427F 11FD 0FAA 4B08 0123  F01C DDFA 1A3E 3687 9494
+
+4. No warrants have ever been served to us with regard to the Qubes OS
+   Project (e.g. to hand out the private signing keys or to introduce
+   backdoors).
+
+5. We plan to publish the next of these canary statements in the first
+   fourteen days of September 2025. Special note should be taken if no new
+   canary is published by that time or if the list of statements changes
+   without plausible explanation.
+
+
+Special announcements
+----------------------
+
+None.
+
+
+Disclaimers and notes
+----------------------
+
+We would like to remind you that Qubes OS has been designed under the
+assumption that all relevant infrastructure is permanently compromised.
+This means that we assume NO trust in any of the servers or services
+which host or provide any Qubes-related data, in particular, software
+updates, source code repositories, and Qubes ISO downloads.
+
+This canary scheme is not infallible. Although signing the declaration
+makes it very difficult for a third party to produce arbitrary
+declarations, it does not prevent them from using force or other means,
+like blackmail or compromising the signers' laptops, to coerce us to
+produce false declarations.
+
+The proof of freshness provided below serves to demonstrate that this
+canary could not have been created prior to the date stated. It shows
+that a series of canaries was not created in advance.
+
+This declaration is merely a best effort and is provided without any
+guarantee or warranty. It is not legally binding in any way to anybody.
+None of the signers should be ever held legally responsible for any of
+the statements made here.
+
+
+Proof of freshness
+-------------------
+
+Tue, 03 Jun 2025 06:49:12 +0000
+
+Source: DER SPIEGEL - International (https://www.spiegel.de/international/index.rss)
+Interview with Danish Prime Minister Frederiksen: "If Trump Wants a Trade War, We Will Respond"
+A Difficult Relationship: How the Gaza War Is Changing Germany's View of Israel
+The German Chancellor's Diplomacy Offensive: Can Friedrich Merz Help Keep Trump from Abandoning Europe?
+Death Zone Drama on K2: "Brother, It's Just Me and You"
+Ruqqia Fights for Survival: Children in Gaza Facing Malnourishment as Humanitarian Situation Worsens
+
+Source: NYT > World News (https://rss.nytimes.com/services/xml/rss/nyt/World.xml)
+Gaza Cease-Fire Negotiations Hit A New Impasse Over An Old Dispute
+South Korea’s New President Will Lead A Country More Divided Than Ever
+Ukraine and Russia Met for 2nd Round of Talks as Attacks Escalate
+In Drone Attacks on Russia, Ukraine Aims for Strategic and Symbolic Blow
+Poland Election: Karol Nawrocki Wins Presidential Vote
+
+Source: BBC News (https://feeds.bbci.co.uk/news/world/rss.xml)
+Suspect in Colorado fire attack planned for a year, FBI says
+Russia and Ukraine fail again to agree ceasefire but commit to prisoner swap
+How Ukraine carried out daring 'Spider Web' attack on Russian bombers
+Disney makes hundreds more layoffs as it cuts costs
+Mount Etna erupts as large plumes rise from volcano
+
+Source: Blockchain.info
+00000000000000000000ad08ae4d191a62914466df62c55d1785bea4b4fd2b01
+
+
+Footnotes
+----------
+
+[1] This file should be signed in two ways: (1) via detached PGP
+signatures by each of the signers, distributed together with this canary
+in the qubes-secpack.git repo, and (2) via digital signatures on the
+corresponding qubes-secpack.git repo tags. [2]
+
+[2] Don't just trust the contents of this file blindly! Verify the
+digital signatures! Instructions for doing so are documented here:
+https://www.qubes-os.org/security/pack/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

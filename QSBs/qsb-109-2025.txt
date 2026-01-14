@@ -1,0 +1,94 @@
+
+             ---===[ Qubes Security Bulletin 109 ]===---
+
+                              2025-08-14
+
+                       Intel microcode updates
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2025-08-12, Intel published the following security advisories and
+accompanying microcode updates [3]:
+
+ - INTEL-SA-01249 [4]
+ - INTEL-SA-01308 [5]
+ - INTEL-SA-01310 [6]
+ - INTEL-SA-01311 [7]
+ - INTEL-SA-01313 [8]
+ - INTEL-SA-01367 [9]
+
+However, these advisories do not provide enough information for us to
+make a definitive assessment about the extent to which these
+vulnerabilities affect the security of Qubes OS. Based on the limited
+information available, we surmise that it is likely that INTEL-SA-01249
+and INTEL-SA-01308 affect Qubes, while it is less likely that
+INTEL-SA-01310 affects Qubes, and not at all likely that the rest affect
+Qubes.
+
+Impact
+-------
+
+On affected systems, a compromised qube might be able to escalate its
+privileges to that of dom0 or Xen.
+
+Affected systems
+-----------------
+
+INTEL-SA-01249 affects 12th Generation Intel Core and newer CPU models
+(see [4] for a more complete and detailed list). Note that the fixes for
+some CPU models were already included in the microcode updates released
+on 2025-05-12 (see note in [3]).
+
+INTEL-SA-01308 and INTEL-SA-01310 affect only certain Intel server CPU
+models (see [5] and [6] for a list).
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes OS 4.2 and 4.3, in dom0:
+  - microcode_ctl version 2.1.20250812
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+microcode updates.
+
+Credits
+--------
+
+See the original Intel Security Advisories.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20250812
+[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01249.html
+[5] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01308.html
+[6] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01310.html
+[7] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01311.html
+[8] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01313.html
+[9] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01367.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

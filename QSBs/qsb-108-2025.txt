@@ -1,0 +1,113 @@
+
+             ---===[ Qubes Security Bulletin 108 ]===---
+
+                              2025-07-08
+
+                Transitive Scheduler Attacks (XSA-471)
+
+Changelog
+----------
+
+2025-07-08: Original QSB
+2025-07-11: Revise language
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2025-07-08, the Xen Project published XSA-471, "x86: Transitive
+Scheduler Attacks" (CVE-2024-36350, CVE-2024-36357) [3]:
+| Researchers from Microsoft and ETH Zurich have discovered several new
+| speculative sidechannel attacks which bypass current protections.
+| They are detailed in a paper titled "Enter, Exit, Page Fault, Leak:
+| Testing Isolation Boundaries for Microarchitectural Leaks".
+| 
+| Two issues, which AMD have named Transitive Scheduler Attacks, utilise
+| timing information from instruction execution.  These are:
+| 
+|   * CVE-2024-36350: TSA-SQ (TSA in the Store Queues)
+|   * CVE-2024-36357: TSA-L1 (TSA in the L1 data cache)
+
+For more information, see also [4], [5] and [6].
+
+Impact
+-------
+
+On affected systems, an attacker who manages to compromise a qube may be
+able to use it to infer the contents of arbitrary system memory,
+including memory assigned to other qubes.
+
+As noted in XSA-471, the paper [6] also describes two Rogue System
+Register Read (sometimes called Spectre-v3a) attacks, namely
+CVE-2024-36348 and CVE-2045-36349. However, these are not believed to
+affect the security of Qubes OS.
+
+Affected systems
+-----------------
+
+Only AMD CPUs with Zen 3 or Zen 4 cores are believed to be affected
+(CPUID family 0x19). For a more detailed list, see [5].
+
+Patching
+---------
+
+As of this writing, AMD has published only non-server CPU microcode
+updates via the linux-firmware repository. [7] They have not yet
+published microcode updates for server CPUs. When this happens, we will
+provide an updated amd-ucode-firmware package. Users with server CPUs
+may be able to obtain the relevant microcode update via a motherboard
+firmware (BIOS/UEFI) update, but this depends on the motherboard vendor
+making such an update available. The appendix of [4] (page 5) contains a
+table showing the minimum microcode version required for mitigating
+transient scheduler attacks for different CPUs. The required microcode
+version (not to be confused with the amd-ucode-firmware package version)
+depends on the CPUID family/model/stepping. Users can compare the
+values from the table with their own system's family/model/stepping and
+current microcode version, which can be viewed by executing the command
+`cat /proc/cpuinfo` in a dom0 terminal.
+
+On affected systems with non-server CPUs, the following packages contain
+security updates that address the vulnerabilities described in this
+bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.5-10
+  - amd-ucode-firmware version 20250708-1
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory and linked publications.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-471.html
+[4] https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
+[5] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7029.html
+[6] https://www.microsoft.com/en-us/research/publication/enter-exit-page-fault-leak-testing-isolation-boundaries-for-microarchitectural-leaks/
+[7] https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/amd-ucode/README
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

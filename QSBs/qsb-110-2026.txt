@@ -29,13 +29,13 @@ paging structures in EPT" [3]:
 Impact
 -------
 
-On affected systems, attacker controlling any PVH/HVM qube can attempt
+On affected systems, an attacker controlling any PVH or HVM qube can attempt
 to exploit this vulnerability in order to compromise Qubes OS.
 
 Affected systems
 -----------------
 
-Only x86 Intel systems are vulnerable.
+Only x86 Intel systems are affected.
 
 Patching
 ---------

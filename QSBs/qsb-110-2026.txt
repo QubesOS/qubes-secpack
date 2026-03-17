@@ -1,0 +1,77 @@
+
+             ---===[ Qubes Security Bulletin 110 ]===---
+
+                              2026-03-17
+
+         Use after free of paging structures in EPT (XSA-480)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-03-17, the Xen Project published XSA-480, "Use after free of
+paging structures in EPT" [3]:
+| The Intel EPT paging code uses an optimization to defer flushing of any cached
+| EPT state until the p2m lock is dropped, so that multiple modifications done
+| under the same locked region only issue a single flush.
+| 
+| Freeing of paging structures however is not deferred until the flushing is
+| done, and can result in freed pages transiently being present in cached state.
+| Such stale entries can point to memory ranges not owned by the guest, thus
+| allowing access to unintended memory regions.
+
+Impact
+-------
+
+On affected systems, attacker controlling any PVH/HVM qube can attempt
+to exploit this vulnerability in order to compromise Qubes OS.
+
+Affected systems
+-----------------
+
+Only x86 Intel systems are vulnerable.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages version 4.17.6-3
+  For Qubes 4.3, in dom0:
+  - Xen packages version 4.19.4-5
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory and linked publications.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-480.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

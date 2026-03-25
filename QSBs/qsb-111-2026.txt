@@ -1,0 +1,72 @@
+
+             ---===[ Qubes Security Bulletin 111 ]===---
+
+                             2026-03-26
+
+                   xfce4-screensaver login bypass
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+When activating screensaver login prompt, there is a very short time
+when keyboard input may be sent to the active application, bypassing
+the login prompt.
+
+Impact
+-------
+
+The time window normally is too short to do real damage manually, but
+if the system is configured to allow USB keyboard without confirmation
+prompt, a device like USB Rubber Ducky can be used to attempt to
+disable screensaver quickly.
+
+Affected systems
+-----------------
+
+Qubes 4.3 with Xfce (the default one) is affected. Other Qubes
+versions and other desktop environments are not affected.
+
+Systems configured to not allow USB keyboard or to require
+confirmation when attaching USB keyboard are not affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - xfce4-screensaver 4.18.4-5
+
+For GUI domain users, the relevant template will get the update
+through appropriate distribution repositories (Fedora, Debian, etc).
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 user session must be restarted afterward in order for the updates
+to take effect.
+
+Credits
+--------
+
+The issue was reported by Murat Altindis and Maria Kessler of AWARE7 GmbH.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

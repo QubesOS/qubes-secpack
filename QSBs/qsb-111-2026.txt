@@ -3,7 +3,7 @@
 
                              2026-03-26
 
-                   xfce4-screensaver login bypass
+                     xfce4-screensaver login bypass
 
 User action
 ------------
@@ -15,26 +15,47 @@ required in response to this QSB.
 Summary
 --------
 
-When activating screensaver login prompt, there is a very short time
-when keyboard input may be sent to the active application, bypassing
-the login prompt.
+When activating the screensaver login prompt on a locked screen, there
+is a very short time when keyboard input is not intercepted by
+xfce4-screensaver and is instead sent to the application that was active
+before locking, bypassing the login prompt.
 
 Impact
 -------
 
-The time window normally is too short to do real damage manually, but
-if the system is configured to allow USB keyboard without confirmation
-prompt, a device like USB Rubber Ducky can be used to attempt to
-disable screensaver quickly.
+The time window normally is too short to do real damage manually. But if
+an attacker is able to automatically generate input events the attacker
+can try to deactiveate the screensaver by typing a command quickly
+enough.
 
 Affected systems
 -----------------
 
-Qubes 4.3 with Xfce (the default one) is affected. Other Qubes
-versions and other desktop environments are not affected.
+Qubes 4.3 with xfce4-screensaver as the screensaver (the default option
+with the default Xfce desktop environment) is affected. Other Qubes
+versions and other screensavers are not affected.
 
-Systems configured to not allow USB keyboard or to require
-confirmation when attaching USB keyboard are not affected.
+If the system is configured to allow USB keyboard input without a
+confirmation prompt (off by default) it's easy for an attacker to
+quickly generate input events by using an USB device that emulates an
+keyboard.
+
+Systems that otherwise expose a keyboard input interface are affected
+even when USB keyboard input without configuration is not allowed. The
+most common, but nowadays overall still uncommon, option is PS/2 input.
+
+An attacker could also access internal interfaces through physical
+modifications. For example the connection of an integrated keyboard of a
+laptop. This is more complicated than the above options and requires
+physical access to an extend that other attacks that are out of scope to
+Qubes' security model are possible too.
+
+The time window in which the input events are wrongly delivered seems to
+heavily vary between systems (between non being able to get even one key
+event through, to users being able to manually type a full password).
+The exact circumstances are not understood yet, but it might be related
+to the interaction of the graphic stack with the hardware installed in a
+system.
 
 Patching
 ---------
@@ -61,11 +82,16 @@ Credits
 
 The issue was reported by Murat Altindis and Maria Kessler of AWARE7 GmbH.
 
+Qubes issue #10720 [3] is likely a report of the same problem, but was
+wrongly indentified as a duplicate of a similar sounding, but not
+security relevant issue.
+
 References
 -----------
 
 [1] https://www.qubes-os.org/doc/how-to-update/
 [2] https://www.qubes-os.org/doc/testing/
+[3] https://github.com/QubesOS/qubes-issues/issues/10720
 
 --
 The Qubes Security Team

@@ -68,6 +68,14 @@ significantly depending on the nature of the interface:
    attack vectors and requires extensive physical access, making it much
    more difficult to execute successfully.
 
+Note that attacks requiring physical access are mostly out of scope of
+Qubes' security model. Beside the general limitations of protecting
+against attackers with physical access, the primary reason is that
+protections depend heavily on the hardware and firmware details of the
+system that are usually beyond Qubes' control and vary betwenn systems,
+since Qubes can be used on many modern x86 systems. But we consider this
+screensaver login bypass to be in scope.
+
 Patching
 ---------
 

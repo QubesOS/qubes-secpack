@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 111 ]===---
 
-                             2026-03-26
+                             2026-04-10
 
                      xfce4-screensaver login bypass
 
@@ -15,8 +15,9 @@ required in response to this QSB.
 Summary
 --------
 
-When activating the xfce4-screensaver login prompt on a locked screen,
-there is a very short window of time during which keyboard input is not
+When connecting or disconneting a display or in some cases when simply
+activating the xfce4-screensaver login prompt on a locked screen, there
+is a very short window of time during which keyboard input is not
 intercepted by xfce4-screensaver and is instead sent to the application
 that was active before locking.
 
@@ -60,23 +61,12 @@ significantly depending on the nature of the interface:
  - Even when there is no keyboard input interface exposed on the outside
    of the machine as a convenient port, it may still be possible for the
    attacker to physically modify the machine in order to gain access to
-   such an interface. For example, in most laptops, the physical
-   keyboard is internally connected to the motherboard through a PS/2
-   (or similar) interface. An attacker who can gain access to the
-   internal components of the machine could disconnect the legitimate
-   keyboard and attach his own malicious device to the same interface.
-   However, this form of attack is significantly more complex than the
-   foregoing attack vectors and requires extensive physical access,
-   making it much more difficult to execute successfully.
-
-It is worth noting that the window of time during which keyboard input
-events are incorrectly delivered seems to vary significantly between
-systems. In our internal testing, we were sometimes unable to get even a
-single key event to bypass the login prompt. Meanwhile, one user
-reported being able to manually type a full password before the login
-prompt began properly intercepting keyboard input. While the precise
-causes are not yet understood, it may be related to the interaction of
-the graphics stack with the system's specific hardware configuration.
+   such an interface. An attacker who can gain access to the internal
+   components of the machine could disconnect the legitimate keyboard
+   and attach their own malicious device to the same interface. However,
+   this form of attack is significantly more complex than the foregoing
+   attack vectors and requires extensive physical access, making it much
+   more difficult to execute successfully.
 
 Patching
 ---------
@@ -84,13 +74,13 @@ Patching
 The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
-  For Qubes 4.3:
+  For Qubes 4.3, in dom0:
   - xfce4-screensaver 4.18.4-5
 
 In systems without a GUI domain, this update will be applied in dom0.
-For systems with a GUI domain, this update will be distributed via the
-distribution repositories (e.g., Fedora or Debian) of the template on
-which the GUI domain is based.
+For systems with a GUI domain, an update will be distributed by the
+distribution of the template on which the GUI domain is based (e.g.,
+Fedora or Debian).
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

@@ -15,7 +15,7 @@ required in response to this QSB.
 Summary
 --------
 
-When connecting or disconneting a display or in some cases when simply
+When connecting or disconnecting a display or, in some cases, when simply
 activating the xfce4-screensaver login prompt on a locked screen, there
 is a very short window of time during which keyboard input is not
 intercepted by xfce4-screensaver and is instead sent to the application
@@ -25,10 +25,9 @@ Impact
 -------
 
 The time window is normally too short for any real harm to occur when
-the user is physically typing on the keyboard. However, if an attacker
-is able to generate input events in an automated way, the attacker can
-attempt to deactivate the screensaver by sending a command quickly
-enough.
+physically typing on a keyboard. However, if an attacker is able to
+generate input events in an automated way, the attacker can attempt to
+deactivate the screensaver by sending a command quickly enough.
 
 Affected systems
 -----------------
@@ -41,7 +40,7 @@ Systems that permit an attacker physical access to a keyboard interface
 are affected. Most systems permit such access in some way, since the
 user's legitimate keyboard must connect to the system through such an
 interface, but the degree of difficulty for the attacker varies
-significantly depending on the nature of the interface:
+significantly depending on the nature of the interface.
 
  - The easiest method for an attacker is unrestricted USB keyboard input
    without a confirmation prompt, but this is disabled in Qubes OS by
@@ -59,22 +58,33 @@ significantly depending on the nature of the interface:
    keyboard input is restricted.
 
  - Even when there is no keyboard input interface exposed on the outside
-   of the machine as a convenient port, it may still be possible for the
-   attacker to physically modify the machine in order to gain access to
-   such an interface. An attacker who can gain access to the internal
-   components of the machine could disconnect the legitimate keyboard
-   and attach their own malicious device to the same interface. However,
-   this form of attack is significantly more complex than the foregoing
-   attack vectors and requires extensive physical access, making it much
-   more difficult to execute successfully.
+   of the machine as a convenient port, as in the case of a laptop with
+   disabled USB keyboard input and no PS/2 port, it may still be
+   possible for the attacker to physically modify the machine in order
+   to gain access to such an interface. For example, built-in laptop
+   keyboards must still be internally connected to the laptop's
+   motherboard through such an interface in order to function properly.
+   An attacker who can gain access to the internal components of the
+   machine could disconnect the legitimate keyboard and attach their own
+   malicious device to the same interface. However, this form of attack
+   is significantly more complex than the foregoing attack vectors and
+   requires extensive physical access, making it much more difficult to
+   execute successfully.
 
-Note that attacks requiring physical access are mostly out of scope of
-Qubes' security model. Beside the general limitations of protecting
-against attackers with physical access, the primary reason is that
-protections depend heavily on the hardware and firmware details of the
-system that are usually beyond Qubes' control and vary betwenn systems,
-since Qubes can be used on many modern x86 systems. But we consider this
-screensaver login bypass to be in scope.
+Discussion
+-----------
+
+In general, we consider most attacks that require physical access to the
+system to fall outside the scope of the Qubes security model. Aside from
+the general challenges of protecting against physical attacks, this is
+primarily because physical protections depend heavily on the hardware
+and firmware details of the system. Since Qubes OS is designed to run on
+any x86 system that meets its system requirements [2], these hardware
+and firmware details can vary significantly between systems and are
+typically outside of Qubes' control. Nonetheless, we consider this
+screensaver login bypass vulnerability to fall within the scope of the
+Qubes security model, since Qubes OS does have control over keyboard
+input interception on the lock screen.
 
 Patching
 ---------
@@ -82,17 +92,16 @@ Patching
 The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
-  For Qubes 4.3, in dom0:
+  For Qubes 4.3, in dom0 (no GUI domain):
   - xfce4-screensaver 4.18.4-5
 
-In systems without a GUI domain, this update will be applied in dom0.
-For systems with a GUI domain, an update will be distributed by the
+For systems with a GUI domain, a similar update will be provided by the
 distribution of the template on which the GUI domain is based (e.g.,
 Fedora or Debian).
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages should be installed
+by the community. [3] Once available, the packages should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
 Dom0's user session must be restarted afterward in order for the updates
@@ -105,16 +114,17 @@ Credits
 The issue was reported by Murat Altindis and Maria Kessler of AWARE7
 GmbH.
 
-Qubes issue #10720 [3] is likely a report of the same problem. This
+Qubes issue #10720 [4] is likely a report of the same problem. This
 issue was incorrectly identified as a duplicate of another issue that
 sounds similar but that is not relevant to the security of Qubes OS.
 
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/how-to-update/
-[2] https://www.qubes-os.org/doc/testing/
-[3] https://github.com/QubesOS/qubes-issues/issues/10720
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/hardware/system-requirements.html
+[3] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[4] https://github.com/QubesOS/qubes-issues/issues/10720
 
 --
 The Qubes Security Team

@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 111 ]===---
 
-                             2026-04-10
+                             2026-04-14
 
                      xfce4-screensaver login bypass
 
@@ -20,6 +20,8 @@ activating the xfce4-screensaver login prompt on a locked screen, there
 is a very short window of time during which keyboard input is not
 intercepted by xfce4-screensaver and is instead sent to the application
 that was active before locking.
+
+The issue has been fixed upstream in [2].
 
 Impact
 -------
@@ -79,7 +81,7 @@ system to fall outside the scope of the Qubes security model. Aside from
 the general challenges of protecting against physical attacks, this is
 primarily because physical protections depend heavily on the hardware
 and firmware details of the system. Since Qubes OS is designed to run on
-any x86 system that meets its system requirements [2], these hardware
+any x86 system that meets its system requirements [3], these hardware
 and firmware details can vary significantly between systems and are
 typically outside of Qubes' control. Nonetheless, we consider this
 screensaver login bypass vulnerability to fall within the scope of the
@@ -101,7 +103,7 @@ Fedora or Debian).
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [3] Once available, the packages should be installed
+by the community. [4] Once available, the packages should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
 Dom0's user session must be restarted afterward in order for the updates
@@ -114,7 +116,7 @@ Credits
 The issue was reported by Murat Altindis and Maria Kessler of AWARE7
 GmbH.
 
-Qubes issue #10720 [4] is likely a report of the same problem. This
+Qubes issue #10720 [5] is likely a report of the same problem. This
 issue was incorrectly identified as a duplicate of another issue that
 sounds similar but that is not relevant to the security of Qubes OS.
 
@@ -122,9 +124,10 @@ References
 -----------
 
 [1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
-[2] https://doc.qubes-os.org/en/latest/user/hardware/system-requirements.html
-[3] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
-[4] https://github.com/QubesOS/qubes-issues/issues/10720
+[2] https://gitlab.xfce.org/apps/xfce4-screensaver/-/commit/4436087c6af5e915a2438d7c1dd0fdc282f547f8
+[3] https://doc.qubes-os.org/en/latest/user/hardware/system-requirements.html
+[4] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[5] https://github.com/QubesOS/qubes-issues/issues/10720
 
 --
 The Qubes Security Team

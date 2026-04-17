@@ -1,0 +1,80 @@
+
+             ---===[ Qubes Security Bulletin 112 ]===---
+
+                             2026-04-17
+
+        x86: Floating Point Divider State Sampling (XSA-488)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-04-17, the Xen Project published XSA-488, "x86: Floating Point
+Divider State Sampling" (CVE-2025-54505) [3]:
+| Researchers from the CISPA Helmholtz Center for Information Security have
+| discovered Floating Point Divider State Sampling.  It is detailed in a paper
+| titled "TREVEX: A Black-Box Detection Framework For Data-Flow Transient
+| Execution Vulnerabilities"
+| 
+| For more information, see:
+|   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7053.html
+|   https://roots.ec/blog/fpdss/
+| 
+
+Impact
+-------
+
+An attacker might be able to infer data belonging to other contexts,
+including data belonging to other qubes.
+
+Affected systems
+-----------------
+
+Only AMD Fam17h CPUs (Zen1 microarchitecture) are believed to be
+vulnerable.  Other AMD CPUs and CPUs from other manufacturers are not
+known to be affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.6-4
+  For Qubes 4.3, in dom0:
+  - Xen packages, version 4.19.4-7
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory and linked publications.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-488.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

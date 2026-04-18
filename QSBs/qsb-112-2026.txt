@@ -17,15 +17,14 @@ Summary
 
 On 2026-04-17, the Xen Project published XSA-488, "x86: Floating Point
 Divider State Sampling" (CVE-2025-54505) [3]:
-| Researchers from the CISPA Helmholtz Center for Information Security have
-| discovered Floating Point Divider State Sampling.  It is detailed in a paper
-| titled "TREVEX: A Black-Box Detection Framework For Data-Flow Transient
-| Execution Vulnerabilities"
+| Researchers from the CISPA Helmholtz Center for Information Security
+| have discovered Floating Point Divider State Sampling.  It is detailed
+| in a paper titled "TREVEX: A Black-Box Detection Framework For
+| Data-Flow Transient Execution Vulnerabilities"
 | 
 | For more information, see:
 |   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7053.html
 |   https://roots.ec/blog/fpdss/
-| 
 
 Impact
 -------
@@ -37,8 +36,8 @@ Affected systems
 -----------------
 
 Only AMD CPUs with the Zen or Zen+ microarchitecture (Family 17h) are
-believed to be vulnerable. Other AMD CPUs (including later Zen
-generations) and CPUs from other manufacturers are not known to be
+believed to be affected. Other AMD CPUs (including later Zen
+generations) and CPUs from other manufacturers are not believed to be
 affected.
 
 Patching
@@ -72,8 +71,8 @@ See the original Xen Security Advisory and linked publications.
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/how-to-update/
-[2] https://www.qubes-os.org/doc/testing/
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
 [3] https://xenbits.xen.org/xsa/advisory-488.html
 
 --

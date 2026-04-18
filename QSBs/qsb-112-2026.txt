@@ -1,9 +1,9 @@
 
              ---===[ Qubes Security Bulletin 112 ]===---
 
-                             2026-04-17
+                             2026-04-18
 
-        x86: Floating Point Divider State Sampling (XSA-488)
+           Floating Point Divider State Sampling (XSA-488)
 
 User action
 ------------
@@ -36,9 +36,10 @@ including data belonging to other qubes.
 Affected systems
 -----------------
 
-Only AMD Fam17h CPUs (Zen1 microarchitecture) are believed to be
-vulnerable.  Other AMD CPUs and CPUs from other manufacturers are not
-known to be affected.
+Only AMD CPUs with the Zen or Zen+ microarchitecture (Family 17h) are
+believed to be vulnerable. Other AMD CPUs (including later Zen
+generations) and CPUs from other manufacturers are not known to be
+affected.
 
 Patching
 ---------

@@ -1,0 +1,78 @@
+
+             ---===[ Qubes Security Bulletin 113 ]===---
+
+                              2026-05-12
+
+              x86: CPU Opcode Cache corruption (XSA-490)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-05-12, the Xen Project published XSA-490, "x86: CPU Opcode
+Cache corruption" (CVE-2025-54518) [3]:
+| AMD have disclosed a potential vulnerability in certain CPUs which can
+| cause instructions to execute at a higher privilege.
+| 
+
+For more information, see [4].
+
+Impact
+-------
+
+On affected systems, an attacker may use this vulnerability to
+escalate their privileges from userspace in a qube, to the kernel
+(escaping sandboxes inside a qube), and also to compromise the whole
+host.
+
+Affected systems
+-----------------
+
+Only AMD Zen2 systems are affected. Systems with other AMD
+microarchitectures, or Intel processors are not affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.6-5
+  For Qubes 4.3, in dom0:
+  - Xen packages, version 4.19.4-8
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
+Credits
+--------
+
+See original AMD advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://xenbits.xen.org/xsa/advisory-490.html
+[4] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7052.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

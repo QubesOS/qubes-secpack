@@ -3,7 +3,7 @@
 
                               2026-05-12
 
-              x86: CPU Opcode Cache corruption (XSA-490)
+              AMD CPU Opcode Cache corruption (XSA-490)
 
 User action
 ------------
@@ -15,26 +15,24 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-05-12, the Xen Project published XSA-490, "x86: CPU Opcode
-Cache corruption" (CVE-2025-54518) [3]:
+On 2026-05-12, the Xen Project published XSA-490, "x86: CPU Opcode Cache
+corruption" (CVE-2025-54518) [3]:
 | AMD have disclosed a potential vulnerability in certain CPUs which can
 | cause instructions to execute at a higher privilege.
-| 
 
 For more information, see [4].
 
 Impact
 -------
 
-On affected systems, an attacker may use this vulnerability to
-escalate their privileges from userspace in a qube, to the kernel
-(escaping sandboxes inside a qube), and also to compromise the whole
-host.
+On affected systems, an attacker may use this vulnerability to escalate
+their privileges from userspace in a qube, to the kernel (escaping
+sandboxes inside a qube), and also to compromise the whole host.
 
 Affected systems
 -----------------
 
-Only AMD Zen2 systems are affected. Systems with other AMD
+Only AMD Zen 2 systems are affected. Systems with other AMD
 microarchitectures, or Intel processors are not affected.
 
 Patching

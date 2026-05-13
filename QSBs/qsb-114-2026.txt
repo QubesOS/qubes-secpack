@@ -16,11 +16,12 @@ Summary
 --------
 
 On 2026-05-12, Intel published "2026.2 IPU-Intel Processor Firmware
-Advisory" (CVE-2025-35979). [3] Unfortunately, this advisory does not
-provide sufficient information for us to make a definitive assessment
-about the extent to which this vulnerability affects the security of
-Qubes OS. Based on the limited information available, we surmise that it
-is likely that it might affect cross-qube data leaks.
+Advisory" (INTEL-SA-01420, CVE-2025-35979). [3] Unfortunately, this
+advisory does not provide sufficient information for us to make a
+definitive assessment about the extent to which this vulnerability
+affects the security of Qubes OS. Based on the limited information
+available, we surmise that it is likely that it might affect cross-qube
+data leaks.
 
 Impact
 -------

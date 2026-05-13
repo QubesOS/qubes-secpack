@@ -1,0 +1,73 @@
+
+             ---===[ Qubes Security Bulletin 114 ]===---
+
+                              2026-05-13
+
+                        Intel microcode update
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-05-12, Intel published INTEL-SA-01420 advisory[3].
+
+However, this Intel advisory do not provide enough information for us to
+make a definitive assessment about the extent to which these
+vulnerabilities affect the security of Qubes OS. Based on the limited
+information available, we surmise that it is likely that it might
+affect cross-qube data leaks.
+
+Impact
+-------
+
+On affected systems, a compromised qube might be able to leak
+information from another qube.
+
+Affected systems
+-----------------
+
+INTEL-SA-01420 affects Intel Core Ultra Series 2 and 3 processors (see
+[3] for more detailed list).
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes OS 4.2 and 4.3, in dom0:
+  - microcode_ctl version 2.1.20260512
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+microcode updates.
+
+Credits
+--------
+
+See the original Intel Security Advisory.
+
+References
+-----------
+
+[1] https://www.qubes-os.org/doc/how-to-update/
+[2] https://www.qubes-os.org/doc/testing/
+[3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01420.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

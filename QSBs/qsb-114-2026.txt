@@ -15,13 +15,13 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-05-12, Intel published INTEL-SA-01420 advisory[3].
+On 2026-05-12, Intel published INTEL-SA-01420 advisory [3].
 
 However, this Intel advisory do not provide enough information for us to
 make a definitive assessment about the extent to which these
 vulnerabilities affect the security of Qubes OS. Based on the limited
-information available, we surmise that it is likely that it might
-affect cross-qube data leaks.
+information available, we surmise that it is likely that it might affect
+cross-qube data leaks.
 
 Impact
 -------

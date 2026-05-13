@@ -20,20 +20,22 @@ corruption" (CVE-2025-54518) [3]:
 | AMD have disclosed a potential vulnerability in certain CPUs which can
 | cause instructions to execute at a higher privilege.
 
-For more information, see [4].
+For more information, see AMD's "CPU OP Cache Corruption" advisory. [4]
 
 Impact
 -------
 
-On affected systems, an attacker may use this vulnerability to escalate
-their privileges from userspace in a qube, to the kernel (escaping
-sandboxes inside a qube), and also to compromise the whole host.
+On affected systems, an attacker can attempt to exploit this
+vulnerability in order to:
+- escalate privileges from userspace to the kernel inside of a given
+  qube in order to escape sandboxes inside that qube
+- compromise Qubes OS itself
 
 Affected systems
 -----------------
 
 Only AMD Zen 2 systems are affected. Systems with other AMD
-microarchitectures, or Intel processors are not affected.
+microarchitectures and systems with Intel processors are not affected.
 
 Patching
 ---------
@@ -61,13 +63,13 @@ binaries.
 Credits
 --------
 
-See original AMD advisory.
+See AMD's "CPU OP Cache Corruption" advisory. [4]
 
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/how-to-update/
-[2] https://www.qubes-os.org/doc/testing/
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
 [3] https://xenbits.xen.org/xsa/advisory-490.html
 [4] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7052.html
 

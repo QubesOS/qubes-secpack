@@ -3,7 +3,7 @@
 
                               2026-05-13
 
-                Intel CPU data exposure vulnerability 
+                Intel CPU data exposure vulnerability
 
 User action
 ------------

@@ -3,7 +3,7 @@
 
                               2026-05-13
 
-                        Intel microcode update
+                Intel CPU data exposure vulnerability 
 
 User action
 ------------
@@ -21,14 +21,14 @@ advisory does not provide sufficient information for us to make a
 definitive assessment about the extent to which this vulnerability
 affects the security of Qubes OS. Based on the limited information
 available, we surmise that it is likely that it might affect cross-qube
-data leaks.
+data exposure.
 
 Impact
 -------
 
 On affected systems, an attacker who has managed to compromise one qube
-can attempt to exploit this vulnerability in order to read data from
-other qubes.
+can attempt to exploit this vulnerability in order to infer data
+belonging to other qubes.
 
 Affected systems
 -----------------

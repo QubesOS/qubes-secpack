@@ -59,8 +59,8 @@ TODO
 References
 -----------
 
-[1] https://www.qubes-os.org/doc/how-to-update/
-[2] https://www.qubes-os.org/doc/testing/
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
 TODO
 
 --

@@ -11,3 +11,5 @@ This repository contains various PGP keys used throughout the Qubes OS Project.
 - `template-keys/` contains keys used to sign [templates](https://doc.qubes-os.org/en/latest/user/templates/templates.html) and their packages. These keys are not signed by the QMSK (except for the Fedora package signing key, since it is also used for dom0 packages and ISOs). Keys containing `templates` in the name are used to sign whole templates. Note that the Qubes OS 4.0 and 4.1 releases use the same set of keys.
 
 - `doc-signing/` contains keys belonging to Qubes documentation and website editors.
+
+- `build-logs/` contains keys used to sign build logs.

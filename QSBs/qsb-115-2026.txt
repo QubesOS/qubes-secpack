@@ -1,0 +1,82 @@
+
+             ---===[ Qubes Security Bulletin 115 ]===---
+
+                              2026-06-09
+
+                 HVM I/O port list traversal (XSA-491)
+
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-06-09, the Xen Project published XSA-491, "x86 HVM I/O port
+list traversal" (CVE-2026-42487) [3]:
+| HVM guest I/O port accesses are subject to either emulation or at least
+| translation.  Translations are managed by the device model (via
+| XEN_DOMCTL_ioport_mapping), and hence the linked list used may changed
+| at any time.  Traversal of those lists (while handling guest I/O port
+| accesses) therefore needs synchronizing with updates, which was missing
+| so far.
+
+Impact
+-------
+
+A malicious stub-domain can crash the hypervisor (and hence the entire
+system). A stub-domain is a qube that accompanies a
+"fully-virtualized" (HVM) qube and in which qemu is isolated.
+Privilege escalation and information leaks cannot be ruled out.
+
+Affected systems
+-----------------
+
+All supported version of Qubes OS are affected.
+
+Only qubes in HVH mode are affected. In the default configuration, this
+includes sys-net and sys-usb.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.2, in dom0:
+  - Xen packages, version 4.17.6-6
+  For Qubes 4.3, in dom0:
+  - Xen packages, version 4.19.4-8
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new Xen
+binaries.
+
+Credits
+--------
+
+See the original Xen Security Advisory.
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[3] https://xenbits.xen.org/xsa/advisory-491.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/
+

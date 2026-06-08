@@ -1,9 +1,8 @@
 # Qubes security pack (qubes-secpack)
 
-The [Qubes security pack
-(qubes-secpack)](https://doc.qubes-os.org/en/latest/project-security/security-pack.html)
-is a git repository containing security-related information about the
-Qubes OS Project. It includes the following:
+The [Qubes security pack (qubes-secpack)][doc] is a git repository containing
+security-related information about the Qubes OS Project. It includes the
+following:
 
  - Qubes PGP keys (`keys/`)
  - Qubes security bulletins (`QSBs/`)
@@ -11,26 +10,28 @@ Qubes OS Project. It includes the following:
  - Qubes fund information (`fund/`)
  - Qubes ISO digests (`digests/`)
 
-The files contained in this repository can be
-[authenticated](https://doc.qubes-os.org/en/latest/project-security/security-pack.html#how-to-obtain-and-authenticate)
-in two ways:
+[doc]: https://doc.qubes-os.org/en/latest/project-security/security-pack.html
+
+The files contained in this repository can be [authenticated][doc-auth] in two
+ways:
 
  - By verifying the git commit tags (`git tag -v`)
  - By verifying the detached PGP signatures, which are provided for the
    majority of files included here (e.g., individual QSBs, canaries, and
    other announcements)
 
+[doc-auth]: https://doc.qubes-os.org/en/latest/project-security/security-pack.html#how-to-obtain-and-authenticate
+
 All the keys used by the Qubes OS Project itself, including the keys used to
 sign files and commits in this repository (but excluding some keys owned by
 individual people), are ultimately signed by the Qubes Master Signing Key
 (QMSK). Even though the QMSK is included in this repo, you should make sure to
 [obtain the QMSK fingerprint from multiple independent sources in several
-different
-ways](https://doc.qubes-os.org/en/latest/project-security/verifying-signatures.html#how-to-import-and-authenticate-the-qubes-master-signing-key),
-as a fake Qubes security pack would contain a fake QMSK.
+different ways][qmsk-auth] as a fake Qubes security pack would contain a fake
+QMSK.
 
-For more information about the Qubes security pack, including its
-history and rationale, and for detailed instructions for verifying its
-contents, please see the [Qubes security pack (qubes-secpack)
-documentation
-page](https://doc.qubes-os.org/en/latest/project-security/security-pack.html).
+[qmsk-auth]: https://doc.qubes-os.org/en/latest/project-security/verifying-signatures.html#how-to-import-and-authenticate-the-qubes-master-signing-key
+
+For more information about the Qubes security pack, including its history and
+rationale, and for detailed instructions for verifying its contents, please see
+the [Qubes security pack (qubes-secpack) documentation page][doc].

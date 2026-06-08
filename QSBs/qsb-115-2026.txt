@@ -50,7 +50,7 @@ vulnerabilities described in this bulletin:
   For Qubes 4.2, in dom0:
   - Xen packages, version 4.17.6-6
   For Qubes 4.3, in dom0:
-  - Xen packages, version 4.19.4-8
+  - Xen packages, version 4.19.4-9
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested

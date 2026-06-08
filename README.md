@@ -20,12 +20,12 @@ in two ways:
    majority of files included here (e.g., individual QSBs, canaries, and
    other announcements)
 
-All the keys used by the Qubes OS Project itself, including the keys
-used to sign files and commits in this repository (but excluding keys
-owned by individual people), are ultimately signed by the Qubes Master
-Signing Key (QMSK). Even though the QMSK is included in this repo, you
-should make sure to [obtain the QMSK fingerprint from multiple
-independent sources in several different
+All the keys used by the Qubes OS Project itself, including the keys used to
+sign files and commits in this repository (but excluding some keys owned by
+individual people), are ultimately signed by the Qubes Master Signing Key
+(QMSK). Even though the QMSK is included in this repo, you should make sure to
+[obtain the QMSK fingerprint from multiple independent sources in several
+different
 ways](https://doc.qubes-os.org/en/latest/project-security/verifying-signatures.html#how-to-import-and-authenticate-the-qubes-master-signing-key),
 as a fake Qubes security pack would contain a fake QMSK.
 

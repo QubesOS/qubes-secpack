@@ -16,30 +16,30 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-06-09, the Xen Project published XSA-491, "x86 HVM I/O port
-list traversal" (CVE-2026-42487) [3]:
-| HVM guest I/O port accesses are subject to either emulation or at least
-| translation.  Translations are managed by the device model (via
+On 2026-06-09, the Xen Project published XSA-491, "x86 HVM I/O port list
+traversal" (CVE-2026-42487) [3]:
+| HVM guest I/O port accesses are subject to either emulation or at
+| least translation.  Translations are managed by the device model (via
 | XEN_DOMCTL_ioport_mapping), and hence the linked list used may changed
 | at any time.  Traversal of those lists (while handling guest I/O port
-| accesses) therefore needs synchronizing with updates, which was missing
-| so far.
+| accesses) therefore needs synchronizing with updates, which was
+| missing so far.
 
 Impact
 -------
 
-A malicious stub-domain can crash the hypervisor (and hence the entire
-system). A stub-domain is a qube that accompanies a
-"fully-virtualized" (HVM) qube and in which qemu is isolated.
-Privilege escalation and information leaks cannot be ruled out.
+A malicious stub domain can crash the hypervisor (and hence the entire
+system). A stub domain is a qube that accompanies a "fully-virtualized"
+(HVM) qube and in which QEMU is isolated. Privilege escalation and
+information leaks cannot be ruled out.
 
 Affected systems
 -----------------
 
-All supported version of Qubes OS are affected.
+All supported versions of Qubes OS are affected.
 
-Only qubes in HVH mode are affected. In the default configuration, this
-includes sys-net and sys-usb.
+Only qubes running in HVM mode are affected. In the default
+configuration, this includes sys-net and sys-usb.
 
 Patching
 ---------
@@ -67,7 +67,7 @@ binaries.
 Credits
 --------
 
-See the original Xen Security Advisory.
+See the original Xen Security Advisory. [3]
 
 References
 -----------

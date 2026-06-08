@@ -5,4 +5,3 @@ used depending on the build artifact category:
 - `packages-community.asc` - release packages for community supported templates (when built on official infrastructure) - Archlinux, Ubuntu
 - `templates-community.asc` - community template builds
 - `packages-devel.asc` - devel version packages for testing purpose
-

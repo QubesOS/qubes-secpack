@@ -84,14 +84,12 @@ default configuration of Qubes OS, sys-net and sys-usb are HVM qubes and
 are considered to be untrusted.
 
 XSA-507: The only affected systems are those that have qubes that are
-included in memory balancing but that are set to use the kernel from
-within those qubes and that either do not support memory hotplug or that
-have their virt_mode set to "HVM." The default Qubes OS configuration is
-not affected, nor are commonly-used HVM qubes like Windows. Advanced
-users can check support for memory hotplug by looking for the
-`CONFIG_XEN_BALLOON_MEMORY_HOTPLUG` option in the Linux kernel build
-config.
-
+included in memory balancing but don't advertise memory hotplugging
+support. This applies to a malicious qube that has memory balancing
+enabled if it's running in HVM mode, or is a standalone or template
+qubes that is using a in-qube kernel qube. The default Qubes OS
+configuration is not affected, nor are commonly-used HVM qubes like
+Windows (since they don't have memory balancing enabled).
 
 Patching
 ---------

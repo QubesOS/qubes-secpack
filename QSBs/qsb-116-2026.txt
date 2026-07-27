@@ -70,26 +70,26 @@ Affected systems
 
 XSA-500: All systems are affected.
 
-XSA-505: The affected systems are those that have PV qubes stubdomains
-for HVM qubes (or both), but the vulnerability is easier to exploit on
+XSA-505: Systems with either PV qubes or stubdomains for HVM qubes (or
+both) are affected, but the vulnerability is easier to exploit on
 systems with PV qubes. In the default Qubes OS configuration, there are
-PV qubes, but sys-net and sys-usb are HVM qubes that have stubdomains.
-This means that the vulnerability is more difficult to exploit in the
-default Qubes OS configuration, but if a user has manually created PV
-qubes in a particular system, the vulnerability will be easier to
-exploit on that system.
+no PV qubes, but sys-net and sys-usb are HVM qubes that have
+stubdomains. This means that the vulnerability is more difficult to
+exploit in the default Qubes OS configuration, but if a user has
+manually created PV qubes in a particular system, the vulnerability will
+be easier to exploit on that system.
 
-XSA-506: All systems with untrusted HVM qubes are affected. In the
-default configuration of Qubes OS, sys-net and sys-usb are HVM qubes and
-are considered to be untrusted.
+XSA-506: Systems with untrusted HVM qubes are affected. In the default
+configuration of Qubes OS, sys-net and sys-usb are HVM qubes and are
+considered to be untrusted.
 
-XSA-507: The only affected systems are those that have qubes that are
-included in memory balancing but don't advertise memory hotplugging
-support. This applies to a malicious qube that has memory balancing
-enabled if it's running in HVM mode, or is a standalone or template
-qubes that is using a in-qube kernel qube. The default Qubes OS
-configuration is not affected, nor are commonly-used HVM qubes like
-Windows (since they don't have memory balancing enabled).
+XSA-507: Systems are affected if they have qubes that are included in
+memory balancing but that don't advertise memory hotplug support. This
+includes malicious qubes with memory balancing enabled while running in
+HVM mode, as well as templates and standalones using in-qube kernels.
+The default Qubes OS configuration is not affected, nor are
+commonly-used HVM qubes like Windows, since they don't have memory
+balancing enabled.
 
 Patching
 ---------
@@ -126,11 +126,11 @@ References
 [4] https://xenbits.xen.org/xsa/advisory-505.html
 [5] https://xenbits.xen.org/xsa/advisory-506.html
 [6] https://xenbits.xen.org/xsa/advisory-507.html
-[7] A qube that is running with virt_mode set to "pv".
-[8] For each qube that is running with virt_mode set to "hvm" there's an
+[7] A PV qube is a qube that is running with virt_mode set to "pv."
+[8] For each qube that is running with virt_mode set to "hvm," there's a
     small Xen-internal helper VM running alongside it, in which QEMU is
     executed to provide device emulation for that qube. This helper VM
-    runs in PV mode and is called stubdomain.
+    runs in PV mode and is called a "stubdomain."
 
 --
 The Qubes Security Team

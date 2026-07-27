@@ -85,11 +85,11 @@ considered to be untrusted.
 
 XSA-507: Systems are affected if they have qubes that are included in
 memory balancing but that don't advertise memory hotplug support. This
-includes malicious qubes with memory balancing enabled while running in
-HVM mode, as well as templates and standalones using in-qube kernels.
-The default Qubes OS configuration is not affected, nor are
-commonly-used HVM qubes like Windows, since they don't have memory
-balancing enabled.
+includes malicious HVM qubes with memory balancing enabled, as well as
+templates and standalones that use in-qube kernels and that have memory
+balancing enabled. The default Qubes OS configuration is not affected,
+nor are commonly-used HVM qubes like Windows, since they don't have
+memory balancing enabled.
 
 Patching
 ---------

@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 116 ]===---
 
-                              2026-07-29
+                              2026-07-28
 
        Multiple Xen issues (XSA-500, XSA-505, XSA-506, XSA-507)
 
@@ -15,7 +15,7 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-07-29, the Xen Project published the security advisories below.
+On 2026-07-28, the Xen Project published the security advisories below.
 
 XSA-500 [3] "grant-table: type confusion in grant-copy":
 

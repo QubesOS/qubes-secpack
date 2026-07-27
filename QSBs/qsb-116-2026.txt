@@ -52,14 +52,13 @@ XSA-507 [6] "PoD: Don't try to reclaim special pages":
 Impact
 -------
 
-XSA-500 and XSA-507: A malicious qube may be able to compromise Qubes
-OS.
+XSA-500 and XSA-507: A malicious qube may be able to compromise
+Qubes OS.
 
-XSA-505: A malicious qube with its virt_mode set to "pv" may be able to
-compromise Qubes OS. The same impact applies to stubdomains for HVM
-qubes, but in this case an attacker would first have to discover and
-exploit an independent vulnerability (in QEMU) in order to gain access
-to the stubdomain.
+XSA-505: A malicious PV qube [7] may be able to compromise Qubes OS. The
+same impact applies to stubdomains for HVM qubes [8], but in this case
+an attacker would first have to discover and exploit an independent
+vulnerability (in QEMU) in order to gain access to the stubdomain.
 
 XSA-506: The stubdomain for an HVM qube may be able to leak data from
 other qubes in the system. In order to exploit this vulnerability, an
@@ -71,15 +70,14 @@ Affected systems
 
 XSA-500: All systems are affected.
 
-XSA-505: The affected systems are those that have either qubes set to
-the "pv" virt_mode or stubdomains for HVM qubes (or both), but the
-vulnerability is easier to exploit on systems with qubes set to the "pv"
-virt_mode. In the default Qubes OS configuration, there are no qubes set
-to the "pv" virt_mode, but sys-net and sys-usb are HVM qubes that have
-stubdomains. This means that the vulnerability is more difficult to
-exploit in the default Qubes OS configuration, but if a user has
-manually created or set qubes to the "pv" virt_mode in a particular
-system, the vulnerability will be easier to exploit on that system.
+XSA-505: The affected systems are those that have PV qubes stubdomains
+for HVM qubes (or both), but the vulnerability is easier to exploit on
+systems with PV qubes. In the default Qubes OS configuration, there are
+PV qubes, but sys-net and sys-usb are HVM qubes that have stubdomains.
+This means that the vulnerability is more difficult to exploit in the
+default Qubes OS configuration, but if a user has manually created PV
+qubes in a particular system, the vulnerability will be easier to
+exploit on that system.
 
 XSA-506: All systems with untrusted HVM qubes are affected. In the
 default configuration of Qubes OS, sys-net and sys-usb are HVM qubes and
@@ -130,6 +128,11 @@ References
 [4] https://xenbits.xen.org/xsa/advisory-505.html
 [5] https://xenbits.xen.org/xsa/advisory-506.html
 [6] https://xenbits.xen.org/xsa/advisory-507.html
+[7] A qube that is running with virt_mode set to "pv".
+[8] For each qube that is running with virt_mode set to "hvm" there's an
+    small Xen-internal helper VM running alongside it, in which QEMU is
+    executed to provide device emulation for that qube. This helper VM
+    runs in PV mode and is called stubdomain.
 
 --
 The Qubes Security Team

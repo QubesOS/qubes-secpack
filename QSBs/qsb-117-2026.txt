@@ -1,0 +1,79 @@
+
+             ---===[ Qubes Security Bulletin 117 ]===---
+
+                              2026-08-28
+
+                          Intel CPU issues
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+On 2026-08-11, Intel published "microcode-20260811 Release" referring
+to several security advisories. Of those, the following might apply to
+Qubes OS:
+- "Intel® Processor Firmware Advisory - 01428" (INTEL-SA-01428) [3]
+- "Intel® Processor Firmware Advisory - 01435" (INTEL-SA-01435) [4]
+
+Unfortunately, this advisory does not provide sufficient information
+for us to make a definitive assessment about the extent to which this
+vulnerability affects the security of Qubes OS. Based on the limited
+information available, we cannot exclude possibility of a cross-VM
+attack.
+
+Impact
+-------
+
+On affected systems, an attacker who has managed to compromise one qube
+can attempt to exploit this vulnerability in order to infer data
+belonging to other qubes or escalate their privileges.
+
+Affected systems
+-----------------
+
+Intel Core Ultra Series 2 and newer are affected. For a more
+detailed list of affected products, see Intel's advisories [3][4].
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - microcode_ctl version 2.1.20260812
+
+Note Intel has retracted the update for Meteor Lake (Intel Core Ultra
+Series 2) since then, "due to functional issues". Due to limited
+information, the impact on those systems without relevant patch is
+unclear.
+
+Dom0 must be restarted afterward in order for the updates to take
+effect.
+
+If you use Anti Evil Maid, you will need to reseal your secret
+passphrase to new PCR values, as PCR18+19 will change due to the new
+microcode updates.
+
+Credits
+--------
+
+See Intel's advisories [3][4].
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01428.html
+[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01435.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

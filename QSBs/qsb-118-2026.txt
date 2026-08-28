@@ -3,7 +3,7 @@
 
                               2026-08-28
 
-        Dom0 command injection in qvm-copy-to-vm error reporting
+    Dom0 arbitrary code execution in qvm-copy-to-vm error reporting
 
 User action
 ------------
@@ -167,9 +167,9 @@ vulnerability described in this bulletin:
   - qubes-core-dom0-linux, version 4.3.22
 
 This package will migrate from the security-testing repository to the
-current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the package should be installed
-via the Qubes Update tool or its command-line equivalents. [1]
+current (stable) repository after a short period of testing by the
+community. [2] Once available, the package should be installed via the
+Qubes Update tool or its command-line equivalents. [1]
 
 Credits
 --------

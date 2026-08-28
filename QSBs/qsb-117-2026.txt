@@ -15,12 +15,17 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-08-11, Intel published "microcode-20260811 Release," which is
-associated with several Intel security advisories. Among these security
-advisories, we suspect the following may apply to Qubes OS:
+On 2026-08-11, Intel published "microcode-20260811 Release," [3] which
+is associated with several Intel security advisories. Among these
+security advisories, we suspect the following may apply to Qubes OS:
 
-- "Intel Processor Firmware Advisory - 01428" (INTEL-SA-01428) [3]
-- "Intel Processor Firmware Advisory - 01435" (INTEL-SA-01435) [4]
+- "2026.3 IPU, Intel Processor Load Value Injection Zero Data Advisory"
+  (INTEL-SA-01423) [4]
+- "Intel Processor Firmware Advisory - 01428" (INTEL-SA-01428) [5]
+- "Intel Processor Firmware Advisory - 01435" (INTEL-SA-01435) [6]
+- "2026.3 IPU, Intel Processor Firmware Advisory" (INTEL-SA-01441) [7]
+- "2026.3 IPU, Intel Xeon Processor Firmware Advisory"
+  (INTEL-SA-01442) [8]
 
 Unfortunately, these advisories do not provide sufficient information
 for us to make a definitive assessment about the extent to which these
@@ -38,14 +43,21 @@ belonging to other qubes or escalate their privileges.
 Affected systems
 -----------------
 
-Intel Core Ultra Series 2 and newer are affected. For a more detailed
-list of affected products, see Intel Processor Firmware Advisories
-01428 [3] and 01435 [4].
+Only systems with one of the following Intel CPUs are affected by at
+least some of the advisories:
+
+ - 10th Generation Intel Core
+ - 11th Generation Intel Core
+ - Intel Core Ultra, Series 1 to 3
+ - various Xeon variants
+
+For a more detailed list of affected products see Intel's advisories.
 
 Note: As of this writing, Intel has withdrawn the relevant update for
-Meteor Lake (Intel Core Ultra Series 2) CPUs "due to functional issues."
-Due to limited information, the impact of the vulnerabilities discussed
-in this bulletin on systems without the relevant update is unclear.
+Meteor Lake (Intel Core Ultra Series 2) CPUs "due to functional issues"
+[9]. Due to limited information, the impact of the vulnerabilities
+discussed in this bulletin on systems without the relevant update is
+unclear.
 
 Patching
 ---------
@@ -72,15 +84,20 @@ microcode updates.
 Credits
 --------
 
-See Intel Processor Firmware Advisories 01428 [3] and 01435 [4].
+See Intel's advisories.
 
 References
 -----------
 
 [1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
 [2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
-[3] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01428.html
-[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01435.html
+[3] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20260811
+[4] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01423.html
+[5] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01428.html
+[6] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01435.html
+[7] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01441.html
+[8] https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-01442.html
+[9] https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/blob/main/releasenote.md#microcode-20260812
 
 --
 The Qubes Security Team

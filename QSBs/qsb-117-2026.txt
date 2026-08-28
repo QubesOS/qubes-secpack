@@ -3,7 +3,7 @@
 
                               2026-08-28
 
-                          Intel CPU issues
+                  Intel CPU firmware vulnerabilities
 
 User action
 ------------
@@ -15,47 +15,55 @@ required in response to this QSB.
 Summary
 --------
 
-On 2026-08-11, Intel published "microcode-20260811 Release" referring
-to several security advisories. Of those, the following might apply to
-Qubes OS:
-- "Intel® Processor Firmware Advisory - 01428" (INTEL-SA-01428) [3]
-- "Intel® Processor Firmware Advisory - 01435" (INTEL-SA-01435) [4]
+On 2026-08-11, Intel published "microcode-20260811 Release," which is
+associated with several Intel security advisories. Among these security
+advisories, we suspect the following may apply to Qubes OS:
 
-Unfortunately, this advisory does not provide sufficient information
-for us to make a definitive assessment about the extent to which this
-vulnerability affects the security of Qubes OS. Based on the limited
-information available, we cannot exclude possibility of a cross-VM
+- "Intel Processor Firmware Advisory - 01428" (INTEL-SA-01428) [3]
+- "Intel Processor Firmware Advisory - 01435" (INTEL-SA-01435) [4]
+
+Unfortunately, these advisories do not provide sufficient information
+for us to make a definitive assessment about the extent to which these
+vulnerabilities affect the security of Qubes OS. Based on the limited
+information available, we cannot exclude possibility of a cross-qube
 attack.
 
 Impact
 -------
 
 On affected systems, an attacker who has managed to compromise one qube
-can attempt to exploit this vulnerability in order to infer data
+can attempt to exploit these vulnerabilities in order to infer data
 belonging to other qubes or escalate their privileges.
 
 Affected systems
 -----------------
 
-Intel Core Ultra Series 2 and newer are affected. For a more
-detailed list of affected products, see Intel's advisories [3][4].
+Intel Core Ultra Series 2 and newer are affected. For a more detailed
+list of affected products, see Intel Processor Firmware Advisories
+01428 [3] and 01435 [4].
+
+Note: As of this writing, Intel has withdrawn the relevant update for
+Meteor Lake (Intel Core Ultra Series 2) CPUs "due to functional issues."
+Due to limited information, the impact of the vulnerabilities discussed
+in this bulletin on systems without the relevant update is unclear.
 
 Patching
 ---------
 
-The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+The following package contains the security update that addresses the
+vulnerability described in this bulletin:
 
   For Qubes 4.3, in dom0:
   - microcode_ctl version 2.1.20260812
 
-Note Intel has retracted the update for Meteor Lake (Intel Core Ultra
-Series 2) since then, "due to functional issues". Due to limited
-information, the impact on those systems without relevant patch is
-unclear.
+Note: This package has already finished migrating from the
+security-testing repository to the current (stable) repository after
+being tested by the community. [2] (This QSB is being published later
+than usual.) The package, which is already available to all users,
+should be installed via the Qubes Update tool or its command-line
+equivalents. [1]
 
-Dom0 must be restarted afterward in order for the updates to take
-effect.
+Dom0 must be restarted afterward in order for the update to take effect.
 
 If you use Anti Evil Maid, you will need to reseal your secret
 passphrase to new PCR values, as PCR18+19 will change due to the new
@@ -64,7 +72,7 @@ microcode updates.
 Credits
 --------
 
-See Intel's advisories [3][4].
+See Intel Processor Firmware Advisories 01428 [3] and 01435 [4].
 
 References
 -----------

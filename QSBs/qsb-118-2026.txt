@@ -15,32 +15,35 @@ required in response to this QSB.
 Summary
 --------
 
-A malicious qube can inject arbitrary command to dom0 if user uses
-`qvm-copy-to-vm` tool to copy a file from dom0 to such qube.
+If `qvm-copy-to-vm` is used to copy a file from dom0 to a malicious
+qube, that qube can inject an arbitrary command into dom0.
 
 Impact
 -------
 
-An attacker who has control over a qube that is a target of a
-user-initiated `qvm-copy-to-vm` call from dom0, can take control over
-the whole system.
+If an attacker has compromised a qube, and if the user initiates a
+`qvm-copy-to-vm` call from dom0 to the compromised qube, then the
+attacker can attempt to exploit this vulnerability in order to inject an
+arbitrary command into dom0, which could allow the attacker to take
+control of Qubes OS.
 
-Issue details 
---------------
+Technical details
+------------------
 
-The `qvm-copy-to-vm` tool allows copying files out of dom0, to a
-selected qube. It uses "qfile" protocol, which is a simplified archive
-format including simple file metadata (much simpler than `tar` or
-`cpio`). The protocol includes also transfer confirmation at the end,
-sent by the target, back to the source. This confirmation includes
-checksum of all the transferred files, error code (if any) and name of
-the last received file. In case of error, as reported by the error
-code field, dom0 displays a GUI message including the error information
-and the name of affected file, as reported by the target qube. The
-issue exists in the processing of that file name:
+The `qvm-copy-to-vm` tool allows copying files from dom0 to a specified
+qube. It uses the "qfile" protocol, which is a simplified archive
+format, including simple file metadata (much simpler than `tar` or
+`cpio`). The protocol also includes transfer confirmation at the end,
+which is sent by the target back to the source. This confirmation
+includes a checksum of all the transferred files, an error code (if
+any), and the name of the last received file. In the case of an error,
+as reported by the error code field, dom0 displays a GUI message that
+includes the error information and the name of the affected file, as
+reported by the target qube. The vulnerability exists in the processing
+of that file name:
 
 1. The `wait_for_result()` function calls `sanitize_remote_filename()`
-on received name, before passing it to the error handler:
+on the received name before passing it to the error handler:
 
 linux-utils/qrexec-lib/pack.c:
 
@@ -53,13 +56,13 @@ linux-utils/qrexec-lib/pack.c:
      61             *untrusted_filename = '_';
      62     }
      63 }
-     64 
+     64
      65 void wait_for_result(void)
      66 {
     ...
      98     /* sanitize the remote filename */
      99     sanitize_remote_filename(last_filename);
-    100     
+    100
     101     errno = hdr.error_code;
     102     if (hdr.error_code != 0) {
     103         switch (hdr.error_code) {
@@ -68,9 +71,9 @@ linux-utils/qrexec-lib/pack.c:
     106                 break;
     ...
 
-2. Then, `call_error_handler()` calls dom0 variant of the error
-reporting function - `gui_fatal()` -> `display_error()`, which uses
-`system()` to launch actual error dialog:
+2. Then, `call_error_handler()` calls the dom0 variant of the error
+reporting function -- `gui_fatal()` -> `display_error()`, which uses
+`system()` to launch the actual error dialog:
 
 core-admin-linux/file-copy-vm/qfile-dom0-agent.c:
 
@@ -104,12 +107,12 @@ core-admin-linux/file-copy-vm/qfile-dom0-agent.c:
      42     exit(1);
      43 }
 
-The issue is that `sanitize_remote_filename()` removes only non-ASCII
-characters (and double quotes), but leaves shell meta-characters in.
-And then, `system()` runs the constructed command, including
-attacker-controlled name via shell.
+The problem is that `sanitize_remote_filename()` removes only non-ASCII
+characters (and double quotation marks) but leaves shell meta-characters
+in place. Then, `system()` runs the constructed command, including the
+attacker-controlled name via the shell.
 
-Note the VM variant of `qvm-copy-to-vm` is not affected, as its
+Note that the VM variant of `qvm-copy-to-vm` is not affected, as its
 version of the error reporting function does not use `system()`:
 
 core-agent-linux/qubes-rpc/gui-fatal.c:
@@ -152,26 +155,26 @@ core-agent-linux/qubes-rpc/gui-fatal.c:
 Affected systems
 -----------------
 
-All Qubes OS versions are affected.
+All Qubes OS releases are affected.
 
 Patching
 ---------
 
-The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+The following package contains the security update that addresses the
+vulnerability described in this bulletin:
 
   For Qubes 4.3, in dom0:
   - qubes-core-dom0-linux, version 4.3.22
 
-These packages will migrate from the security-testing repository to the
+This package will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages should be installed
+by the community. [2] Once available, the package should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
 Credits
 --------
 
-The issue was discovered by Tim C.
+The vulnerability was discovered by Tim C.
 
 References
 -----------

@@ -23,9 +23,9 @@ Impact
 
 If an attacker has compromised a qube, and if the user initiates a
 `qvm-copy-to-vm` call from dom0 to the compromised qube, then the
-attacker can attempt to exploit this vulnerability in order to inject an
-arbitrary command into dom0, which could allow the attacker to take
-control of Qubes OS.
+attacker can exploit this vulnerability in order to inject an arbitrary
+command into dom0, which allows the attacker to take control of
+Qubes OS.
 
 Technical details
 ------------------

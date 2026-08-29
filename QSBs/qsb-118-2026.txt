@@ -1,0 +1,187 @@
+
+             ---===[ Qubes Security Bulletin 118 ]===---
+
+                              2026-08-28
+
+    Dom0 arbitrary code execution in qvm-copy-to-vm error reporting
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+If `qvm-copy-to-vm` is used to copy a file from dom0 to a malicious
+qube, that qube can inject an arbitrary command into dom0.
+
+Impact
+-------
+
+If an attacker has compromised a qube, and if the user initiates a
+`qvm-copy-to-vm` call from dom0 to the compromised qube, then the
+attacker can exploit this vulnerability in order to inject an arbitrary
+command into dom0, which allows the attacker to take control of
+Qubes OS.
+
+Technical details
+------------------
+
+The `qvm-copy-to-vm` tool allows copying files from dom0 to a specified
+qube. It uses the "qfile" protocol, which is a simplified archive
+format, including simple file metadata (much simpler than `tar` or
+`cpio`). The protocol also includes transfer confirmation at the end,
+which is sent by the target back to the source. This confirmation
+includes a checksum of all the transferred files, an error code (if
+any), and the name of the last received file. In the case of an error,
+as reported by the error code field, dom0 displays a GUI message that
+includes the error information and the name of the affected file, as
+reported by the target qube. The vulnerability exists in the processing
+of that file name:
+
+1. The `wait_for_result()` function calls `sanitize_remote_filename()`
+on the received name before passing it to the error handler:
+
+linux-utils/qrexec-lib/pack.c:
+
+     55 static void sanitize_remote_filename(char *untrusted_filename)
+     56 {
+     57     for (; *untrusted_filename; ++untrusted_filename) {
+     58         if (*untrusted_filename < ' ' ||
+     59             *untrusted_filename > '~' ||
+     60             *untrusted_filename == '"')
+     61             *untrusted_filename = '_';
+     62     }
+     63 }
+     64
+     65 void wait_for_result(void)
+     66 {
+    ...
+     98     /* sanitize the remote filename */
+     99     sanitize_remote_filename(last_filename);
+    100
+    101     errno = hdr.error_code;
+    102     if (hdr.error_code != 0) {
+    103         switch (hdr.error_code) {
+    104             case EEXIST:
+    105                 call_error_handler("A file named \"%s\" already exists in QubesIncoming dir", last_filename);
+    106                 break;
+    ...
+
+2. Then, `call_error_handler()` calls the dom0 variant of the error
+reporting function -- `gui_fatal()` -> `display_error()`, which uses
+`system()` to launch the actual error dialog:
+
+core-admin-linux/file-copy-vm/qfile-dom0-agent.c:
+
+     15 void display_error(const char *fmt, va_list args) {
+     16     char *dialog_cmd;
+     17     char buf[1024];
+     18     struct stat st_buf;
+     19     int ret;
+     20
+     21     (void) vsnprintf(buf, sizeof(buf), fmt, args);
+     22     ret = stat("/usr/bin/kdialog", &st_buf);
+     23 #define KDIALOG_CMD "kdialog --title 'File copy/move error' --sorry "
+     24 #define ZENITY_CMD "zenity --title 'File copy/move error' --warning --text "
+     25     if (asprintf(&dialog_cmd, "%s '%s: %s (error type: %s)'",
+     26                 ret==0 ? KDIALOG_CMD : ZENITY_CMD,
+     27                 program_invocation_short_name, buf, strerror(errno)) < 0) {
+     28         fprintf(stderr, "Failed to allocate memory for error message :(\n");
+     29         return;
+     30     }
+     31 #undef KDIALOG_CMD
+     32 #undef ZENITY_CMD
+     33     fprintf(stderr, "%s\n", buf);
+     34     system(dialog_cmd);
+     35 }
+     36
+     37 _Noreturn void gui_fatal(const char *fmt, ...) {
+     38     va_list args;
+     39     va_start(args, fmt);
+     40     display_error(fmt, args);
+     41     va_end(args);
+     42     exit(1);
+     43 }
+
+The problem is that `sanitize_remote_filename()` removes only non-ASCII
+characters (and double quotation marks) but leaves shell meta-characters
+in place. Then, `system()` runs the constructed command, including the
+attacker-controlled name via the shell.
+
+Note that the VM variant of `qvm-copy-to-vm` is not affected, as its
+version of the error reporting function does not use `system()`:
+
+core-agent-linux/qubes-rpc/gui-fatal.c:
+
+     16 static void produce_message(const char *type, const char *fmt, va_list args)
+     17 {
+    ...
+     31     if (progress_type && !strcmp(progress_type, "gui"))
+     32     {
+     33         switch (fork())
+     34         {
+     35         case -1:
+     36             exit(1); // what else
+     37         case 0:
+     38             if (geteuid() == 0) {
+     39                 if (setuid(getuid()) != 0) {
+     40                     perror("setuid failed, not calling zenity/kdialog");
+     41                     exit(1);
+     42                 }
+     43             }
+     44             fix_display();
+     45             execlp("/usr/bin/zenity", "zenity", "--error", "--text", dialog_msg, NULL);
+     46             execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
+     47             exit(1);
+     48         default:;
+     49         }
+     50     }
+     51     free(dialog_msg);
+     52 }
+     53
+     54 void gui_fatal(const char *fmt, ...)
+     55 {
+     56     va_list args;
+     57     va_start(args, fmt);
+     58     produce_message("Fatal error", fmt, args);
+     59     va_end(args);
+     60     exit(1);
+     61 }
+
+Affected systems
+-----------------
+
+All Qubes OS releases are affected.
+
+Patching
+---------
+
+The following package contains the security update that addresses the
+vulnerability described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - qubes-core-dom0-linux, version 4.3.22
+
+This package will migrate from the security-testing repository to the
+current (stable) repository after a short period of testing by the
+community. [2] Once available, the package should be installed via the
+Qubes Update tool or its command-line equivalents. [1]
+
+Credits
+--------
+
+The vulnerability was discovered by Tim C.
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

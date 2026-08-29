@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 118 ]===---
 
-                              2026-08-28
+                              2026-08-29
 
     Dom0 arbitrary code execution in qvm-copy-to-vm error reporting
 

@@ -3,7 +3,7 @@
 
                               2026-09-15
 
-    Potentially attacker controlled format string in qvm-open-in-vm
+     Potential attacker-controlled format string in qvm-open-in-vm
 
 User action
 ------------
@@ -15,108 +15,120 @@ required in response to this QSB.
 Summary
 --------
 
-Under certain circumstances (see "Technical details") if the user
+Under certain circumstances (see "Technical details" below), if the user
 invokes qvm-open-in-vm (either directly or through the "Edit in
-disposable qube" GUI integration) on a file with an attacker controlled
-file name/path the attacker might be able to execute code in the qube in
-which the user invoked qvm-open-in-vm.
+disposable qube" GUI integration) on a file with an attacker-controlled
+filename or path, the attacker might be able to execute code in the qube
+in which the user invoked qvm-open-in-vm.
 
 Impact
 -------
 
-If the exploitation is successful the attacker can take control over the
-qube in which the user invoked qvm-open-in-vm.
-
-Normally bug that does not cross qube boundary, like this one, is out of
-scope for our security support. We make an exception here since it's a
-bug in our code and the qvm-open-in-vm functionality is specifically
-designed to handle untrusted input. Keep in mind that handling less
-trusted input in the same qube is still risks. For example unsafe
-handling of attacker controlled paths is an easy error in the shell, or
-a file explorer might render a thumbnail of the untrusted input with a
-bugy parser, or you you might accidentially open the file with another
-application than qvm-open-in-vm exposing the full attack surfare of that
-application.
-
-Technical details
-------------------
-
-When qvm-open-in-vm is invoked with a file (not an URI) the source side
-part of the qrexec call is handled by the qopen-in-vm helper program.
-After sending the file content to the other side qopen-in-vm tries to
-open a temporary file alongside the original file to save the response
-in case the user edited the file in the target qube. If creating this
-file fails, for example because the directory is read-only, qopen-in-vm
-creates a temporary file in /tmp and shows an error message to the user.
-When printing this error message it wrongly invokes the gui_nonfatal
-function, such that the original file names ends up in a printf format
-string, which is unsafe.
-
-For an attack to be possible multiple conditions need to be fulfilled:
-
- - The attacker needs to trick the user to open a file with
-   qvm-open-in-vm.
-  - The file name (last component of the file's path) needs to be longer
-    than 248 bytes.
-  - Or, the directory that contains the file is not writable.
-
- - And the path (but not necessarily the last component) needs to
-   contain printf-style conversion specifiers (like %n).
-
- - And qvm-open-in-vm must not have been invoked with the --view-only
-   flag.
-
- - And the target qube either needs to ...
-   - send back the file content because it's mtime changed (usually
-     because the user saved the file being edited, even if overwriting
-     it with the same content),
-   - or be compromised by the attacker.
-
- - The build of qvm-open-in-vm needs to have been compiled without the
-   _FORTIFY_SOURCE hardening enabled (or set to a level below 2). Due to
-   an unfortunate interaction of our build script with the way Debian
-   enables this options, this hardening was not enabled for our Debian
-   packages. The Fedora packages had it enabled. With enabled hardening
-   the program simply safely aborts with an error, making the bug
-   unexploitable.
-
-The first reporter reported exploitability on their system with a low
-success probability (< 3 %). Additionally the demo required a very long
-path (multiple nested directories) with many format specifiers in it,
-making the requirement of the user opening a suspicious looking path
-harder.
+An attacker who successfully exploits this vulnerability can take
+control over the qube in which the user invoked qvm-open-in-vm.
 
 Affected systems
 -----------------
 
-All Qubes OS releases are affected.
+All supported Qubes OS releases are affected. Among official Qubes OS
+templates, only Debian templates are affected.
 
-From the official templates it's only exploitable in Debian-based
-templates.
+Technical details
+------------------
+
+When qvm-open-in-vm is invoked with a file (not an URI), the source-side
+part of the qrexec call is handled by the qopen-in-vm helper program.
+After sending the file content to the other side, qopen-in-vm tries to
+open a temporary file alongside the original file in order to save the
+response in case the user has edited the file in the target qube. If
+creating this file fails (e.g., because the directory is read-only),
+qopen-in-vm creates a temporary file in /tmp and shows an error message
+to the user. When printing this error message, it incorrectly invokes
+the gui_nonfatal function, such that the original filename ends up in a
+printf format string, which is unsafe.
+
+For this vulnerability to be exploitable, multiple conditions must be
+fulfilled:
+
+ 1. The attacker must trick the user into using qvm-open-in-vm to open a
+    file that either
+    a. has a filename (i.e., the last component of the file's path)
+       longer than 248 bytes or
+    b. is located in a directory that is not writable.
+
+ 2. The path (but not necessarily its last component) must
+    contain printf-style conversion specifiers (such as '%n').
+
+ 3. qvm-open-in-vm must not have been invoked with the --view-only flag.
+
+ 4. The target qube must either
+    a. send back the file content because its mtime changed (which
+       usually happens because the user saved the file being edited,
+       even if merely by overwriting it with the same content) or
+    b. be compromised by the attacker.
+
+ 5. The build of qvm-open-in-vm must have been compiled without
+    _FORTIFY_SOURCE hardening enabled (or set to a level below 2). Due
+    to an unfortunate interaction between our build script and the way
+    Debian handles this option, this hardening was not enabled for our
+    Debian packages. (This problem did not affect our Fedora packages,
+    for which the hardening was correctly enabled.) With enabled
+    hardening, the program safely aborts with an error, making the bug
+    unexploitable.
+
+The first person to report this vulnerability tested its exploitability
+on his system. He found that it was successfully exploited in less than
+3% of attempts. Moreover, his demonstration required a very long path
+with multiple nested directories and that contained many format
+specifiers. In the real world, many users would likely find such a path
+suspicious, which would likely make it more difficult for an attacker to
+successfully trick the user into opening such a path.
+
+Discussion
+-----------
+
+Normally, we do not issue Qubes security bulletins for purely "in-VM"
+vulnerabilities (like this one) that do not involve crossing the VM
+security boundary. However, we have decided to make an exception in this
+case, since this is a bug in our code and since qvm-open-in-vm is
+specifically intended to operate on untrusted input.
+
+While qvm-open-in-vm is designed to be hardened, keep in mind that
+handling untrusted data can still be risky for other reasons, for
+example:
+
+ - Unsafe handling of attacker-controlled paths is an easy mistake to
+   make in the shell.
+ - A file explorer could render the thumbnail of an untrusted file with
+   a buggy parser.
+ - You might accidentally open the file with an application other than
+   qvm-open-in-vm, exposing the full attack surface of that application.
 
 Patching
 ---------
 
-The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+The following package contains the security update that addresses the
+vulnerability described in this bulletin:
 
-  For Qubes 4.3, in templates and standalones:
+  For Qubes 4.3, in affected templates and standalones:
   - qubes-core-agent version 4.3.48
 
-These packages will migrate from the security-testing repository to the
+This package will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages should be installed
+by the community. [2] Once available, the package should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
-All template-based qubes and disposable qubes need must be restarted after
-updating and shutting down their template in order for the updates to take
-effect.
+In order for this security update to take effect, all affected templates
+must be updated with the package above, then shut down. Afterward, all
+qubes based on these templates (including disposables) must be
+restarted. All affected standalones must be updated with the package
+above, then restarted.
 
 Credits
 --------
 
-This issues was initially reported by Giulio Berra and shortly after
-that independently by Rafal Wojtczuk.
+This vulnerability was first reported by Giulio Berra. Shortly after, it
+was independently reported by Rafal Wojtczuk.
 
 References
 -----------

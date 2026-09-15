@@ -78,7 +78,7 @@ fulfilled:
 
 The first person to report this vulnerability tested its exploitability
 on his system. He found that it was successfully exploited in less than
-3% of attempts. Moreover, his demonstration required a very long path
+3 % of attempts. Moreover, his demonstration required a very long path
 with multiple nested directories and that contained many format
 specifiers. In the real world, many users would likely find such a path
 suspicious, which would likely make it more difficult for an attacker to
@@ -122,7 +122,7 @@ In order for this security update to take effect, all affected templates
 must be updated with the package above, then shut down. Afterward, all
 qubes based on these templates (including disposables) must be
 restarted. All affected standalones must be updated with the package
-above, then restarted.
+above.
 
 Credits
 --------

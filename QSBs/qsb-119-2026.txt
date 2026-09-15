@@ -80,9 +80,11 @@ The first person to report this vulnerability tested its exploitability
 on his system. He found that it was successfully exploited in less than
 3 % of attempts. Moreover, his demonstration required a very long path
 with multiple nested directories and that contained many format
-specifiers. In the real world, many users would likely find such a path
-suspicious, which would likely make it more difficult for an attacker to
-successfully trick the user into opening such a path.
+specifiers. In the real world, the attacker may control only the last
+part of the file name in most cases. And even when they do control the
+full path, many users would likely find such a path suspicious, which
+would likely make it more difficult for an attacker to successfully
+trick the user into opening such a path.
 
 Discussion
 -----------

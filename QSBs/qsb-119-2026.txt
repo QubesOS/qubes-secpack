@@ -96,8 +96,8 @@ case, since this is a bug in our code and since qvm-open-in-vm is
 specifically intended to operate on untrusted input.
 
 While qvm-open-in-vm is designed to be hardened, keep in mind that
-handling untrusted data can still be risky for other reasons, for
-example:
+handling less trusted data in a more trusted VM still can be risky for
+other reasons, for example:
 
  - Unsafe handling of attacker-controlled paths is an easy mistake to
    make in the shell.

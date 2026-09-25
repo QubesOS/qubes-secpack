@@ -1,0 +1,85 @@
+
+             ---===[ Qubes Security Bulletin 120 ]===---
+
+                              2026-09-28
+
+                Key policy bypass in CTAP/FIDO2 proxy
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+A vulnerable version of CTAP proxy[3] does not properly enforce usage of
+only the key specified in the policy. The proxy backend (the part
+usually running in the USB qube) does not correctly validate type of
+the request, allowing authentication requests even if sent to a
+different service (like `u2f.Register` or `ctap.GetInfo`).
+Additionally CTAP2 authentication request containing multiple signing
+request is mistakenly allowed if any of the requested keys is allowed,
+even if others are not.
+
+TODO: verify terminology above
+
+Impact
+-------
+
+A malicious or compromised qube with intended access to only specific
+keys may be able to access other keys present on the same hardware
+token.
+
+TODO: consider adding note about needing command execution in the VM
+to perform the attack?
+
+Affected systems
+-----------------
+
+Only systems that use CTAP proxy are affected. Only qubes with access
+to the `u2f.Authenticate` service limited to specific keys (qrexec
+call arguments), or some other CTAP proxy service (`u2f.Register`,
+`ctap.GetInfo`, `ctap.ClientPin`) are affected. Note qubes with
+unlimited access to the `u2f.Authenticate` service are not affected
+because they already intentionally have access to any key.
+
+The issue was introduced in qubes-ctap package version 2.0.0, older
+versions of the package (known as qubes-u2f before) are not affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in template for USB qube(s):
+  - qubes-ctap package, version 2.0.8
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+USB qube must be restarted afterward in order for the updates to take
+effect.
+
+Credits
+--------
+
+The CTAP2 authentication request vulnerability was reported by Giulio
+Berra of Freedom of the Press Foundation. The command validation
+vulnerability was discovered by Piotr Bartman-Szwarc.
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[3] https://doc.qubes-os.org/en/r4.3/user/security-in-qubes/ctap-proxy.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

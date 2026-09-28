@@ -3,7 +3,7 @@
 
                               2026-09-28
 
-                Key policy bypass in CTAP/FIDO2 proxy
+                      Policy bypass in CTAP proxy
 
 User action
 ------------
@@ -15,39 +15,79 @@ required in response to this QSB.
 Summary
 --------
 
-A vulnerable version of CTAP proxy[3] does not properly enforce usage of
-only the key specified in the policy. The proxy backend (the part
-usually running in the USB qube) does not correctly validate type of
-the request, allowing authentication requests even if sent to a
-different service (like `u2f.Register` or `ctap.GetInfo`).
-Additionally CTAP2 authentication request containing multiple signing
-request is mistakenly allowed if any of the requested keys is allowed,
-even if others are not.
+The CTAP proxy [3] allows usage of hardware authentication devices that
+uses one of the CTAP protocols and are attached to a USB qube by other
+qubes. Depending on version and usage CTAP and related components that
+make use of it are also known as U2F, CTAP1, CTAP2, FIDO2, WebAuthn,
+passkeys.
 
-TODO: verify terminology above
+CTAP requests forwarded through the CTAP proxy can be controlled through
+qrexec policies. Different request types are handled by different qrexec
+services (ctap.ClientPin, ctap.GetInfo, u2f.Authenticate, u2f.Register).
+Additionally the u2f.Authenticate service can be limited to specific
+credentials by only allowing specific qrexec service arguments.
+
+It was discovered that vulnerable versions of the CTAP proxy did not
+enfore that CTAP requests match the requested service type.
+
+An additionaly vulnerability in the u2f.Authenticate service allowed a
+qube, which is limited by the qrexec policy to send qrexec requests with
+specific service arguments, to send a CTAP2 request requesting multiple
+assertions (used for authentication) as long as any of those matched the
+allowed service argument.
 
 Impact
 -------
 
-A malicious or compromised qube with intended access to only specific
-keys may be able to access other keys present on the same hardware
-token.
+The broken request type filtering allows a qube that was allwed access
+to any of the CTAP releated qrexec services to send any request type. So
+for example even if the policy only allowed access to ctap.GetInfo the
+qube could send a authentication request. In realistic configuration
+this in particular mean that the argument based filtering of access to
+specific credentials was ineffective since a qube could send the
+authentication requests through one of the other allowed services.
+Unlike the bug in the argument based filterting this affects all CTAP
+versions.
 
-TODO: consider adding note about needing command execution in the VM
-to perform the attack?
+The bug in u2f.Authenticate's filtering based on the service arguments
+allows a qube that is supposed to only access certain credentials on a
+forwarded authentication device to use any credentials for CTAP2 (but
+not CTAP1) assertion requests, therefore using those credentials for
+authentication even though it it should not.
 
 Affected systems
 -----------------
 
-Only systems that use CTAP proxy are affected. Only qubes with access
-to the `u2f.Authenticate` service limited to specific keys (qrexec
-call arguments), or some other CTAP proxy service (`u2f.Register`,
-`ctap.GetInfo`, `ctap.ClientPin`) are affected. Note qubes with
-unlimited access to the `u2f.Authenticate` service are not affected
-because they already intentionally have access to any key.
+Only systems that use CTAP proxy are affected.
+
+For practical use only setups that use a qrexec policy that restricts
+qubes access to a subset of the credentials available on the
+authentication device are affected. Since otherwise the qube already has
+intentionally access to any credential on the device.
 
 The issue was introduced in qubes-ctap package version 2.0.0, older
 versions of the package (known as qubes-u2f before) are not affected.
+
+Discussion
+-----------
+
+The software accessing a hardware authentication device (either a real
+one, or in this case an emulated one that forwards requests through
+qrexec), usually a web browser, must limit what requests is sends to the
+device. For example if you visit example.org the browser must ensure
+that that site can only requests authentication for example.org.
+Therefore without a further bug there, a website can not make use of
+these vulnerabilites. But the intention of Qube's CTAP proxy is (beside
+making CTAP hardware devices usable at all) to further restrict the
+access of qubes, such that even if the qube acts maliciously (for
+example because the attacker compromised it), it can not access
+credentials on the CTAP hardware it is not allowed. This later protction
+is what was broken by the vulnerabilities discussed here.
+
+Note on the qrexec policies were correctly enfored. So these are not
+bugs in qrexec. The problem lies in the CTAP proxy implemention of the
+qrexec services, breaking the intended semantics of the (correctly
+enforeced) qrexec policies.
 
 Patching
 ---------
@@ -63,15 +103,16 @@ current (stable) repository over the next two weeks after being tested
 by the community. [2] Once available, the packages should be installed
 via the Qubes Update tool or its command-line equivalents. [1]
 
-USB qube must be restarted afterward in order for the updates to take
-effect.
+USB qube must be restarted after it's template has been updated and
+shutdown, in order for the updates to take effect.
 
 Credits
 --------
 
 The CTAP2 authentication request vulnerability was reported by Giulio
 Berra of Freedom of the Press Foundation. The command validation
-vulnerability was discovered by Piotr Bartman-Szwarc.
+vulnerability was discovered internaly by Piotr Bartman-Szwarc during
+review of the previos report.
 
 References
 -----------

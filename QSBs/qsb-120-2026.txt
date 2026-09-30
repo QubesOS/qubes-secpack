@@ -73,9 +73,9 @@ use the CTAP proxy on a supported Qubes release are affected. Users who
 do not use the CTAP proxy are not affected.
 
 In practice, the only systems that are affected are those in which the
-RPC policies have been manually configured to restrict a qube's access
-to a subset of the credentials available on an authentication device,
-since otherwise the qube already (intentionally) has access to all
+RPC policies have been configured to restrict a qube's access to a
+subset of the credentials available on an authentication device, since
+otherwise the qube already (intentionally) has access to all
 credentials on the authentication device.
 
 These vulnerabilities were introduced in qubes-ctap package version

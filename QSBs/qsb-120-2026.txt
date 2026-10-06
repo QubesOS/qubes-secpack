@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 120 ]===---
 
-                              2026-09-28
+                              2026-10-06
 
                    Two CTAP proxy vulnerabilities
 

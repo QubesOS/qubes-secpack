@@ -125,10 +125,10 @@ after their respective templates have been updated and shut down.
 Credits
 --------
 
-Vulnerability 1 was discovered by Giulio Berra of the Freedom of the
+Vulnerability 2 was discovered by Giulio Berra of the Freedom of the
 Press Foundation.
 
-Vulnerability 2 was discovered internally by Piotr Bartman-Szwarc during
+Vulnerability 1 was discovered internally by Piotr Bartman-Szwarc during
 review of the previous report.
 
 References

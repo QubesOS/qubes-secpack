@@ -1,0 +1,145 @@
+
+             ---===[ Qubes Security Bulletin 120 ]===---
+
+                              2026-10-08
+
+                   Two CTAP proxy vulnerabilities
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Background
+-----------
+
+The Client to Authenticator Protocol (CTAP) is a standard governing the
+interoperation of authentication devices, such as hardware security
+keys, with client platforms, such as laptops. Qubes OS has a feature
+known as the Qubes CTAP proxy [3] that enables a USB authentication
+device to be used in a given qube without exposing that qube to the full
+USB stack, similar to the way the USB keyboard and mouse proxies [4]
+work in Qubes. There are multiple versions of CTAP, different ways it
+can be used, and various related components that can work with it, so
+there's a variety of other terms that you might see associated with
+CTAP, such as U2F, CTAP1, CTAP2, FIDO2, WebAuthn, and passkeys.
+
+Qubes users can write RPC policies [5] to control the way CTAP requests
+forwarded through the CTAP proxy are handled. There are various request
+types that are handled by different qrexec services: ctap.ClientPin,
+ctap.GetInfo, u2f.Authenticate, and u2f.Register. In addition, users can
+limit the u2f.Authenticate service to specific credentials by allowing
+only specific qrexec service arguments.
+
+Summary
+--------
+
+This QSB describes two CTAP proxy vulnerabilities:
+
+Vulnerability 1: CTAP requests are supposed to match their requested
+service types, but the CTAP proxy fails to enforce this.
+
+Vulnerability 2: When RPC policies limit a qube to sending requests with
+specific service arguments, the u2f.Authenticate service incorrectly
+allows that qube to request multiple assertions (used for
+authentication) as long as any of them match the allowed service
+argument.
+
+Impact
+-------
+
+Vulnerability 1: A qube that is allowed access to any of the
+CTAP-related qrexec services can send any request type. For example,
+even if the policy allows a qube access only to ctap.GetInfo, that qube
+can also send an authentication request. In realistic configurations,
+this means that argument-based filtering of access to specific
+credentials is ineffective, since a qube can send authentication
+requests through one of its other allowed services. This vulnerability
+affects all CTAP versions.
+
+Vulnerability 2: A qube that is allowed to have access only to specific
+credentials on a forwarded authentication device can use any credentials
+for CTAP2 (but not CTAP1) assertion requests, thereby enabling it to use
+those credentials for authentication even though it should not be
+allowed to do so.
+
+Affected systems
+-----------------
+
+Since these vulnerabilities affect only the CTAP proxy, only users who
+use the CTAP proxy on a supported Qubes release are affected. Users who
+do not use the CTAP proxy are not affected.
+
+In practice, the only systems that are affected are those in which the
+RPC policies have been configured to restrict a qube's access to a
+subset of the credentials available on an authentication device, since
+otherwise the qube already (intentionally) has access to all
+credentials on the authentication device.
+
+These vulnerabilities were introduced in qubes-ctap package version
+2.0.0. Older versions of the package (previously known as qubes-u2f) are
+not affected.
+
+Discussion
+-----------
+
+The software (usually a web browser) accessing a hardware authentication
+device (either a real one, or in this case an emulated one that forwards
+requests through qrexec) must limit the requests it sends to the device.
+For example, if you visit <https://example.org>, the browser must ensure
+that that site can request authentication only for
+<https://example.org>. Therefore, in the absence of an additional,
+exploitable vulnerability in the browser, a malicious website cannot
+exploit either of the vulnerabilities described in this QSB. However,
+the intention of the CTAP proxy is (in addition to making CTAP
+authentication devices usable in the first place) to restrict the access
+that qubes have to authentication devices, such that even if a qube is
+compromised, it cannot access credentials on the authentication device
+that it has not been given permission to access. The vulnerabilities
+described in this QSB affect this latter form of protection.
+
+Note that the RPC policies themselves are correctly enforced, so these
+are not vulnerabilities in qrexec. Rather, the problem lies in the CTAP
+proxy's implementation of the qrexec services, which breaks the intended
+semantics of the (correctly-enforced) RPC policies.
+
+Patching
+---------
+
+The following package contains the security update that addresses the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in template for USB qube(s):
+  - qubes-ctap package, version 2.0.8
+
+This package will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the package should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+In order for the update to take effect, all USB qubes must be restarted
+after their respective templates have been updated and shut down.
+
+Credits
+--------
+
+Vulnerability 2 was discovered by Giulio Berra of the Freedom of the
+Press Foundation.
+
+Vulnerability 1 was discovered internally by Piotr Bartman-Szwarc during
+review of the previous report.
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[3] https://doc.qubes-os.org/en/r4.3/user/security-in-qubes/ctap-proxy.html
+[4] https://doc.qubes-os.org/en/r4.3/user/advanced-topics/usb-qubes.html
+[5] https://doc.qubes-os.org/en/r4.3/user/advanced-topics/rpc-policy.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

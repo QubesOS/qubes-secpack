@@ -1,0 +1,106 @@
+
+             ---===[ Qubes Security Bulletin 122 ]===---
+
+                              2026-11-04
+
+                  APT security update (DSA-6607-1)
+
+User action
+------------
+
+Continue to update normally [1] in order to receive the security updates
+described in the "Patching" section below. No other user action is
+required in response to this QSB.
+
+Summary
+--------
+
+The Debian Security Team has announced a security vulnerability
+(DSA-6607-1) in the Advanced Package Tool (APT)[3]:
+| Max Justicz discovered a vulnerability in the APT package manager. APT
+| can merge two different package downloads after an HTTP redirect gives
+| them the same URI. Improper file handling when resuming an HTTP download
+| allows a man-in-the-middle attacker to replace a package after
+| verification, resulting in the execution of arbitrary code as root.
+
+Impact
+-------
+
+An attacker controlling an update mirror or being in position to
+modify network traffic can compromise Debian-based templates.
+
+Affected systems
+-----------------
+
+Users who use Debian or Whonix VMs are affected. Users who use only
+Fedora VMs are not affected. Although we do not provide any other
+official or community APT-based templates, any other APT-based VMs that
+users have installed on their own should also be assumed to be affected.
+
+Debian templates on Qubes OS use HTTPS to download updates by default,
+which eliminates the man-in-the-middle attack vector. But users that
+change the configuration to use plain HTTP (either for default
+repositories, or for 3rd-party ones) are still affected.
+
+Discussion
+----------
+
+Normally, we do not release Qubes Security Bulletins (QSBs) to address
+vulnerabilities that only affect VMs internally without affecting the
+rest of the Qubes system, i.e. vulnerabilities that do not undermine the
+Qubes security model.
+
+The APT update bug discussed today is, however, somewhat special.
+While it is indeed a bug that only affects VMs internally, it could
+allow an attacker to compromise TemplateVMs, which are used as a basis
+for creating other VMs, such as AppVMs and ServiceVMs. If a TemplateVM
+is compromised, then all the VMs based on that TemplateVM will be
+compromised. Since AppVMs operate directly on user data, and since
+ServiceVMs can be critical to user privacy (especially in the case of
+Whonix and VPN ProxyVMs), this is a serious matter.
+
+In Qubes OS, we take special precautions to make TemplateVMs difficult
+to compromise. For example, we block all network connections to and from
+templates, with one exception: We allow templates to connect to the
+so-called "Update Proxy" (which runs in the NetVM). This allows the
+TemplateVM to retrieve updates while protecting users from accidentally
+using TemplateVMs to perform risky activities, such as browsing the web.
+
+Since the bug under discussion has the potential to subvert this very
+protection mechanism, we've decided to issue this QSB.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - qubes-core-dom0-linux 4.3.25
+  - qubes-mgmt-salt-dom0-update 4.3.4
+
+Those packages apply the fix using Qubes's supported update methods[1].
+Users updating their Debian-based templates some other way need to
+follow upstream recommendations manually.
+
+These packages will migrate from the security-testing repository to the
+current (stable) repository over the next two weeks after being tested
+by the community. [2] Once available, the packages should be installed
+via the Qubes Update tool or its command-line equivalents. [1]
+
+Credits
+--------
+
+The vulnerability was discovered by Max Justicz and reported to the
+Debian Security Team.
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[3] https://lists.debian.org/debian-security-announce/2026/msg00526.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

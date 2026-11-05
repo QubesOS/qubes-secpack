@@ -3,71 +3,102 @@
 
                               2026-11-04
 
-                  APT security update (DSA-6607-1)
+            Package verification bypass in APT (DSA-6607-1)
 
 User action
 ------------
 
-Continue to update normally [1] in order to receive the security updates
-described in the "Patching" section below. No other user action is
-required in response to this QSB.
+Once the security updates described in the "Patching" section below
+become available to your Qubes OS system, you must take the following
+actions in the order listed:
+
+1. Update dom0 normally. [1]
+2. Update all Debian and Whonix templates and standalones normally. [1]
+3. Restart all Debian and Whonix qubes.
 
 Summary
 --------
 
-The Debian Security Team has announced a security vulnerability
-(DSA-6607-1) in the Advanced Package Tool (APT)[3]:
+On 2026-11-04, the Debian security team published DSA 6607-1, "apt
+security update" (CVE-2026-109518) [3]:
 | Max Justicz discovered a vulnerability in the APT package manager. APT
 | can merge two different package downloads after an HTTP redirect gives
-| them the same URI. Improper file handling when resuming an HTTP download
-| allows a man-in-the-middle attacker to replace a package after
-| verification, resulting in the execution of arbitrary code as root.
+| them the same URI. Improper file handling when resuming an HTTP
+| download allows a man-in-the-middle attacker to replace a package
+| after verification, resulting in the execution of arbitrary code as
+| root.
+
+Also see "APT-2026-11-01 security update." [4]
 
 Impact
 -------
 
-An attacker controlling an update mirror or being in position to
-modify network traffic can compromise Debian-based templates.
+An attacker who controls an update mirror or who can modify network
+traffic can attempt to exploit this vulnerability in order to compromise
+Debian and Whonix qubes.
 
 Affected systems
 -----------------
 
-Users who use Debian or Whonix VMs are affected. Users who use only
-Fedora VMs are not affected. Although we do not provide any other
-official or community APT-based templates, any other APT-based VMs that
-users have installed on their own should also be assumed to be affected.
+Qubes OS systems containing Debian and Whonix qubes are affected.
 
-Debian templates on Qubes OS use HTTPS to download updates by default,
-which eliminates the man-in-the-middle attack vector. But users that
-change the configuration to use plain HTTP (either for default
-repositories, or for 3rd-party ones) are still affected.
+Qubes OS systems containing only Fedora (or other non-APT-based) qubes
+are not affected.
 
 Discussion
-----------
+-----------
 
-Normally, we do not release Qubes Security Bulletins (QSBs) to address
-vulnerabilities that only affect VMs internally without affecting the
-rest of the Qubes system, i.e. vulnerabilities that do not undermine the
-Qubes security model.
+By default, the Advanced Package Tool (APT) verifies downloaded packages
+via signed repository metadata. This allows for using package
+repositories without having to trust the server hosting them or the
+transport method used to download them. The vulnerability under
+discussion breaks this mechanism. An attacker who successfully exploits
+this vulnerability can manipulate the packages that APT downloads and
+installs, potentially leading to complete compromise of the affected
+qube. A successful attack requires one or more of the following:
 
-The APT update bug discussed today is, however, somewhat special.
-While it is indeed a bug that only affects VMs internally, it could
-allow an attacker to compromise TemplateVMs, which are used as a basis
-for creating other VMs, such as AppVMs and ServiceVMs. If a TemplateVM
-is compromised, then all the VMs based on that TemplateVM will be
-compromised. Since AppVMs operate directly on user data, and since
-ServiceVMs can be critical to user privacy (especially in the case of
-Whonix and VPN ProxyVMs), this is a serious matter.
+ - The attacker controls the server on which the repository is hosted
+   (e.g., a third-party mirror).
 
-In Qubes OS, we take special precautions to make TemplateVMs difficult
-to compromise. For example, we block all network connections to and from
-templates, with one exception: We allow templates to connect to the
-so-called "Update Proxy" (which runs in the NetVM). This allows the
-TemplateVM to retrieve updates while protecting users from accidentally
-using TemplateVMs to perform risky activities, such as browsing the web.
+ - The transport mechanism is not authenticated (e.g., plain HTTP), and
+   the attacker can tamper with the connection to the server.
 
-Since the bug under discussion has the potential to subvert this very
-protection mechanism, we've decided to issue this QSB.
+ - An independent vulnerability allows the attacker to achieve one of
+   the above (e.g., exploiting a bug in the server or compromising a
+   trusted certificate authority (CA) or a digital certificate issued by
+   such an authority).
+
+In Qubes OS, Debian and Whonix qubes use HTTPS for APT repositories by
+default, which eliminates the second (man-in-the-middle) attack vector.
+(Users who have manually changed their configurations to use plain HTTP
+for any repositories are still affected. Users who have manually
+installed unofficial APT-based qubes besides Debian and Whonix are also
+affected.)
+
+Normally, we do not release Qubes security bulletins (QSBs) to address
+vulnerabilities that affect qubes only internally without affecting the
+rest of Qubes OS, since such vulnerabilities do not undermine the Qubes
+security model. (On the contrary, the security model is built on the
+assumption that such vulnerabilities are inevitable.)
+
+However, the vulnerability under discussion is somewhat special. While
+it affects qubes only internally, it could allow an attacker to
+compromise templates, which are used as a basis for creating other
+qubes, such as app and service qubes. If a template is compromised, then
+all the qubes based on that template will also be compromised. App qubes
+operate directly on user data, and service qubes can affect user privacy
+(e.g., Whonix and VPN proxy qubes).
+
+In Qubes OS, we take special precautions to make templates difficult to
+compromise. For example, we block all network connections to and from
+templates, with one exception: We allow templates to connect to an
+"update proxy" that allows the template to retrieve updates while
+protecting users from accidentally using templates to perform risky
+activities, such as browsing the web.
+
+Since the vulnerability under discussion has the potential to subvert
+these defenses, and since we can address it via the Qubes update system,
+we've decided to issue this QSB and its attendant security updates.
 
 Patching
 ---------
@@ -79,20 +110,15 @@ vulnerabilities described in this bulletin:
   - qubes-core-dom0-linux 4.3.25
   - qubes-mgmt-salt-dom0-update 4.3.4
 
-Those packages apply the fix using Qubes's supported update methods[1].
-Users updating their Debian-based templates some other way need to
-follow upstream recommendations manually.
-
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages should be installed
-via the Qubes Update tool or its command-line equivalents. [1]
+by the community. [2] Once available, follow the instructions in the
+"User action" section above in order to apply them properly.
 
 Credits
 --------
 
-The vulnerability was discovered by Max Justicz and reported to the
-Debian Security Team.
+See the Debian and APT security advisories. [3][4]
 
 References
 -----------
@@ -100,6 +126,7 @@ References
 [1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
 [2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
 [3] https://lists.debian.org/debian-security-announce/2026/msg00526.html
+[4] https://lists.debian.org/deity/2026/11/msg00005.html
 
 --
 The Qubes Security Team

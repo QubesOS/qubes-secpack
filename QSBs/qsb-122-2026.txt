@@ -8,15 +8,25 @@
 User action
 ------------
 
-Once the security updates described in the "Patching" section below
-become available to your Qubes OS system, you must take the following
-actions in the order listed:
+If you update Qubes OS using the Qubes Update tool, continue to update
+normally in order to receive the security updates described in the
+"Patching" section below.
 
-1. Update only dom0 (without any other qubes) via the Qubes Update tool
-   or `qubes-dom0-update` in a dom0 terminal. [1]
-2. Update all Debian and Whonix templates and standalones via the Qubes
-   Update tool or `qubes-vm-update` in a dom0 terminal. [1]
-3. Restart all Debian and Whonix qubes.
+If you update Qubes OS using command-line tools instead of the Qubes
+Update tool, you must first update dom0 by itself (without any other
+qubes) via `qubes-dom0-update` in a dom0 terminal. Only after dom0 has
+been successfully updated should you update all Debian and Whonix
+templates and standalones via `qubes-vm-update` in a dom0 terminal. (The
+Qubes Update tool automatically handles updating in the correct order.)
+
+Do not attempt to update any qube using the `apt` command directly, as
+this bypasses built-in Qubes OS update security measures. Use only the
+Qubes Update tool or its command-line equivalents in the order described
+above. [1]
+
+After updating dom0 and all Debian and Whonix templates and standalones,
+we recommend restarting all Debian and Whonix qubes to ensure the
+updates take effect.
 
 Summary
 --------
@@ -116,8 +126,8 @@ way.
 
 These packages will migrate from the security-testing repository to the
 current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, follow the instructions in the
-"User action" section above in order to apply them properly.
+by the community. [2] Once available, the packages should be installed
+as described in the "User action" section above.
 
 Credits
 --------

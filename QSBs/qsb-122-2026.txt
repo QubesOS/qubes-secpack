@@ -12,8 +12,10 @@ Once the security updates described in the "Patching" section below
 become available to your Qubes OS system, you must take the following
 actions in the order listed:
 
-1. Update dom0 normally. [1]
-2. Update all Debian and Whonix templates and standalones normally. [1]
+1. Update only dom0 (without any other qubes) via the Qubes Update tool
+   or `qubes-dom0-update` in a dom0 terminal. [1]
+2. Update all Debian and Whonix templates and standalones via the Qubes
+   Update tool or `qubes-vm-update` in a dom0 terminal. [1]
 3. Restart all Debian and Whonix qubes.
 
 Summary
@@ -103,8 +105,10 @@ we've decided to issue this QSB and its attendant security updates.
 Patching
 ---------
 
-The following packages contain security updates that address the
-vulnerabilities described in this bulletin:
+The packages below contain security updates to the Qubes update tools
+that address the vulnerability described in this bulletin. After these
+updates are applied, the Qubes update tools will update APT in a safe
+way.
 
   For Qubes 4.3, in dom0:
   - qubes-core-dom0-linux 4.3.25

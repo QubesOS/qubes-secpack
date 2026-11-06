@@ -1,7 +1,7 @@
 
              ---===[ Qubes Security Bulletin 122 ]===---
 
-                              2026-11-04
+                              2026-11-06
 
             Package verification bypass in APT (DSA-6607-1)
 

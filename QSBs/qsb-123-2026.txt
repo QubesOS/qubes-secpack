@@ -22,29 +22,29 @@ XSA-524 [5] "AMD IOMMU Out-of-Bounds Device Table Read":
 | With AMD IOMMUs, the OS or Hypervisor chooses the position and size of
 | the Device Table, which holds the main configuration information for
 | devices.
-| 
+|
 | AMD have disclosed a vulnerability in some IOMMUs, whereby under
 | specific circumstances they read beyond the size chosen by the OS or
 | Hypervisor.  This gets interpreted as valid configuration data for
 | certain devices.
-| 
+|
 | For more information, see:
 |   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3060.html
 
 XSA-525 [6] "x86: Transient Scheduler Attacks (update)":
 
 | AMD have discovered further properties of Transient Scheduler Attacks.
-| 
+|
 | The previously published XSA-471 dealt with two TSA variants, TSA-SQ
 | and TSA-L1 on Zen3 and Zen4 CPUs.  For details, see XSA-471.
-| 
+|
 | AMD had previously said that Zen5 CPUs were not vulnerable to TSA-SQ and
 | TSA-L1.  This statement has been corrected, and is being tracked as
 | AMD-SB-7073 using the existing CVE-2024-36350 and CVE-2024-36357.
-| 
+|
 | AMD have also disclosed a new TSA variant, TSA-Fill, which is being
 | tracked as AMD-SB-3031 and CVE-2026-0004.
-| 
+|
 | For more information, see:
 |   https://xenbits.xen.org/xsa/advisory-471.html
 |   https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
@@ -54,20 +54,20 @@ XSA-525 [6] "x86: Transient Scheduler Attacks (update)":
 Impact
 -------
 
-XSA-524: On affected systems, a malicious qube may be able to
-compromise Qubes OS by writing to arbitrary memory page.
+XSA-524: On affected systems, a malicious qube may be able to compromise
+Qubes OS by writing to arbitrary memory page.
 
-XSA-525: On affected systems, a malicious qube may be able to leak
-data from other qubes in the system.
+XSA-525: On affected systems, a malicious qube may be able to leak data
+from other qubes in the system.
 
 Affected systems
 -----------------
 
-XSA-524: Some of the AMD EPYC CPUs are affected (see AMD
-advisory [7] for details), additionally with specific devices
-configuration (see Xen advisory [5]). 
+XSA-524: Some AMD EPYC CPUs are affected (see AMD advisory [7] for
+details), additionally the system needs a specific device configuration
+to be affected (see Xen advisory [5]).
 
-XSA-525: AMD Zen5 CPUs are affected.
+XSA-525: AMD Zen 5 CPUs are affected.
 
 Patching
 ---------

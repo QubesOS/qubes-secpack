@@ -3,7 +3,7 @@
 
                               2026-11-10
 
-                  AMD CPU issues (XSA-524, XSA-525)
+              AMD CPU vulnerabilities (XSA-524, XSA-525)
 
 User action
 ------------
@@ -55,7 +55,7 @@ Impact
 -------
 
 XSA-524: On affected systems, a malicious qube may be able to compromise
-Qubes OS by writing to arbitrary memory page.
+Qubes OS by writing to arbitrary memory pages.
 
 XSA-525: On affected systems, a malicious qube may be able to leak data
 from other qubes in the system.
@@ -63,11 +63,13 @@ from other qubes in the system.
 Affected systems
 -----------------
 
-XSA-524: Some AMD EPYC CPUs are affected (see AMD advisory [7] for
-details), additionally the system needs a specific device configuration
-to be affected (see Xen advisory [5]).
+XSA-524: Some AMD EPYC CPUs are affected (see AMD-SB-3060 [7] for
+details). Only systems with a specific device configuration are affected
+(see XSA-524 [5] for details).
 
 XSA-525: AMD Zen 5 CPUs are affected.
+
+In both cases, Intel CPUs are not affected.
 
 Patching
 ---------

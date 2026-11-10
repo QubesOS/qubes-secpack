@@ -1,0 +1,122 @@
+
+             ---===[ Qubes Security Bulletin 123 ]===---
+
+                              2026-11-10
+
+                  AMD CPU issues (XSA-524, XSA-525)
+
+User action
+------------
+
+Continue to update normally via the Qubes Update tool or its
+command-line equivalents [1] in order to apply the security updates
+described in the "Patching" section below.
+
+Summary
+--------
+
+On 2026-11-10, the Xen Project published the security advisories below.
+
+XSA-524 [5] "AMD IOMMU Out-of-Bounds Device Table Read":
+
+| With AMD IOMMUs, the OS or Hypervisor chooses the position and size of
+| the Device Table, which holds the main configuration information for
+| devices.
+| 
+| AMD have disclosed a vulnerability in some IOMMUs, whereby under
+| specific circumstances they read beyond the size chosen by the OS or
+| Hypervisor.  This gets interpreted as valid configuration data for
+| certain devices.
+| 
+| For more information, see:
+|   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3060.html
+
+XSA-525 [6] "x86: Transient Scheduler Attacks (update)":
+
+| AMD have discovered further properties of Transient Scheduler Attacks.
+| 
+| The previously published XSA-471 dealt with two TSA variants, TSA-SQ
+| and TSA-L1 on Zen3 and Zen4 CPUs.  For details, see XSA-471.
+| 
+| AMD had previously said that Zen5 CPUs were not vulnerable to TSA-SQ and
+| TSA-L1.  This statement has been corrected, and is being tracked as
+| AMD-SB-7073 using the existing CVE-2024-36350 and CVE-2024-36357.
+| 
+| AMD have also disclosed a new TSA variant, TSA-Fill, which is being
+| tracked as AMD-SB-3031 and CVE-2026-0004.
+| 
+| For more information, see:
+|   https://xenbits.xen.org/xsa/advisory-471.html
+|   https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
+|   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7073.html
+|   https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3031.html
+
+Impact
+-------
+
+XSA-524: On affected systems, a malicious qube may be able to
+compromise Qubes OS by writing to arbitrary memory page.
+
+XSA-525: On affected systems, a malicious qube may be able to leak
+data from other qubes in the system.
+
+Affected systems
+-----------------
+
+XSA-524: Some of the AMD EPYC CPUs are affected (see AMD
+advisory [7] for details), additionally with specific devices
+configuration (see Xen advisory [5]). 
+
+XSA-525: AMD Zen5 CPUs are affected.
+
+Patching
+---------
+
+The following packages contain security updates that address the
+vulnerabilities described in this bulletin:
+
+  For Qubes 4.3, in dom0:
+  - Xen packages, 4.19.6-4
+
+These packages will migrate from the security-testing repositories to
+the current (stable) repositories after being tested by the community.
+This testing period is intended to catch bugs affecting Qubes OS
+stability before the packages reach the broader userbase. By default,
+the security-testing repositories are disabled in both dom0 and
+templates. If you wish to receive security updates faster at the risk of
+encountering more bugs, you can enable the security-testing repositories
+either temporarily (for a single update) or permanently. [2] Dom0,
+templates, and standalones each have their own security-testing
+repositories, which can be enabled independently of one another. [3][4]
+If you do not have the relevant security-testing repositories enabled
+while security updates are in security-testing, you must wait until they
+migrate to the current (stable) repositories, which generally takes one
+to two weeks but may be expedited in urgent cases. Once the packages are
+available to your Qubes OS system, you should install them as described
+in the "User action" section above.
+
+After you have installed the packages listed above, you must restart
+dom0 in order for the security updates to take effect.
+
+If you use Anti Evil Maid, you must reseal your secret passphrase to new
+PCR values, as PCR18+19 changes when Xen binaries are updated.
+
+Credits
+--------
+
+See the original Xen Security Advisories. [5][6]
+
+References
+-----------
+
+[1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html#updates
+[3] https://doc.qubes-os.org/en/latest/user/advanced-topics/how-to-install-software-in-dom0.html#testing-repositories
+[4] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-install-software.html#testing-repositories
+[5] https://xenbits.xen.org/xsa/advisory-524.html
+[6] https://xenbits.xen.org/xsa/advisory-525.html
+[7] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3060.html
+
+--
+The Qubes Security Team
+https://www.qubes-os.org/security/

@@ -3,7 +3,7 @@
 
                              2026-11-13
 
-                Partial filtering bypass in Split-gpg2
+                Partial filtering bypass in split-gpg2
 
 User action
 ------------
@@ -15,35 +15,54 @@ described in the "Patching" section below.
 Summary
 --------
 
-Split-gpg2 filters incoming gpg-agent commands by parsing them, and
-then re-constructing allowed commands, possibly removing/replacing
-some of its parts. While the input command length is properly
-enforced, the command sent to the real gpg-agent after parsing and
-re-constructing may be longer than the 1002 characters limit defined by
-the GnuPG Assuan protocol. Such too long command sent as a response to
-an "INQUIRY" results in gpg-agent ignoring initial 1002 characters and
-executing rest of the line as a next command, bypassing split-gpg2
-command filtering.
+Split-gpg2 filters incoming gpg-agent commands by parsing them, and then
+re-constructing allowed commands, possibly removing/replacing some of
+its parts. Due to a bug it was possible to send lines that exceed the
+line length limit of the protocol. Combined with GnuPG's handling of
+such overlong lines this allows injection of commands that the
+split-gpg2 normal filtering would not allow.
 
 Impact
 -------
 
 In the supported configuration, a malicious qube can make gpg-agent
-display a password prompt with arbitrary text, and receive response
-that user entered. Such prompt will have window borders of the backend
-(AKA vault) qube, so it will look like a safe place to enter the
-passphrase.
+display a password prompt with arbitrary text, and receive the response
+that the user entered. Such prompt will have window borders of the
+backend (for example vault) qube, so it will look like a safe place to
+enter the passphrase.
+
 This vulnerability may be used to exploit some further hypothetical
 GnuPG issue, that normally would be prevented by the Splig-gpg2
 filtering.
+
 In the standard configuration, this issue does not allow extracting or
 manipulating secret keys, since Split-gpg2 uses an "extra" gpg-agent
 socket that has limited capabilities.
 
+Technical details
+------------------
+
+When checking incomming "D" commands in responses to an "INQUIRY" from
+the gpg-agent split-gpg2 allowed unescaped "%" characters. When sending
+those to the gpg-agent it would correctly escape them ("%25") as
+required by the protocol. This means the length of the lines increases.
+Therefore it sends a line that can exceed the line length limit (which
+it correctly checks on incomming lines).
+
+When receiving overlong lines the behavior of GnuPG's gpg-agent
+implementation depends on the context. For normal commands it treat it
+as an fatal error. But for "INQUIRY" responses it just aborts the
+command that initiated the "INQUIRY" with an error response and then
+treats the part of the line exeecing the limit as a new line that it
+will regularly parse as a command.
+
 Affected systems
 -----------------
 
-All versions of split-gpg2 (split-gpg2 package) are affected.
+All supported version of QubesOS are affected. Only users of split-gpg2
+(split-gpg2 package) are affected. All recent versions of split-gpg2 are
+affected.
+
 Split-gpg2 is a different component than Split-gpg (qubes-gpg-split
 package)
 

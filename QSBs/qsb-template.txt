@@ -9,9 +9,9 @@ User action
 ------------
 
 TODO:
-Continue to update normally [1] in order to receive the security updates
-described in the "Patching" section below. No other user action is
-required in response to this QSB.
+Continue to update normally via the Qubes Update tool or its
+command-line equivalents [1] in order to apply the security updates
+described in the "Patching" section below.
 
 Summary
 --------
@@ -34,22 +34,33 @@ Patching
 The following packages contain security updates that address the
 vulnerabilities described in this bulletin:
 
-  For Qubes 4.2, in TODO:
+  For Qubes TODO, in TODO:
   - TODO
 
-These packages will migrate from the security-testing repository to the
-current (stable) repository over the next two weeks after being tested
-by the community. [2] Once available, the packages should be installed
-via the Qubes Update tool or its command-line equivalents. [1]
+These packages will migrate from the security-testing repositories to
+the current (stable) repositories after being tested by the community.
+This testing period is intended to catch bugs affecting Qubes OS
+stability before the packages reach the broader userbase. By default,
+the security-testing repositories are disabled in both dom0 and
+templates. If you wish to receive security updates faster at the risk of
+encountering more bugs, you can enable the security-testing repositories
+either temporarily (for a single update) or permanently. [2] Dom0,
+templates, and standalones each have their own security-testing
+repositories, which can be enabled independently of one another. [3][4]
+If you do not have the relevant security-testing repositories enabled
+while security updates are in security-testing, you must wait until they
+migrate to the current (stable) repositories, which generally takes one
+to two weeks but may be expedited in urgent cases. Once the packages are
+available to your Qubes OS system, you should install them as described
+in the "User action" section above.
 
 TODO:
-Dom0 must be restarted afterward in order for the updates to take
-effect.
+After you have installed the packages listed above, you must restart
+dom0 in order for the security updates to take effect.
 
 TODO:
-If you use Anti Evil Maid, you will need to reseal your secret
-passphrase to new PCR values, as PCR18+19 will change due to the new Xen
-binaries.
+If you use Anti Evil Maid, you must reseal your secret passphrase to new
+PCR values, as PCR18+19 changes when Xen binaries are updated.
 
 Credits
 --------
@@ -60,7 +71,9 @@ References
 -----------
 
 [1] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-update.html
-[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html
+[2] https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/testing.html#updates
+[3] https://doc.qubes-os.org/en/latest/user/advanced-topics/how-to-install-software-in-dom0.html#testing-repositories
+[4] https://doc.qubes-os.org/en/latest/user/how-to-guides/how-to-install-software.html#testing-repositories
 TODO
 
 --

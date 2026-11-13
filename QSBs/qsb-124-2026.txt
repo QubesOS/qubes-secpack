@@ -15,74 +15,82 @@ described in the "Patching" section below.
 Summary
 --------
 
-Split-gpg2 filters incoming gpg-agent commands by parsing them, and then
-re-constructing allowed commands, possibly removing/replacing some of
-its parts. Due to a bug it was possible to send lines that exceed the
-line length limit of the protocol. Combined with GnuPG's handling of
-such overlong lines this allows injection of commands that the
-split-gpg2 normal filtering would not allow.
+Split-gpg2 filters incoming gpg-agent commands by parsing them and then
+reconstructing allowed commands, in some cases by removing or replacing
+some of their parts. Due to a bug, it is possible for lines to be sent
+that exceed the line length limit of the protocol. Combined with GnuPG's
+handling of such overlong lines, this allows commands to be injected
+that split-gpg2's filtering would normally not allow.
 
 Impact
 -------
 
-In the supported configuration, a malicious qube can make gpg-agent
-display a password prompt with arbitrary text, and receive the response
-that the user entered. Such prompt will have window borders of the
-backend (for example vault) qube, so it will look like a safe place to
-enter the passphrase.
+In the supported split-gpg2 configuration, a malicious qube can cause
+the gpg-agent to display a password prompt with arbitrary text and
+receive the response that the user enters. Such a prompt would have the
+window borders of the backend (for example, vault) qube, so an attacker
+could use this to try to trick the user into entering a passphrase.
 
-This vulnerability may be used to exploit some further hypothetical
-GnuPG issue, that normally would be prevented by the Splig-gpg2
-filtering.
+However, if the user's PGP key does not have a passphrase, then such a
+request might not make sense (e.g., the user might be confused about the
+passphrase being requested and may not have one to provide). Moreover,
+in the supported configuration, the vulnerability under discussion does
+not allow for extracting or manipulating secret keys, since split-gpg2
+uses an "extra" gpg-agent socket that has limited capabilities.
+Therefore, even if the user's PGP key does have a passphrase, and even
+if the attacker manages to steal that passphrase, the passphrase should
+be useless to the attacker without the secret key.
 
-In the standard configuration, this issue does not allow extracting or
-manipulating secret keys, since Split-gpg2 uses an "extra" gpg-agent
-socket that has limited capabilities.
-
-Technical details
-------------------
-
-When checking incomming "D" commands in responses to an "INQUIRY" from
-the gpg-agent split-gpg2 allowed unescaped "%" characters. When sending
-those to the gpg-agent it would correctly escape them ("%25") as
-required by the protocol. This means the length of the lines increases.
-Therefore it sends a line that can exceed the line length limit (which
-it correctly checks on incomming lines).
-
-When receiving overlong lines the behavior of GnuPG's gpg-agent
-implementation depends on the context. For normal commands it treat it
-as an fatal error. But for "INQUIRY" responses it just aborts the
-command that initiated the "INQUIRY" with an error response and then
-treats the part of the line exeecing the limit as a new line that it
-will regularly parse as a command.
+In theory, this vulnerability could also be used to exploit some further
+hypothetical GnuPG vulnerability that normally would have been prevented
+by split-gpg2's filtering.
 
 Affected systems
 -----------------
 
-All supported version of QubesOS are affected. Only users of split-gpg2
-(split-gpg2 package) are affected. All recent versions of split-gpg2 are
-affected.
+All supported Qubes OS releases are affected. Only users of split-gpg2
+(i.e., the `split-gpg2` package) are affected. All recent versions of
+split-gpg2 are affected.
 
-Split-gpg2 is a different component than Split-gpg (qubes-gpg-split
-package)
+Note: split-gpg2 is a distinct component from split-gpg1 (i.e., the
+`qubes-gpg-split` package).
 
-Note about not security supported configuration
------------------------------------------------
+Technical details
+------------------
 
-It is possible to enable `allow_keygen` option in the split-gpg2
-config, as documented in the README[5] file:
+When checking incoming "D" commands in response to an "INQUIRY" from the
+gpg-agent, split-gpg2 allows unescaped "%" characters. When sending
+these to the gpg-agent, split-gpg2 correctly escapes them ("%25") as
+required by the protocol. This increases the lengths of lines containing
+such characters. Therefore, split-gpg2 can send lines that exceed the
+line length limit (which it correctly checks on incoming lines).
+
+When receiving overlong lines, the behavior of GnuPG's gpg-agent
+implementation depends on the context. For normal commands, they are
+treated as fatal errors. However, for "INQUIRY" responses, the command
+that initiated the "INQUIRY" is simply aborted with an error response.
+The part of the line exceeding the limit is then treated as a new line
+that is parsed normally as a command.
+
+While the vulnerability under discussion does not allow an attacker to
+extract secret keys in the supported configuration, it is possible for
+the user to manually set up an unsupported configuration that does allow
+an attacker to extract secret keys. In particular, the user can enable
+the `allow_keygen` option in the split-gpg2 config, as documented in the
+README [5]:
 
     ## Allow key generation
 
-    By setting `allow_keygen = yes` in `qubes-split-gpg2.conf` you can allow the client to generate new keys.
-    Normal usage should not need this.
+    By setting `allow_keygen = yes` in `qubes-split-gpg2.conf` you can
+    allow the client to generate new keys. Normal usage should not need
+    this.
 
-    **Warning**: This feature is new and not much tested.
-    Therefore it's not security supported!
+    **Warning**: This feature is new and not much tested. Therefore it's
+    not security supported!
 
-As noted above, such configuration is not security supported.
-When this option is enabled, this vulnerability allows malicious qube
-to extract secret keys.
+Again, as stated in the quoted text above, this configuration is not
+security supported. It is mentionned here only for the sake of
+completeness.
 
 Patching
 ---------
@@ -110,8 +118,8 @@ to two weeks but may be expedited in urgent cases. Once the packages are
 available to your Qubes OS system, you should install them as described
 in the "User action" section above.
 
-After you have installed the packages listed above, you must shutdown
-relevant templates and restart vault qubes where split-gpg2 is used.
+After you have installed the packages listed above, you must shut down
+the relevant templates and restart all split-gpg2 backend qubes.
 
 Credits
 --------
